@@ -261,7 +261,7 @@ shows these entries but they do nothing, see the experimental
 - **Flash part:** unknown; updater addresses a window ending at `0x3EFFFF` → at least 4 MB (32 Mbit).
 - **USB control endpoint:** Realtek vendor HID, `0BDA:1100`.
 - **APCS logic:** fires on exact 4-hour multiples (modulo, not a threshold) — that's why searching for a plain `≥ 4 h` comparison never found it.
-- **Bug (confirmed signature):** after APCS completes, the next power-on immediately shows "Please turn off the power for panel protection…" — a request flag the completion path fails to clear on one branch. The likely cause is a **shared completion path**: the AOCS consumer also runs the APCS completion helper (`0xE5BD`), which clears the APCS request bit, copies hours, and increments the APCS counter even though no APCS ran. Both bits are eventually cleared, so this is a bookkeeping bug rather than a missing clear.
+- **Bookkeeping defect (confirmed in code, visible effect not proven):** the AOCS consumer at bank 18 `0x92F1` calls the APCS completion helper `0xE5BD` on its normal path. `0xE5BD` clears the APCS request bit, copies the current panel hours into the last-APCS record (`0xD12E`/`0xD12F`), and increments the APCS completion counter (`0xD131`). The AOCS path does not re-check the APCS bit before that call, so an AOCS-only request can be recorded as an APCS completion. That is a real bookkeeping error, but it is **not** a proven cause of the power-on popup: updating the last-APCS timestamp would tend to suppress APCS requests, not create extra ones. The power-on nag is better explained by the stock 4 h APCS / 36 h reminder schedule plus the minute-slot check at bank 13 `0xCB1A`–`0xCB2D`.
 
 ### Firmware images held / hashed (5 builds)
 
@@ -269,12 +269,28 @@ F04, F05 Beta, F06 (2022-08-19), F08/F08b (2022-11-15), plus OSD Sidekick B21.07
 
 ### Goals for feature expansion
 
-- Fix the APCS completion bookkeeping (the AOCS path double-counts APCS via `0xE5BD`).
+- Audit and fix the APCS completion bookkeeping in the AOCS path (`0xE5BD`).
 - Unlock ADCS in the normal OSD menu (no service mode).
 - Make AOCS trigger reliably.
 - Reduce ASBL aggressiveness / allow disabling persistently.
 - Fix FreeSync frame-rate drops and HDR color issues.
 - Allow APCS interval tuning (e.g., 36 h like F08b, or user-configurable).
+
+### Feature ideas (ranked by what is actually reachable)
+
+| Idea | Feasibility | Notes |
+|---|---|---|
+| Build-time APCS/AOCS/reminder presets | **Done** | `analysis/build_custom.py`; no new UI risk. |
+| Direct **APCS / AOCS now** from the service menu | **Done (experimental)** | `--menu-actions`; uses the existing service labels and the real `0xD12D` bits. |
+| "No-nag" profile (36 h APCS, reminder off) | **Done (experimental)** | `F08-menu-no-nag.bin`. |
+| Show panel hours / last refresh in the service menu | Medium | Data is already in XDATA (`0xD13D`, `0xD12E`); needs a numeric/text renderer and one menu item. |
+| Persistent user settings in NVRAM | Medium-hard | The panel timer at `0xD130`–`0xD13F` is persistent, but the NVRAM block layout and save trigger are not fully mapped. |
+| ADCS in the normal OSD | Medium-hard | Handler and string exist (service item 28/29); the normal menu page and visibility gate are unknown. |
+| ASBL/ABL tuning | Hard/risky | Must preserve OLED protection; needs hardware measurement. |
+| Custom boot logo / OSD theme | Medium | Needs the logo/asset format mapped first. |
+| Faster input auto-switch / wake | Medium | HDMI/DP hotplug logic; regression risk. |
+| Per-mode HDR brightness presets | Medium | Brightness is stored per SDR/HDR domain; a menu preset is plausible. |
+| Panel overclock / permanent ABL defeat | **Not recommended** | Risks panel damage and defeats the protection the firmware is trying to provide. |
 
 ### Progress since the first release
 
@@ -296,20 +312,40 @@ F04, F05 Beta, F06 (2022-08-19), F08/F08b (2022-11-15), plus OSD Sidekick B21.07
 
 ### Patched firmware variants (experimental)
 
-`analysis/build_variant.py` reproduces three variants from the original F08
-image, with every patch checked against the expected original bytes:
+`analysis/build_variant.py` reproduces the first three variants and
+`analysis/build_custom.py` reproduces the menu variants, with every patch
+checked against the expected original bytes:
 
 | Variant | MD5 | What it changes |
 |---|---|---|
 | `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`). Intended to make the service-menu APCS/AOCS actions work in normal mode. |
 | `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` plus APCS every 2 h, AOCS every 750 h, reminder after 12 h. |
 | `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` plus APCS every 36 h — the public F08b popup fix, for fewer interruptions. |
+| `F08-menu.bin` | `fcab11e12a855fe7d7f3622b7b38410e` | `F08-unlock` plus **service-menu actions**: selecting **APCS** / **AOCS** sets the real `0xD12D` request bit. Stock schedule. |
+| `F08-menu-quiet.bin` | `b9716bc3c916492909503d7f5586343e` | `F08-menu` plus APCS every 36 h. |
+| `F08-menu-no-nag.bin` | `1034a9dcc86f19dc1ae3ab35ef88c040` | `F08-menu-quiet` plus the 36 h reminder disabled. Least intrusive. |
+| `F08-menu-care.bin` | `fdb1a011dfed7b3fed2f0df9f3d666e7` | `F08-menu` plus APCS 8 h, AOCS 750 h, reminder 12 h. |
 
-> ⚠️ **Neither variant has been flashed on hardware.** The service-menu gate
-> removal is a hypothesis: it is confirmed that the gate exists, not confirmed
-> that it is the only thing blocking the menu actions. Keep the original image
-> (`d4324c6c88abea48b1ee896f7e14ee9f`) and read
+`analysis/build_custom.py` builds these and any other combination:
+
+```powershell
+python analysis/build_custom.py --verify
+python analysis/build_custom.py --preset all
+python analysis/build_custom.py --name F08-my-care --unlock --menu-actions `
+    --apcs 8 --aocs 750 --tss 12
+```
+
+> ⚠️ **None of these variants has been flashed on hardware.** The service-menu
+> gate removal is a hypothesis: it is confirmed that the gate exists, not
+> confirmed that it is the only thing blocking the menu actions. Keep the
+> original image (`d4324c6c88abea48b1ee896f7e14ee9f`) and read
 > [`firmware/PATCHED/README.md`](firmware/PATCHED/README.md) before trying them.
+>
+> **On the enhanced menu request:** the service-menu APCS/AOCS entries are now
+> real action buttons, but the normal OSD still has no panel-care settings
+> page. A fully in-monitor settings page needs NVRAM persistence, a numeric
+> value renderer, and hardware testing; the build-time builder is the safe
+> path until that work is done.
 
 ### Local decompilation quickstart
 
@@ -351,13 +387,20 @@ From the reverse-engineering thread — owners can verify:
 │   └── PATCHED/
 │       ├── F08-unlock.bin             # experimental: APCS/AOCS command gate removed
 │       ├── F08-care.bin               # experimental: unlock + faster care schedule
+│       ├── F08-quiet.bin              # experimental: unlock + APCS 36 h
+│       ├── F08-menu.bin               # experimental: unlock + service-menu actions
+│       ├── F08-menu-quiet.bin         # experimental: menu actions + APCS 36 h
+│       ├── F08-menu-no-nag.bin        # experimental: menu actions + APCS 36 h + no reminder
+│       ├── F08-menu-care.bin          # experimental: menu actions + APCS 8 h / AOCS 750 h / 12 h
 │       ├── *.bin.md5                  # checksums for the variants
-│       └── MANIFEST.md                # generated patch manifest
+│       ├── MANIFEST.md                # generated manifest (fixed variants)
+│       └── MANIFEST-custom.md         # generated manifest (custom builder presets)
 ├── analysis/
 │   ├── README.md                      # reverse-engineering notes (strings, banks, panel logic)
 │   ├── panel_protection.md            # APCS/AOCS/TSS write-up
 │   ├── osd_strings.py / osd_strings.txt   # decoded 310-entry OSD string table
-│   ├── build_variant.py               # reproducible patched-firmware builder
+│   ├── build_variant.py               # reproducible fixed-variant builder
+│   ├── build_custom.py                # configurable builder (APCS/AOCS/TSS + menu actions)
 │   ├── patch.py                       # extract/reassemble/patch scaffold
 │   └── banks/bank_0..19.bin           # per-bank 64 KB code extracts
 ├── osd-sidekick/

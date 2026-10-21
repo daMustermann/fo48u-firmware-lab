@@ -198,10 +198,16 @@ The AOCS consumer calls **both** paths:
 
 So an AOCS completion also performs the APCS bookkeeping and increments the
 **APCS** counter (`0xD131`), even though no APCS ran. This shared-path
-double-count is the most likely source of the reported "APCS completion flag"
-symptom: the request and the last-hours timestamp are updated on a path that
-is not the APCS path. It is a **bookkeeping** issue, not a missing clear —
-the code does clear both bits eventually.
+double-count is a **bookkeeping defect**: the request and the last-hours
+timestamp are updated on a path that is not the APCS path. It is not a missing
+clear — the code does clear both bits eventually.
+
+Its visible effect is **not proven**. `0xE5BD` also copies the current panel
+hours into `0xD12E`/`0xD12F` (the last-APCS record), which would tend to
+*suppress* a future APCS request, not create an extra popup. The power-on
+"panel refresh needed" nag is better explained by the stock 4 h APCS / 36 h
+reminder schedule and the minute-slot check at `0xCB1A`–`0xCB2D`. Treat the
+`0xE5BD` call as a candidate cleanup, not as a confirmed popup fix.
 
 ### APCS run-time / start — bank 18 `0xC499`
 
@@ -277,10 +283,12 @@ Offsets are **file offsets** = `bank * 0x10000 + address`.
 | APCS interval (hours) | `13:0xCAA8` | `94 04` | `subb a,#4` |
 | AOCS period (hours) | `13:0xCAD3` | `7C 05 7D DC` | `mov r4,#5; mov r5,#0xDC` |
 | TSS reminder (hours) | `13:0xCB1A` | `94 24` | `subb a,#0x24` |
-| TSS popup minute slot | `13:0xCB3?` | `E5 85` | reads `0xD385` |
+| TSS popup minute slot | `13:0xCB29` | `90 D3 85` | loads `0xD385`, compared at `0xCB2D` |
 | Force APCS request | `13:0xCAB7` | `44 01` | `orl a,#1` |
 | Force AOCS request | `13:0xCAE9` | `44 02` | `orl a,#2` |
 | Both requests (mailbox) | `19:0x80BD` | `44 03` | `orl a,#3` |
+| Service-menu APCS key path | `9:0xA161` | `90 C6 93` | redirect to trampoline at `0xFEFA` |
+| Service-menu AOCS key path | `9:0xA1D5` | `90 C6 93` | redirect to trampoline at `0xFF08` |
 
 A patch that starts APCS on demand must either:
 

@@ -21,6 +21,10 @@ These images are **unofficial modifications** of
 | `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD` and `0x68BD`). Schedule unchanged. |
 | `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` plus APCS every 2 h, AOCS every 750 h, and the panel-care reminder after 12 h. |
 | `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` plus APCS every 36 h, matching the public F08b popup fix (fewer interruptions). |
+| `F08-menu.bin` | `fcab11e12a855fe7d7f3622b7b38410e` | `F08-unlock` plus the **service-menu action patch**: selecting **APCS** or **AOCS** now sets the real `0xD12D` request bit before the stock handler runs. Stock schedule. |
+| `F08-menu-quiet.bin` | `b9716bc3c916492909503d7f5586343e` | `F08-menu` plus APCS every 36 h (the F08b popup interval). |
+| `F08-menu-no-nag.bin` | `1034a9dcc86f19dc1ae3ab35ef88c040` | `F08-menu-quiet` plus the 36 h panel-care reminder disabled (`0xFF`). Least intrusive profile. |
+| `F08-menu-care.bin` | `fdb1a011dfed7b3fed2f0df9f3d666e7` | `F08-menu` plus APCS every 8 h, AOCS every 750 h, reminder after 12 h. Aggressive care profile. |
 
 All variants are 2,031,616 bytes (31 × 64 KiB banks), the same size as the
 original.
@@ -88,6 +92,89 @@ Bank 13 `0xCB1A`: `94 24` (`subb a,#0x24`) → `94 0C` (`subb a,#0x0C`).
 The "time to screen saver"/panel-care reminder appears after 12 h instead of
 36 h.
 
+### `menu-actions` (all `F08-menu-*` variants)
+
+The stock service menu already shows **APCS** (item 23, handler `0xA14C`) and
+**AOCS** (item 24, handler `0xA1C0`). Those handlers have two paths:
+
+- `R5 == 0` — draw/status path, left untouched;
+- `R5 != 0` — key path, which toggles internal test bits (`0x0BAD` / `0x0BAE`)
+  but does **not** set the real request flag `0xD12D`.
+
+The patch redirects only the key path through a 14-byte trampoline in erased
+bank-9 flash:
+
+| Site | Original | Patched |
+|---|---|---|
+| bank 9 `0xA161` | `90 C6 93` (`mov dptr,#0xC693`) | `02 FE FA` (`ljmp 0xFEFA`) |
+| bank 9 `0xA1D5` | `90 C6 93` (`mov dptr,#0xC693`) | `02 FF 08` (`ljmp 0xFF08`) |
+
+The trampolines do:
+
+```
+0xFEFA  mov  dptr,#0xD12D
+0xFEFD  movx a,@dptr
+0xFEFE  orl  a,#1          ; APCS request
+0xFF00  movx @dptr,a
+0xFF01  mov  dptr,#0xC693  ; restore the original handler state
+0xFF04  movx a,@dptr
+0xFF05  ljmp 0xA165        ; continue the stock key path
+```
+
+and the same with `orl a,#2` / `ljmp 0xA1D9` at `0xFF08` for AOCS.
+
+This is additive: the original handler still runs, and the `0xD12D` bits are
+idempotent. If the stock handler already did something useful, it still does.
+The request is **volatile** — it runs the refresh for the current session, it
+does not rewrite the schedule.
+
+Selecting the item **requests** the refresh; it does not bypass the normal
+state machine. The APCS/AOCS consumer still checks whether the panel is ready
+(bank 18 `0x936B`) and may defer the run until power-off/standby. If the
+monitor is actively displaying an image, expect the request to be honoured
+when the panel is turned off, exactly like an automatic refresh.
+
+> **What this does not do:** it does not add a page to the normal OSD, and it
+> does not let you type a new interval on the monitor. Interval changes are
+> made at build time with `analysis/build_custom.py` (below). The service-menu
+> labels remain the stock **APCS** / **AOCS** strings.
+
+---
+
+## Custom builder
+
+`analysis/build_custom.py` is the flexible version of the fixed variants:
+
+```powershell
+# Verify all patch sites against the original image
+python analysis/build_custom.py --verify
+
+# Build all four menu presets + MANIFEST-custom.md
+python analysis/build_custom.py --preset all
+
+# One custom image: 8 h APCS, 750 h AOCS, 12 h reminder, menu actions
+python analysis/build_custom.py --name F08-my-care --unlock --menu-actions `
+    --apcs 8 --aocs 750 --tss 12
+
+# Interval only, no menu patch
+python analysis/build_custom.py --name F08-apcs36 --apcs 36
+```
+
+| Option | Meaning |
+|---|---|
+| `--unlock` | Remove the `0xCFDE == 2` command gate. |
+| `--menu-actions` | Make the service-menu APCS/AOCS items request a real refresh. |
+| `--apcs N` | APCS every `N` hours; `0` = never. |
+| `--aocs N` | AOCS every `N` hours; `0` = never. |
+| `--tss N` | Panel-care reminder after `N` hours; `0` = never. |
+| `--preset menu` | Stock schedule + menu actions. |
+| `--preset menu-quiet` | APCS 36 h + menu actions. |
+| `--preset menu-no-nag` | APCS 36 h + reminder off + menu actions. |
+| `--preset menu-care` | APCS 8 h + AOCS 750 h + reminder 12 h + menu actions. |
+
+Every site is checked against the original bytes; the tool refuses to write an
+image if the source size/MD5 is wrong or if a patch site has drifted.
+
 ---
 
 ## How they were built
@@ -141,8 +228,18 @@ bootloader will accept a re-flash over USB after a corrupted image.
 
 - The `0xCFDE == 2` gate is confirmed to exist, but it has not been confirmed
   that the service-menu APCS/AOCS actions are the caller that hits it.
-- The APCS/AOCS completion path has a known flag bug in the original firmware;
-  running the routines more often may make that bug more visible.
+- The AOCS consumer at bank 18 `0x92F1` calls the APCS completion helper
+  `0xE5BD`. That helper clears the APCS request, copies the current hours to
+  the last-APCS record, and increments the APCS completion counter. Because
+  the AOCS path does not re-check the APCS bit before the call, this can record
+  an APCS that never ran. It is a real bookkeeping defect, but its **visible**
+  effect is not proven: refreshing the last-APCS timestamp would tend to hide
+  an APCS request, not create an extra popup. Do not expect `--menu-actions`
+  or the interval patches to fix this by themselves.
+- The power-on "panel refresh needed" popup is best explained by the stock
+  schedule (4 h APCS, 36 h reminder) plus the minute-slot check at bank 13
+  `0xCB1A`–`0xCB2D`. `F08-menu-quiet` and `F08-menu-no-nag` reduce or remove
+  that nag; they do not rewrite the completion bookkeeping.
 - No hardware validation of any kind has been done.
 - The updater's acceptance/verification rules are unknown.
 

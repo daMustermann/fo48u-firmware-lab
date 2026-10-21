@@ -324,8 +324,8 @@ service-menu flag; the service menu entry path is still unresolved.
 
 ## Patched variants
 
-`analysis/build_variant.py` generates reproducible variants from the original
-image. Each variant is written to `firmware/PATCHED/` with its own MD5 and a
+`analysis/build_variant.py` generates the fixed variants; `analysis/build_custom.py`
+generates configurable ones. Both write to `firmware/PATCHED/` with MD5s and a
 manifest.
 
 | Variant | Patches | Intent |
@@ -333,9 +333,49 @@ manifest.
 | `F08-unlock` | `unlock_cmd_gate` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`). Intended to make service-menu APCS/AOCS actions work in normal mode. |
 | `F08-care` | `unlock_cmd_gate` + `apcs_2h` + `aocs_750h` + `tss_12h` | Same, plus a more aggressive schedule: APCS every 2 h, AOCS every 750 h, reminder after 12 h. |
 | `F08-quiet` | `unlock_cmd_gate` + `apcs_36h` | Same, plus APCS every 36 h — the public F08b popup interval, for fewer interruptions. |
+| `F08-menu` | `F08-unlock` + `menu-actions` | Service-menu **APCS** / **AOCS** now set the real `0xD12D` request bits before the stock handler runs. Stock schedule. |
+| `F08-menu-quiet` | `F08-menu` + `apcs_36h` | Menu actions + the F08b 36 h APCS interval. |
+| `F08-menu-no-nag` | `F08-menu-quiet` + `tss_never` | Menu actions + APCS 36 h + the 36 h reminder disabled. |
+| `F08-menu-care` | `F08-menu` + `apcs_8h` + `aocs_750h` + `tss_12h` | Menu actions + an aggressive schedule. |
+
+### Service-menu action patch
+
+The interactive service menu calls the item handler with `R5 = key` and
+`R3 = 0/1`. The APCS handler (`0xA14C`) and AOCS handler (`0xA1C0`) split into
+a draw path (`R5 == 0`) and a key path (`R5 != 0`). The key path toggles
+`0x0BAD` / `0x0BAE`, but it does **not** touch the real request register
+`0xD12D`.
+
+`build_custom.py --menu-actions` leaves the draw path alone and redirects the
+key path through a 14-byte trampoline in erased bank-9 flash:
+
+```
+9:0xA161  90 C6 93  ->  02 FE FA   ; APCS key path -> 0xFEFA
+9:0xA1D5  90 C6 93  ->  02 FF 08   ; AOCS key path -> 0xFF08
+
+0xFEFA  mov dptr,#0xD12D
+0xFEFD  movx a,@dptr
+0xFEFE  orl a,#1
+0xFF00  movx @dptr,a
+0xFF01  mov dptr,#0xC693
+0xFF04  movx a,@dptr
+0xFF05  ljmp 0xA165          ; resume stock key path
+
+0xFF08  mov dptr,#0xD12D
+0xFF0B  movx a,@dptr
+0xFF0C  orl a,#2
+0xFF0E  movx @dptr,a
+0xFF0F  mov dptr,#0xC693
+0xFF12  movx a,@dptr
+0xFF13  ljmp 0xA1D9          ; resume stock key path
+```
+
+This is additive and idempotent. It does **not** add a normal-OSD page and it
+does **not** change the schedule; use the builder's `--apcs/--aocs/--tss`
+options for that.
 
 **These are untested.** The original image is the recovery baseline
-(`d4324c6c88abea48b1ee896e7e14ee9f`). See `firmware/PATCHED/README.md`.
+(`d4324c6c88abea48b1ee896f7e14ee9f`). See `firmware/PATCHED/README.md`.
 
 ## Safety
 

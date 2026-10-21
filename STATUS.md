@@ -29,7 +29,7 @@ reverse-engineering notes are in [`analysis/README.md`](analysis/README.md).
 
 ## Experimental
 
-Three patched images are in [`firmware/PATCHED/`](firmware/PATCHED/). They are
+Seven patched images are in [`firmware/PATCHED/`](firmware/PATCHED/). They are
 **built reproducibly** and every patch site is checked against the original
 bytes, but **none has been flashed on hardware**.
 
@@ -38,13 +38,31 @@ bytes, but **none has been flashed on hardware**.
 | `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Remove the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`) |
 | `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` + APCS 2 h / AOCS 750 h / reminder 12 h |
 | `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` + APCS 36 h (public F08b popup interval) |
+| `F08-menu.bin` | `fcab11e12a855fe7d7f3622b7b38410e` | `F08-unlock` + service-menu **APCS / AOCS** key paths now set `0xD12D` |
+| `F08-menu-quiet.bin` | `b9716bc3c916492909503d7f5586343e` | `F08-menu` + APCS 36 h |
+| `F08-menu-no-nag.bin` | `1034a9dcc86f19dc1ae3ab35ef88c040` | `F08-menu-quiet` + reminder disabled |
+| `F08-menu-care.bin` | `fdb1a011dfed7b3fed2f0df9f3d666e7` | `F08-menu` + APCS 8 h / AOCS 750 h / reminder 12 h |
 
 Rebuild and verify:
 
 ```powershell
 python analysis/build_variant.py --verify
 python analysis/build_variant.py
+python analysis/build_custom.py --verify
+python analysis/build_custom.py --preset all
 ```
+
+### Service-menu action patch
+
+The stock APCS/AOCS service handlers only toggle test bits (`0x0BAD` /
+`0x0BAE`). `--menu-actions` redirects their key paths through a 14-byte
+trampoline in erased bank-9 flash:
+
+- APCS key path (`0xA161`): `orl 0xD12D,#0x01`, then resume at `0xA165`
+- AOCS key path (`0xA1D5`): `orl 0xD12D,#0x02`, then resume at `0xA1D9`
+
+The draw path and the stock key handler are preserved. The request is
+volatile; the schedule is unchanged.
 
 ## Unknown / open
 
@@ -52,18 +70,28 @@ python analysis/build_variant.py
    that enables the service carousel (and the boot-time joystick-UP check)
    has not been located. `0xD64E` bit 0 is a panel-care/OSD state flag, not a
    confirmed service flag.
-2. **Whether the service APCS/AOCS items actually start a refresh.** The
+2. **Whether the service APCS/AOCS items actually start a refresh.** The stock
    handlers at `0xA14C` / `0xA1C0` toggle state bits; the real request is
-   `0xD12D`. The link between the two is not proven.
-3. **Host framing.** The USB HID / OSD Sidekick packet format that delivers
+   `0xD12D`. The `--menu-actions` patch adds the direct `0xD12D` request, but
+   it is still unverified on hardware. The stock link between the two is not
+   proven.
+3. **AOCS/APCS completion bookkeeping.** The AOCS consumer at bank 18 `0x92F1`
+   calls `0xE5BD`, which clears the APCS request, copies the current hours to
+   the last-APCS record, and increments the APCS counter. Because the AOCS path
+   does not re-check the APCS bit before the call, this can record an APCS that
+   never ran. The visible effect is not proven; updating the last-APCS record
+   would tend to hide an APCS request, not create an extra popup. The power-on
+   nag is better explained by the 4 h APCS / 36 h reminder schedule and the
+   minute-slot check at `0xCB1A`–`0xCB2D`.
+4. **Host framing.** The USB HID / OSD Sidekick packet format that delivers
    `0xC501 = 0x20` is unknown, so command `0x20` cannot yet be sent from a PC.
    The next lead is the command-class table at bank 3 `0x8A47` and the
    power-state path at bank 19 `0x7E60`–`0x7E99` (see
    [`analysis/README.md`](analysis/README.md)).
-4. **Updater acceptance.** The exact checks OSD Sidekick / the bootloader
+5. **Updater acceptance.** The exact checks OSD Sidekick / the bootloader
    perform on a modified `.bin` are unknown. A successful write is not
    guaranteed.
-5. **Recovery.** No verified recovery path for a failed flash on this model.
+6. **Recovery.** No verified recovery path for a failed flash on this model.
 
 ## Recommended next steps
 

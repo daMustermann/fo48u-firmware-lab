@@ -19,8 +19,13 @@ def check_indirect_receive_path(image: bytes) -> None:
         (13, 0xE3B1): "90 ff 23 e0 54 fe 64 6e 70 32",
         (13, 0xE3BB): "12 26 56 ef 7b 01 70 08 7a cf 79 d8 7d 80 80 06 7a ce 79 e1 7d 50 12 dd 24",
         (13, 0xDD24): "90 c9 c2 eb f0 a3 ea f0 a3 e9 f0 a3 ed f0",
+        (13, 0xDD3C): "78 58 f6 90 ff 24 e0 ff 12 ef 37 12 ef 43",
         (13, 0xDD7A): "90 ff 25 e0 90 c9 c2 12 ef 0d",
+        (13, 0xDDA4): "12 ef 37 90 00 03 12 36 81 b4 fc 0e 90 00 02 12 36 81 b4 03 05",
+        (13, 0xDEB3): "90 fe 89 e0 90 c9 c2 12 ef 0d",
         (13, 0xEF0D): "ff e0 fb a3 e0 fa a3 e0 f9 78 58 e6 06 f5 82 75 83 00 ef 12 36 c0",
+        (13, 0xEF23): "90 00 01 12 36 81 54 7f 24 03 ff e4 33 fe 78 58 e6 7c 00 22",
+        (13, 0xC8BF): "90 cf da e0 90 c9 c4 f0 90 cf db e0 90 c9 c5 f0",
         (0, 0x36C0): "f8 bb 01 0d e5 82 29 f5 82 e5 83 3a f5 83 e8 f0 22",
     }
     for (bank, address), expected in sites.items():

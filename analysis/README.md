@@ -74,7 +74,9 @@ An additional **conditional indirect XDATA write path** is visible in the origin
 
 The receive path at `13:DD7A` reads XDATA `FF25` and calls `13:EF0D`. That helper retrieves the selected base and computed index, then calls the common routine at `0:36C0`, whose `R3 == 01` branch writes through a computed `DPTR` using `MOVX @DPTR,A` at `0:36CF`. **`CFDA..CFDF` lie at offsets 2..7 of the `CFD8` buffer**, making this a concrete potential writer route that direct DPTR reference scans alone would miss. The original instructions are pinned by `analysis/audit_ddcci_ingress.py`.
 
-This is evidence for a buffer-selection/write mechanism, **not proof** of a physical DDC/CI frame, which transport fills `FF25`, or the path into bank-12 command dispatch at `12:53FC`. The meaning of the `2656` result and the full framing/checksum conditions still require tracing.
+Further stock-byte checkpoints explain the candidate frame structure: `13:DD3C` seeds the receiver with a byte from `FF24`; `13:EF23` obtains byte 1 of the selected buffer and computes `(byte & 0x7F) + 3`. This is compatible with a length-coded protocol; its physical origin and full frame validation remain open. At `13:DDA4`, conditional code compares selected-buffer offsets 3 and 2 to `FC` and `03`, respectively. A separate path at `13:DEB3` feeds a byte read from XDATA `FE89` into the same `13:EF0D` helper. At `13:C8BF`, another bank-13 routine copies `CFDA/CFDB` to `C9C4/C9C5`; this is an observed consumer/copy, without a proven link to bank 12. These additional original byte ranges are checked by `analysis/audit_ddcci_ingress.py`.
+
+This is evidence for a conditional buffer-selection/write mechanism and a candidate length field, **not proof** of a physical DDC/CI frame, checksum acceptance, which transport fills `FF25`/`FE89`, or the path into bank-12 command dispatch at `12:53FC`. The meaning of the `2656` result and full end-to-end framing still require tracing.
 
 Bank 19 contains a conditional internal path at `80A4` that may set both request bits when `C501 == 0x20` and other state checks pass. No evidence currently connects that condition to an external USB command.
 

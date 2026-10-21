@@ -326,6 +326,17 @@ checked against the expected original bytes:
 | `F08-menu-no-nag.bin` | `1034a9dcc86f19dc1ae3ab35ef88c040` | `F08-menu-quiet` plus the 36 h reminder disabled. Least intrusive. |
 | `F08-menu-care.bin` | `fdb1a011dfed7b3fed2f0df9f3d666e7` | `F08-menu` plus APCS 8 h, AOCS 750 h, reminder 12 h. |
 
+**Which one should I try?**
+
+- **Fewer popups, otherwise stock:** `F08-menu-quiet.bin` (APCS every 36 h).
+- **Fewest interruptions:** `F08-menu-no-nag.bin` (APCS 36 h + reminder disabled).
+- **On-demand refresh from the service menu:** `F08-menu.bin`.
+- **Aggressive care schedule:** `F08-menu-care.bin` (APCS 8 h / AOCS 750 h / reminder 12 h).
+
+All of them still require the normal service-menu key combo to reach the
+**APCS** / **AOCS** page; the patch does not make the service menu visible in
+the normal OSD.
+
 `analysis/build_custom.py` builds these and any other combination:
 
 ```powershell

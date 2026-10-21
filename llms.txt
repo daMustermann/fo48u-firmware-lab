@@ -1,0 +1,16 @@
+# Gigabyte AORUS FO48U firmware research
+
+Public, unofficial community analysis of the F08 (2022-11-15) reference firmware for the Realtek RTD2718 banked-8051 monitor. Verified static findings concern APCS, AOCS, TSS, service-menu dispatch and host-command routing; manual activation, incoming packet framing and reliable recovery remain open.
+
+## Read first
+
+- README.md: https://github.com/daMustermann/fo48u-firmware-lab/blob/main/README.md
+- Agent instructions: https://github.com/daMustermann/fo48u-firmware-lab/blob/main/AGENTS.md
+- Contributing and PRs: https://github.com/daMustermann/fo48u-firmware-lab/blob/main/CONTRIBUTING.md
+- Current evidence: https://github.com/daMustermann/fo48u-firmware-lab/blob/main/STATUS.md
+- Technical analysis: https://github.com/daMustermann/fo48u-firmware-lab/blob/main/analysis/README.md
+- Open research tasks: https://github.com/daMustermann/fo48u-firmware-lab/issues
+
+## Agent contribution contract
+
+Choose one issue, inspect evidence, reproduce static checks, and submit a small PR. Cite precise bank:address and expected bytes; distinguish observed facts from hypotheses. Do not write to the monitor, flash firmware, bypass OLED protections or commit patched images.

@@ -1,0 +1,56 @@
+name: Research question or finding
+description: Propose an offline investigation or share reproducible FO48U evidence.
+title: "[Research] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read [STATUS.md](../../STATUS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md) first. Keep observations, interpretations, and hypotheses distinct. Do not suggest active monitor commands or flashing.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Research area
+      options:
+        - Panel care (APCS / AOCS / TSS)
+        - Service menu and input routing
+        - Host protocol and packet ingress
+        - Firmware structure and 8051 analysis
+        - Other static research
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question or finding
+      description: State what is known, and what remains to be established.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and source identity
+      description: Include the stock image SHA-256, bank:address references, exact bytes, disassembly, and relevant file/XDATA offsets. Explain if evidence is not yet available.
+      placeholder: "F08 SHA-256: 3dd2e95a…; bank 13:CAA8; original bytes: 94 04; observation: …"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Offline reproduction
+      description: Provide exact commands, prerequisites and observed output, or a specific reproducible next step.
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: Uncertainties and alternative explanations
+      description: Note missing links, negative evidence, and the limits of static analysis.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This report is offline-only and contains no active monitor commands, flash instructions, sensitive captures, or modified firmware.
+          required: true

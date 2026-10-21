@@ -1,0 +1,50 @@
+name: Research tooling or documentation bug
+description: Report a reproducible problem with an offline script, check, or documented claim.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report offline reproducibility problems only. See [CONTRIBUTING.md](../../CONTRIBUTING.md). Do not run monitor-connected probes or attach generated firmware.
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected file or documentation section
+      placeholder: "analysis/audit_service_dispatch.py or STATUS.md section …"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce (offline)
+      description: Include exact command, working directory, Python/tool version, and necessary input identity (stock F08 SHA-256 if relevant).
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: Include a short error traceback or redacted output, with relevant bank:address/bytes for evidence disputes.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: Link the claimed behavior or expected byte-level result.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context and limits
+      description: State differences in inputs or dependencies, and what you have not verified. Omit secrets and private machine details.
+    validations:
+      required: false
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: Reproduction uses offline files only; no active monitor commands, flashing, or firmware generation are required.
+          required: true

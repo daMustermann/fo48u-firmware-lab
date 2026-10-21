@@ -1,0 +1,53 @@
+name: Static research checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-audits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out tracked reference and scripts
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Fetch and verify exact stock F08 image
+        env:
+          REFERENCE_IMAGE: firmware/F08-20221115/FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin
+          EXPECTED_SHA256: 3dd2e95afce675d3b299dc29bffa1bf43aaee5efdad12d88a562442804bfdf5f
+        run: |
+          git lfs pull --include="$REFERENCE_IMAGE" --exclude=""
+          python -B - <<'PY'
+          import hashlib
+          import os
+          from pathlib import Path
+
+          image = Path(os.environ['REFERENCE_IMAGE'])
+          data = image.read_bytes()
+          actual = hashlib.sha256(data).hexdigest()
+          assert len(data) == 2_031_616, f'Unexpected stock image size: {len(data)}'
+          assert actual == os.environ['EXPECTED_SHA256'], f'Unexpected stock image SHA-256: {actual}'
+          print('PASS: verified original F08 image (size and SHA-256)')
+          PY
+
+      - name: Run read-only Python audits
+        run: |
+          python -B analysis/audit_ddcci_ingress.py
+          python -B analysis/audit_menu_reachability.py
+          python -B analysis/audit_packet_field_usage.py
+          python -B analysis/audit_packet_route_families.py
+          python -B analysis/audit_refresh_command_table.py
+          python -B analysis/audit_service_dispatch.py

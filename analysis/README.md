@@ -39,9 +39,11 @@ XDATA `D13D:D13E` stores total usage hours (big-endian), `D13F` tracks minutes, 
 - Actions **23 (APCS)** and **24 (AOCS)** dispatch to bank-9 handlers `A14C` and `A1C0` respectively.
 - The handler branches manipulating `0BAD` and `0BAE` do **not** directly update real requests in `D12D`.
 - The bank-9 traversal at `D516` invokes action handlers during enumeration and can supply register values that resemble a selection without physical input.
+- At `9:D45C`, the incoming `R7` value is stored in XDATA `C501`. Values `0/1/2/5` reach the page/row traversal at `9:D516`, which accesses the descriptors using `C503/C502`. At `9:E4B5`, a row index can be turned into an action ID before dispatch at `9:97DB`.
+- Both page-layout tables include actions **23/24** as adjacent items (`9:9783`, page index 3; `9:9797`, page index 1). This verifies their presence in the enumeration data, **not** a joystick selection.
 - Calls to `9:E057` at `F77C`, `F787` and `F78E` supply action IDs **11, 11, 14**. Its call site at `E0E2` cannot establish APCS/AOCS activation for IDs 23/24.
 
-This establishes **menu records and call graphs**, while the exact physical selection route remains unresolved. Register values from an enumeration path are insufficient proof of a keypress.
+These claims are checked against the hash-identified F08 bytes by `python -B analysis/audit_joystick_event_chain.py`. This establishes **menu records and call graphs**, while the physical joystick-event origin, selection route and connection to the `D12D` request bits remain unresolved. Register values from an enumeration path are insufficient proof of a keypress.
 
 ## Command routing and host protocols
 
@@ -84,6 +86,7 @@ Run from the repository root, using Python 3:
 python analysis/audit_8051_opcodes.py
 python analysis/audit_ddcci_ingress.py
 python analysis/audit_menu_reachability.py
+python analysis/audit_joystick_event_chain.py
 python analysis/audit_packet_field_usage.py
 python analysis/audit_packet_route_families.py
 python analysis/audit_refresh_command_table.py

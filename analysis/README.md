@@ -96,15 +96,21 @@ Other useful inputs include `osd_strings.py`, `osd_strings.txt`, `banks/bank_*.b
 
 ### Linux / WSL2 signature scan
 
-The working CLI route uses REA on Linux with Binwalk on the same image:
+Start with the [portable WSL2 / Linux offline guide](../docs/WSL2_OFFLINE_RESEARCH.md) to check dependencies, validate the stock image hash, and reproduce the scan. Inside a Linux shell, with `FW` pointing to the hash-verified stock F08 file, discover paths rather than assuming an installation directory:
 
 ```bash
-REA_BINWALK_COMMAND="$HOME/.cargo/bin/binwalk" \
-  "$HOME/.local/bin/rea" inspect-firmware-regions \
-  firmware/F08-20221115/FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin \
-  --format json
+BINWALK_BIN="$(type -P binwalk || true)"
+REA_BIN="$(type -P rea || true)"
+test -n "$BINWALK_BIN" || { echo "Binwalk is unavailable on PATH" >&2; exit 1; }
+"$BINWALK_BIN" "$FW"
+if test -n "$REA_BIN"; then
+  REA_BINWALK_COMMAND="$(readlink -f "$BINWALK_BIN")" \
+    "$REA_BIN" inspect-firmware-regions "$FW" --format json
+else
+  echo "REA CLI unavailable; the standalone Binwalk scan above remains usable" >&2
+fi
 ```
 
-A short `gpg_signed`-like signature candidate at `0x5A3F5` lies inside apparent table data and **does not establish the presence of a signed GPG payload**. Treat signature scans as leads rather than proof of embedded formats.
+The REA invocation requires a Linux-compatible installation and was **not independently completed** in the recorded WSL2 test; the standalone Binwalk scan was tested. A short `gpg_signed`-like signature candidate at `0x5A3F5` lies inside apparent table data and **does not establish the presence of a signed GPG payload**. Treat signature scans as leads rather than proof of embedded formats.
 
 A monitor-connected read-only GET-VCP `E0` probe also yielded a generic-looking reply. It does not prove a callable vendor command. The active work is mapping packet ingress and joystick selection; no firmware is considered ready for hardware flashing.

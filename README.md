@@ -5,6 +5,9 @@
 > Monitor model: **Gigabyte AORUS FO48U** (47.53" OLED, 3840×2160, 120 Hz, HDMI 2.1, DisplayPort 1.4, USB-C).  
 > Panel: LG Display OLED (LE48AOD EPA4 / LE480AQD / LE48AQD).  
 > Scaler: Realtek RTD2718 (banked 8051 firmware). Flash: ≥ 4 MB (32 Mbit).
+>
+> **Current status:** what is confirmed, what is experimental, and what is
+> still unknown is tracked in [`STATUS.md`](STATUS.md).
 
 ---
 
@@ -25,6 +28,7 @@
 13. [Files in This Repository](#-files-in-this-repository)
 14. [References](#-references)
 15. [Disclaimer](#-disclaimer)
+16. [Project Status](STATUS.md)
 
 ---
 
@@ -255,7 +259,7 @@ shows these entries but they do nothing, see the experimental
 - **Flash part:** unknown; updater addresses a window ending at `0x3EFFFF` → at least 4 MB (32 Mbit).
 - **USB control endpoint:** Realtek vendor HID, `0BDA:1100`.
 - **APCS logic:** fires on exact 4-hour multiples (modulo, not a threshold) — that's why searching for a plain `≥ 4 h` comparison never found it.
-- **Bug (confirmed signature):** after APCS completes, the next power-on immediately shows "Please turn off the power for panel protection…" — a request flag the completion path fails to clear on one branch.
+- **Bug (confirmed signature):** after APCS completes, the next power-on immediately shows "Please turn off the power for panel protection…" — a request flag the completion path fails to clear on one branch. The likely cause is a **shared completion path**: the AOCS consumer also runs the APCS completion helper (`0xE5BD`), which clears the APCS request bit, copies hours, and increments the APCS counter even though no APCS ran. Both bits are eventually cleared, so this is a bookkeeping bug rather than a missing clear.
 
 ### Firmware images held / hashed (5 builds)
 
@@ -263,7 +267,7 @@ F04, F05 Beta, F06 (2022-08-19), F08/F08b (2022-11-15), plus OSD Sidekick B21.07
 
 ### Goals for feature expansion
 
-- Fix the APCS completion flag bug (clear the request flag).
+- Fix the APCS completion bookkeeping (the AOCS path double-counts APCS via `0xE5BD`).
 - Unlock ADCS in the normal OSD menu (no service mode).
 - Make AOCS trigger reliably.
 - Reduce ASBL aggressiveness / allow disabling persistently.

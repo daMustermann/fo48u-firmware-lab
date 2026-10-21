@@ -184,10 +184,24 @@ state machine in **bank 18**.
 ```
 
 Note the **bit-1 (AOCS) request is not cleared here**. It is cleared later in
-bank 18 `0xC4E4` (`anl 0xD12D,#0xFD`) after the run finishes. This asymmetry is
-the likely root of the reported "APCS completion flag" bug: an APCS completion
-also refreshes the shared last-hours timestamp, while AOCS keeps its request
-bit until a separate state.
+bank 18 `0xC4E4` (`anl 0xD12D,#0xFD`) after the run finishes.
+
+The AOCS consumer calls **both** paths:
+
+```
+0x9301  lcall 0xE5BD      ; APCS bookkeeping: clear bit 0, copy hours, inc 0xD131
+...
+0xC4E4  anl   0xD12D,#0xFD ; clear bit 1
+0xC4EB  copy  current hours -> 0xD12E/0xD12F
+0xC4FA  inc   0xD133        ; AOCS counter
+```
+
+So an AOCS completion also performs the APCS bookkeeping and increments the
+**APCS** counter (`0xD131`), even though no APCS ran. This shared-path
+double-count is the most likely source of the reported "APCS completion flag"
+symptom: the request and the last-hours timestamp are updated on a path that
+is not the APCS path. It is a **bookkeeping** issue, not a missing clear —
+the code does clear both bits eventually.
 
 ### APCS run-time / start — bank 18 `0xC499`
 

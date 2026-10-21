@@ -225,11 +225,57 @@ This is a **host-controllable panel-care surface**, but the USB framing that
 reaches it is still unknown. It is not reachable through the advertised
 DDC/CI VCP list (the VCP descriptor at bank 10 `0xB381` has no VCP 0x20).
 
+### On-demand APCS + AOCS command
+
+Bank 19 `0x80A4` is the cleanest on-demand trigger in the image. It is reached
+from the host command parser and does, in effect:
+
+```
+if (0xC501 == 0x20) {
+    0xD64E |= 0x01;      // panel-care / OSD state
+    0xD12D |= 0x03;      // request APCS (bit 0) and AOCS (bit 1)
+}
+```
+
+So **host command payload `0x20` requests both refreshes**. The request bits
+are the same ones the automatic scheduler uses; the consumers are bank 18
+`0x92BC` (APCS) and `0x92F1` (AOCS). This is the most likely command behind
+the service-menu APCS/AOCS actions, but the host framing that delivers
+`0xC501 = 0x20` has not been captured yet.
+
+### Service-menu action handlers
+
+The 30-entry action table at bank 9 `0x97F0` is indexed by menu item. It maps
+the page entries above to handlers:
+
+| Item | String | Handler | Observed action |
+|---|---|---|---|
+| 22 | 278 IMAGE STICKING PREVENTION | `0xA0DA` | toggles `0x6F31` bit 1 |
+| 23 | 279 APCS | `0xA14C` | toggles `0x0BAD` / `0x0BAE`, then waits on status bits |
+| 24 | 280 AOCS | `0xA1C0` | same pattern for the AOCS state bits |
+| 25 | 281 | `0xA232` | panel-protection state |
+| 28 | 284 | `0xA388` | panel-protection state |
+| 29 | 285 SENDING TIME | `0xA401` | timing/status page |
+
+These handlers are **toggle/status handlers**, not a direct "start a refresh"
+call. The actual request is made elsewhere (the `0xD12D` bits above). This is
+why the service items can look inert: they flip an enable/state bit, while the
+refresh itself is driven by the scheduler or by host command `0x20`.
+
+### `0xD64E` bit 0
+
+`0xD64E` bit 0 is set by the `0xC501 == 0x20` command above. It is checked in
+the boot/init block at bank 0 `0xAFC0`–`0xAFC7`; if set, the code sends
+`0x719F(0x20)` (which writes `0xC553 = 0x20`, `0xC554 = 0x73`) and calls
+`0x6E37` / `0x2EF0`. Bank 11 `0xA7E2` mirrors the bit into `0xFE3A` and
+toggle-maintains bit 1. It is a **panel-care/OSD state flag**, not a confirmed
+service-menu flag; the service menu entry path is still unresolved.
+
 ## Flash layout (confirmed)
 
 - 31 × 64KB banks (0x00000–0x1EFFFF) + 0x1F0000 total (31 × 65536 = 2,031,616). ✓
 - Banks 0–19: code banks. Share a common prefix 0x0000–0x536b (~21 KB) containing
-  vectors, boot init, and core routines (including bank-switch at 0x507e). Diverge at 0x536c
+  vectors, boot init, and core routines (including the bank switch at 0x6000). Diverge at 0x536c
   (bank-ID/version tag) and the remaining ~44 KB is bank-specific code.
 - Banks 20–30: different content (likely XDATA/data/OSD tables or additional banks).
 - Bank 0 is the default (reset vector 0x0000 → 0x4e0c).

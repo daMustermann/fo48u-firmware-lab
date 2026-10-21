@@ -54,6 +54,16 @@ PATCHES: dict[str, list[tuple[int, int, bytes, bytes, str]]] = {
             "APCS interval 4 h -> 2 h (`subb a,#4` -> `subb a,#2`)",
         ),
     ],
+    "apcs_36h": [
+        (
+            13,
+            0xCAA8,
+            bytes.fromhex("94 04"),
+            bytes.fromhex("94 24"),
+            "APCS interval 4 h -> 36 h (`subb a,#4` -> `subb a,#0x24`), "
+            "matching the public F08b popup fix",
+        ),
+    ],
     "aocs_750h": [
         (
             13,
@@ -82,6 +92,10 @@ VARIANTS: dict[str, tuple[list[str], str]] = {
     "F08-care": (
         ["unlock_cmd_gate", "apcs_2h", "aocs_750h", "tss_12h"],
         "unlock + APCS 2 h / AOCS 750 h / reminder 12 h",
+    ),
+    "F08-quiet": (
+        ["unlock_cmd_gate", "apcs_36h"],
+        "unlock + APCS every 36 h (fewer popups, same as the public F08b fix)",
     ),
 }
 
@@ -200,6 +214,7 @@ def write_manifest(built: list[dict[str, object]]) -> None:
         "  cleanest way to request a refresh; the check makes them inert when",
         "  the command code is not 2.",
         "- `apcs_2h` changes the automatic APCS interval from 4 h to 2 h.",
+        "- `apcs_36h` changes the automatic APCS interval from 4 h to 36 h",
         "- `aocs_750h` changes the automatic AOCS interval from 1500 h to 750 h.",
         "- `tss_12h` changes the panel-care reminder from 36 h to 12 h.",
         "",

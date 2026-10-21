@@ -227,6 +227,8 @@ shows these entries but they do nothing, see the experimental
 | Symptom | Fix |
 |---|---|
 | "Please turn off the power for panel protection…" popup won't go away | Let APCS run (5 min). Or unplug power, push joystick nub several times, wait 1 min, plug back in. |
+| The "F" / service menu does not appear | Hold **UP on the joystick before** applying power and keep holding through the whole boot, until the OSD appears. The remote's UP key is often ignored during boot — use the joystick nub. Try a full unplug (≥ 15 s), then repeat. |
+| APCS/AOCS in the service menu do nothing | Those entries toggle an enable/state bit (`0x0BAD` / `0x0BAE`); they are not a direct "run now" button. The actual request is `0xD12D` (bits 0/1), driven by the scheduler or by host command `0x20`. |
 | APCS/AOCS grayed out in OSD | Monitor hasn't been on ≥ 4 h (APCS) or ≥ 1500 h (AOCS). |
 | Firmware update "Firmware download failed" / freeze | Unplug all USB except keyboard/mouse/monitor; run as Admin; use USB 2.0; disable antivirus. |
 | Firmware update interrupted | Unplug power cord, plug back in — should recover. |
@@ -294,13 +296,14 @@ F04, F05 Beta, F06 (2022-08-19), F08/F08b (2022-11-15), plus OSD Sidekick B21.07
 
 ### Patched firmware variants (experimental)
 
-`analysis/build_variant.py` reproduces two variants from the original F08
+`analysis/build_variant.py` reproduces three variants from the original F08
 image, with every patch checked against the expected original bytes:
 
 | Variant | MD5 | What it changes |
 |---|---|---|
 | `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`). Intended to make the service-menu APCS/AOCS actions work in normal mode. |
 | `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` plus APCS every 2 h, AOCS every 750 h, reminder after 12 h. |
+| `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` plus APCS every 36 h — the public F08b popup fix, for fewer interruptions. |
 
 > ⚠️ **Neither variant has been flashed on hardware.** The service-menu gate
 > removal is a hypothesis: it is confirmed that the gate exists, not confirmed

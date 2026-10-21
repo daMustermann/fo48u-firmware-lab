@@ -29,7 +29,7 @@ reverse-engineering notes are in [`analysis/README.md`](analysis/README.md).
 
 ## Experimental
 
-Two patched images are in [`firmware/PATCHED/`](firmware/PATCHED/). They are
+Three patched images are in [`firmware/PATCHED/`](firmware/PATCHED/). They are
 **built reproducibly** and every patch site is checked against the original
 bytes, but **none has been flashed on hardware**.
 
@@ -37,6 +37,7 @@ bytes, but **none has been flashed on hardware**.
 |---|---|---|
 | `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Remove the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`) |
 | `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` + APCS 2 h / AOCS 750 h / reminder 12 h |
+| `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` + APCS 36 h (public F08b popup interval) |
 
 Rebuild and verify:
 

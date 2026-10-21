@@ -20,8 +20,10 @@ These images are **unofficial modifications** of
 |---|---|---|
 | `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD` and `0x68BD`). Schedule unchanged. |
 | `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` plus APCS every 2 h, AOCS every 750 h, and the panel-care reminder after 12 h. |
+| `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` plus APCS every 36 h, matching the public F08b popup fix (fewer interruptions). |
 
-Both are 2,031,616 bytes (31 × 64 KiB banks), the same size as the original.
+All variants are 2,031,616 bytes (31 × 64 KiB banks), the same size as the
+original.
 
 ---
 
@@ -67,6 +69,13 @@ service-menu APCS/AOCS actions reach these entries but were inert because
 
 Bank 13 `0xCAA8`: `94 04` (`subb a,#4`) → `94 02` (`subb a,#2`).
 APCS runs every 2 h of panel usage instead of every 4 h.
+
+### `apcs_36h` (`F08-quiet` only)
+
+Bank 13 `0xCAA8`: `94 04` (`subb a,#4`) → `94 24` (`subb a,#0x24`).
+APCS runs every 36 h of panel usage instead of every 4 h. This is the same
+popup interval as the public F08b build: far fewer interruptions, at the cost
+of less frequent automatic refresh.
 
 ### `aocs_750h` (`F08-care` only)
 

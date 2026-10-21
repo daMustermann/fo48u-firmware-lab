@@ -309,6 +309,7 @@ manifest.
 |---|---|---|
 | `F08-unlock` | `unlock_cmd_gate` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`). Intended to make service-menu APCS/AOCS actions work in normal mode. |
 | `F08-care` | `unlock_cmd_gate` + `apcs_2h` + `aocs_750h` + `tss_12h` | Same, plus a more aggressive schedule: APCS every 2 h, AOCS every 750 h, reminder after 12 h. |
+| `F08-quiet` | `unlock_cmd_gate` + `apcs_36h` | Same, plus APCS every 36 h — the public F08b popup interval, for fewer interruptions. |
 
 **These are untested.** The original image is the recovery baseline
 (`d4324c6c88abea48b1ee896e7e14ee9f`). See `firmware/PATCHED/README.md`.

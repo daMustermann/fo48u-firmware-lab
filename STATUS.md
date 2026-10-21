@@ -10,8 +10,9 @@
 | OLED requests | **Verified in bytes** | `D12D` bit 0 APCS, bit 1 AOCS; bank-18 consumers |
 | Service-menu entry records | **Verified in bytes** | Bank-9 entries 23/24 call `A14C` / `A1C0` |
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
+| Bank-12 caller | **Verified in bytes; input origin open** | Conditional `18:D6CE` call via shared `0:2DB2` trampoline to `12:539D`, then `12:53FC` |
 | Incoming packet framing | **Partial byte evidence; open** | Bank-13 candidate buffer length formula `(buffer[1] & 7F) + 3`; transport and checksum acceptance not established |
-| Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; no demonstrated link to bank-12 dispatcher |
+| Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
 | Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
 | Modified firmware / recovery | **Unverified** | No hardware-validated modification and no verified recovery route |
 
@@ -29,6 +30,7 @@ The observations are specific to the hash-identified binary. Static analysis alo
 | `9:97F0` | Service action dispatch table |
 | `9:A14C` / `9:A1C0` | APCS / AOCS service item handlers |
 | `12:68A9` / `12:68B9` | Command-table APCS / AOCS handlers |
+| `18:D6CE` → `0:2DB2` → `12:539D` | Guarded cross-bank entry into bank-12 protocol setup |
 | `19:80A4` | Conditional state-triggered request for both |
 | `CFDA..CFDF` | Shared protocol fields; usage differs by command family |
 

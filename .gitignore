@@ -28,3 +28,7 @@ venv/
 # Large temp
 *.tmp
 *.log
+
+# Extracted installer payload (regenerate from UpdPack.cab)
+*.7z
+

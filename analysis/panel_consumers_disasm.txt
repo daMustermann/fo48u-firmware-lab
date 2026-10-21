@@ -1,0 +1,240 @@
+===== BANK 18 0x92a0 =====
+        ,=< 0x000092a0      02934f         ljmp 0x934f
+        |   0x000092a3      12e5f2         lcall 0xe5f2
+       ,==< 0x000092a6      20e005         jb 0xe0.0, 0x92ae           ; [0xe0:1]=255
+       ||   0x000092a9      d200           setb 0x20.0                 ; [0x20:1]=117 ; "u\xd0\x10\xa2=\xe43\xff\xd0\xd0\"\x02P\x8a\x90\xd6\x13\xef\xf0\xa3\xed\xf0\xa3\xeb\xf0\"\xab\a}\xca\x7f\x01\x02"
+       ||   0x000092ab      12d967         lcall 0xd967
+       `--> 0x000092ae      7f02           mov r7, #0x02
+        |   0x000092b0      121000         lcall 0x1000
+       ,==< 0x000092b3      02934f         ljmp 0x934f
+       ||   0x000092b6      122eae         lcall 0x2eae
+      ,===< 0x000092b9      02934f         ljmp 0x934f
+      |||   0x000092bc      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=163
+      |||   0x000092bf      e0             movx a, @dptr
+     ,====< 0x000092c0      20e003         jb 0xe0.0, 0x92c6           ; [0xe0:1]=255
+    ,=====< 0x000092c3      02934f         ljmp 0x934f
+    |`----> 0x000092c6      7f1e           mov r7, #0x1e
+    | |||   0x000092c8      12936b         lcall 0x936b
+    |,====< 0x000092cb      5017           jnc 0x92e4
+    |||||   0x000092cd      12e5bd         lcall 0xe5bd
+   ,======< 0x000092d0      7006           jnz 0x92d8
+   ||||||   0x000092d2      90d130         mov dptr, #0xd130           ; [0xd130:1]=228
+   ||||||   0x000092d5      e0             movx a, @dptr
+   ||||||   0x000092d6      04             inc a
+   ||||||   0x000092d7      f0             movx @dptr, a
+   `------> 0x000092d8      90d644         mov dptr, #0xd644           ; [0xd644:1]=224
+    |||||   0x000092db      e0             movx a, @dptr
+   ,======< 0x000092dc      b45a0c         cjne a, #0x5a, 0x92eb
+   ||||||   0x000092df      129388         lcall 0x9388
+  ,=======< 0x000092e2      8007           sjmp 0x92eb
+  |||`----> 0x000092e4      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=163
+  ||| |||   0x000092e7      e0             movx a, @dptr
+  ||| |||   0x000092e8      4401           orl a, #0x01
+  ||| |||   0x000092ea      f0             movx @dptr, a
+  ``------> 0x000092eb      129355         lcall 0x9355
+    |,====< 0x000092ee      02934c         ljmp 0x934c
+    |||||   0x000092f1      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=163
+    |||||   0x000092f4      e0             movx a, @dptr
+    |||||   0x000092f5      c3             clr c
+    |||||   0x000092f6      13             rrc a
+   ,======< 0x000092f7      30e055         jnb 0xe0.0, 0x934f          ; [0xe0:1]=255
+   ||||||   0x000092fa      7f1f           mov r7, #0x1f
+   ||||||   0x000092fc      12936b         lcall 0x936b
+  ,=======< 0x000092ff      5036           jnc 0x9337
+  |||||||   0x00009301      12e5bd         lcall 0xe5bd
+  ========< 0x00009304      7006           jnz 0x930c
+  |||||||   0x00009306      90d130         mov dptr, #0xd130           ; [0xd130:1]=228
+  |||||||   0x00009309      e0             movx a, @dptr
+  |||||||   0x0000930a      04             inc a
+  |||||||   0x0000930b      f0             movx @dptr, a
+  --------> 0x0000930c      90d644         mov dptr, #0xd644           ; [0xd644:1]=224
+  |||||||   0x0000930f      e0             movx a, @dptr
+  ========< 0x00009310      b45a03         cjne a, #0x5a, 0x9316
+  |||||||   0x00009313      129388         lcall 0x9388
+  --------> 0x00009316      129355         lcall 0x9355
+  |||||||   0x00009319      122932         lcall 0x2932
+  |||||||   0x0000931c      e4             clr a
+  |||||||   0x0000931d      90d380         mov dptr, #0xd380           ; [0xd380:1]=163
+  |||||||   0x00009320      f0             movx @dptr, a
+  |||||||   0x00009321      a3             inc dptr
+  |||||||   0x00009322      f0             movx @dptr, a
+  |||||||   0x00009323      7d26           mov r5, #0x26               ; '&'
+  |||||||   0x00009325      7f60           mov r7, #0x60               ; '`'
+  |||||||   0x00009327      7eea           mov r6, #0xea
+  |||||||   0x00009329      122b54         lcall 0x2b54
+  |||||||   0x0000932c      7d28           mov r5, #0x28               ; '('
+  |||||||   0x0000932e      7fe8           mov r7, #0xe8
+  |||||||   0x00009330      7e03           mov r6, #0x03
+  |||||||   0x00009332      122b54         lcall 0x2b54
+  ========< 0x00009335      8018           sjmp 0x934f
+  `-------> 0x00009337      12fc60         lcall 0xfc60
+   ||||||   0x0000933a      90fe1c         mov dptr, #0xfe1c           ; [0xfe1c:1]=255
+===== BANK 18 0xe5b0 =====
+        :   0x0000e5b0      f0             movx @dptr, a
+        `=< 0x0000e5b1      02e17c         ljmp 0xe17c
+            0x0000e5b4      12e17c         lcall 0xe17c
+        ,=< 0x0000e5b7      4003           jc 0xe5bc
+        |   0x0000e5b9      12e070         lcall 0xe070
+        `-> 0x0000e5bc      22             ret
+            0x0000e5bd      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=163
+            0x0000e5c0      e0             movx a, @dptr
+            0x0000e5c1      54fe           anl a, #0xfe
+            0x0000e5c3      f0             movx @dptr, a
+            0x0000e5c4      90d13d         mov dptr, #0xd13d           ; [0xd13d:1]=144
+            0x0000e5c7      e0             movx a, @dptr
+            0x0000e5c8      ff             mov r7, a
+            0x0000e5c9      a3             inc dptr
+            0x0000e5ca      e0             movx a, @dptr
+            0x0000e5cb      90d12e         mov dptr, #0xd12e           ; [0xd12e:1]=224
+            0x0000e5ce      cf             xch a, r7
+            0x0000e5cf      f0             movx @dptr, a
+            0x0000e5d0      a3             inc dptr
+            0x0000e5d1      ef             mov a, r7
+            0x0000e5d2      f0             movx @dptr, a
+            0x0000e5d3      90d131         mov dptr, #0xd131           ; [0xd131:1]=252
+            0x0000e5d6      e0             movx a, @dptr
+            0x0000e5d7      04             inc a
+            0x0000e5d8      f0             movx @dptr, a
+            0x0000e5d9      22             ret
+            0x0000e5da      90d36e         mov dptr, #0xd36e           ; [0xd36e:1]=12
+            0x0000e5dd      e0             movx a, @dptr
+            0x0000e5de      54fd           anl a, #0xfd
+            0x0000e5e0      f0             movx @dptr, a
+            0x0000e5e1      90d160         mov dptr, #0xd160           ; [0xd160:1]=34
+            0x0000e5e4      e0             movx a, @dptr
+            0x0000e5e5      13             rrc a
+            0x0000e5e6      13             rrc a
+            0x0000e5e7      13             rrc a
+===== BANK 18 0xc480 =====
+            0x0000c480      2b             add a, r3
+            0x0000c481      127f28         lcall 0x7f28
+            0x0000c484      122b12         lcall 0x2b12
+            0x0000c487      c3             clr c
+            0x0000c488      90d381         mov dptr, #0xd381           ; [0xd381:1]=224
+            0x0000c48b      e0             movx a, @dptr
+            0x0000c48c      943c           subb a, #0x3c
+            0x0000c48e      90d380         mov dptr, #0xd380           ; [0xd380:1]=163
+            0x0000c491      e0             movx a, @dptr
+            0x0000c492      9400           subb a, #0x00
+        ,=< 0x0000c494      5003           jnc 0xc499
+       ,==< 0x0000c496      02c52b         ljmp 0xc52b
+       |`-> 0x0000c499      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=163
+       |    0x0000c49c      e0             movx a, @dptr
+       |    0x0000c49d      13             rrc a
+       |,=< 0x0000c49e      20e003         jb 0xe0.0, 0xc4a4           ; [0xe0:1]=255
+      ,===< 0x0000c4a1      02c52b         ljmp 0xc52b
+      ||`-> 0x0000c4a4      e4             clr a
+      ||    0x0000c4a5      90d380         mov dptr, #0xd380           ; [0xd380:1]=163
+      ||    0x0000c4a8      f0             movx @dptr, a
+      ||    0x0000c4a9      a3             inc dptr
+      ||    0x0000c4aa      f0             movx @dptr, a
+      ||    0x0000c4ab      7f20           mov r7, #0x20
+      ||    0x0000c4ad      12c08a         lcall 0xc08a
+      ||    0x0000c4b0      7f32           mov r7, #0x32               ; '2'
+      ||    0x0000c4b2      7e00           mov r6, #0x00
+      ||    0x0000c4b4      122a04         lcall 0x2a04
+      ||    0x0000c4b7      7f02           mov r7, #0x02
+      ||    0x0000c4b9      121000         lcall 0x1000
+      ||    0x0000c4bc      7fac           mov r7, #0xac
+      ||    0x0000c4be      7e0d           mov r6, #0x0d
+      ||    0x0000c4c0      12292c         lcall 0x292c
+      ||    0x0000c4c3      12301c         lcall 0x301c
+      ||,=< 0x0000c4c6      4001           jc 0xc4c9
+      |||   0x0000c4c8      22             ret
+      ||`-> 0x0000c4c9      7f01           mov r7, #0x01
+      ||    0x0000c4cb      123022         lcall 0x3022
+      ||    0x0000c4ce      122c80         lcall 0x2c80
+      ||    0x0000c4d1      d200           setb 0x20.0                 ; [0x20:1]=117 ; "u\xd0\x10\xa2=\xe43\xff\xd0\xd0\"\x02P\x8a\x90\xd6\x13\xef\xf0\xa3\xed\xf0\xa3\xeb\xf0\"\xab\a}\xca\x7f\x01\x02"
+      ||    0x0000c4d3      122eba         lcall 0x2eba
+      ||,=< 0x0000c4d6      5049           jnc 0xc521
+      |||   0x0000c4d8      7f21           mov r7, #0x21               ; '!'
+      |||   0x0000c4da      12c08a         lcall 0xc08a
+      |||   0x0000c4dd      7f58           mov r7, #0x58               ; 'X'
+      |||   0x0000c4df      7e02           mov r6, #0x02
+      |||   0x0000c4e1      12292c         lcall 0x292c
+      |||   0x0000c4e4      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=163
+      |||   0x0000c4e7      e0             movx a, @dptr
+      |||   0x0000c4e8      54fd           anl a, #0xfd
+      |||   0x0000c4ea      f0             movx @dptr, a
+      |||   0x0000c4eb      90d13d         mov dptr, #0xd13d           ; [0xd13d:1]=144
+      |||   0x0000c4ee      e0             movx a, @dptr
+      |||   0x0000c4ef      ff             mov r7, a
+      |||   0x0000c4f0      a3             inc dptr
+      |||   0x0000c4f1      e0             movx a, @dptr
+===== BANK 19 0x8070 =====
+            0x00008070      f0             movx @dptr, a
+            0x00008071      90c510         mov dptr, #0xc510           ; [0xc510:1]=255
+            0x00008074      a3             inc dptr
+            0x00008075      a3             inc dptr
+            0x00008076      a3             inc dptr
+            0x00008077      e0             movx a, @dptr
+            0x00008078      5480           anl a, #0x80
+            0x0000807a      ff             mov r7, a
+            0x0000807b      e4             clr a
+            0x0000807c      fe             mov r6, a
+            0x0000807d      7807           mov r0, #0x07
+            0x0000807f      127f8a         lcall 0x7f8a
+            0x00008082      740d           mov a, #0x0d
+            0x00008084      f0             movx @dptr, a
+            0x00008085      90c510         mov dptr, #0xc510           ; [0xc510:1]=255
+            0x00008088      e0             movx a, @dptr
+            0x00008089      fc             mov r4, a
+            0x0000808a      a3             inc dptr
+            0x0000808b      a3             inc dptr
+            0x0000808c      a3             inc dptr
+            0x0000808d      e4             clr a
+            0x0000808e      ff             mov r7, a
+            0x0000808f      fe             mov r6, a
+            0x00008090      fd             mov r5, a
+            0x00008091      ec             mov a, r4
+            0x00008092      7818           mov r0, #0x18
+            0x00008094      127f8c         lcall 0x7f8c
+            0x00008097      127fab         lcall 0x7fab
+            0x0000809a      e0             movx a, @dptr
+            0x0000809b      4480           orl a, #0x80
+            0x0000809d      ff             mov r7, a
+            0x0000809e      127fa8         lcall 0x7fa8
+            0x000080a1      ef             mov a, r7
+            0x000080a2      f0             movx @dptr, a
+            0x000080a3      22             ret
+            0x000080a4      90c501         mov dptr, #0xc501           ; [0xc501:1]=255
+            0x000080a7      ef             mov a, r7
+            0x000080a8      f0             movx @dptr, a
+            0x000080a9      120e86         lcall 0x0e86
+            0x000080ac      ef             mov a, r7
+        ,=< 0x000080ad      701a           jnz 0x80c9
+        |   0x000080af      90c501         mov dptr, #0xc501           ; [0xc501:1]=255
+        |   0x000080b2      e0             movx a, @dptr
+       ,==< 0x000080b3      b42013         cjne a, #0x20, 0x80c9
+       ||   0x000080b6      90d64e         mov dptr, #0xd64e           ; [0xd64e:1]=255
+===== BANK 12 0x6890 =====
+            0x00006890      d176           acall 0x6e76
+            0x00006892      ef             mov a, r7
+            0x00006893      f0             movx @dptr, a
+            0x00006894      90d146         mov dptr, #0xd146           ; [0xd146:1]=254
+            0x00006897      e0             movx a, @dptr
+            0x00006898      ff             mov r7, a
+            0x00006899      12298c         lcall 0x298c
+            0x0000689c      122d16         lcall 0x2d16
+            0x0000689f      90d162         mov dptr, #0xd162           ; [0xd162:1]=240
+            0x000068a2      e0             movx a, @dptr
+            0x000068a3      ff             mov r7, a
+            0x000068a4      12337c         lcall 0x337c
+        ,=< 0x000068a7      802b           sjmp 0x68d4
+        |   0x000068a9      90cfde         mov dptr, #0xcfde           ; [0xcfde:1]=20
+        |   0x000068ac      e0             movx a, @dptr
+        |   0x000068ad      6402           xrl a, #0x02
+       ,==< 0x000068af      7023           jnz 0x68d4
+       ||   0x000068b1      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=18
+       ||   0x000068b4      e0             movx a, @dptr
+       ||   0x000068b5      4401           orl a, #0x01
+      ,===< 0x000068b7      800d           sjmp 0x68c6
+      |||   0x000068b9      90cfde         mov dptr, #0xcfde           ; [0xcfde:1]=20
+      |||   0x000068bc      e0             movx a, @dptr
+     ,====< 0x000068bd      b40214         cjne a, #0x02, 0x68d4
+     ||||   0x000068c0      90d12d         mov dptr, #0xd12d           ; [0xd12d:1]=18
+     ||||   0x000068c3      e0             movx a, @dptr
+     ||||   0x000068c4      4402           orl a, #0x02
+     |`---> 0x000068c6      f0             movx @dptr, a
+     | ||   0x000068c7      122c50         lcall 0x2c50
+     | ||   0x000068ca      122b9c         lcall 0x2b9c

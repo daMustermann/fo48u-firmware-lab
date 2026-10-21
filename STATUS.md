@@ -12,6 +12,7 @@
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
 | Bank-12 caller | **Verified in bytes; input origin open** | Conditional `18:D6CE` call via shared `0:2DB2` trampoline to `12:539D`, then `12:53FC` |
 | Internal buffer handoff | **Verified conditional byte path** | `13:E3BB` tests `D8FE`; `18:E22D` can copy 80 B from `CEE1` or `CF31` into `CFD8` before bank-12 dispatch |
+| `D8FE` source paths | **Verified in bytes; upstream state open** | `4:BA29` passes `C68A` to setter `4:FB1F`; `4:F348` gets `D83C` via `3:A98D` selector `0C` and calls the same setter. `4:E6D4..E70B` temporarily saves, clears, then restores `D8FE`. |
 | Dual receive slots and completion flags | **Verified in bytes** | `13:DD24` reads `FF24/FF25` for `CFD8` or `CEE1`, sets `CFD2` bit 0 conditionally; `13:DE63` reads `FE88/FE89` for `CF31`, sets bit 1 conditionally. `13:C8A4` and `18:D712` include conditional flag clearing. |
 | Incoming packet framing | **Partial byte evidence; open** | Bank-13 candidate buffer length formula `(buffer[1] & 7F) + 3`; transport and checksum acceptance not established |
 | Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
@@ -34,6 +35,7 @@ The observations are specific to the hash-identified binary. Static analysis alo
 | `12:68A9` / `12:68B9` | Command-table APCS / AOCS handlers |
 | `18:D6CE` → `0:2DB2` → `12:539D` | Guarded cross-bank entry into bank-12 protocol setup |
 | `18:E254` → `0:35FC` → `0:35CF` | Conditional 80-byte XDATA copy into `CFD8`; enabled by `CFD2` bit 0/1 and `D8FE` |
+| `3:BF9D` → `0:0F52` → `8:EE5E` | Maps `D8FE`/`D8FC` and incoming `R7` into `03/0C/0F/10`; `3:A823` stores result in `C693` |
 | `19:80A4` | Conditional state-triggered request for both |
 | `CFDA..CFDF` | Shared protocol fields; usage differs by command family |
 
@@ -52,7 +54,7 @@ Firmware has several distinct paths using `CFDA`:
 
 ## Research priorities
 
-1. Trace upstream `D8FE`/`C693` state and physical ingress behind the **two identified receive register paths** (`FF24/FF25` and `FE88/FE89`) using **passive or read-only** evidence.
+1. Trace writers and meaning of `C68A`/`D83C`, then physical ingress behind the **two identified receive register paths** (`FF24/FF25` and `FE88/FE89`), using **passive or read-only** evidence.
 2. Follow physical joystick input to a **true selection event** for service actions 23/24.
 3. Correlate selection, request-bit updates and the bank-18 state machine.
 4. Determine verified recovery and hardware-test procedures before considering any modified firmware.

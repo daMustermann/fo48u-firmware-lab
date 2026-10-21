@@ -12,6 +12,7 @@
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
 | Bank-12 caller | **Verified in bytes; input origin open** | Conditional `18:D6CE` call via shared `0:2DB2` trampoline to `12:539D`, then `12:53FC` |
 | Internal buffer handoff | **Verified conditional byte path** | `13:E3BB` tests `D8FE`; `18:E22D` can copy 80 B from `CEE1` or `CF31` into `CFD8` before bank-12 dispatch |
+| Dual receive slots and completion flags | **Verified in bytes** | `13:DD24` reads `FF24/FF25` for `CFD8` or `CEE1`, sets `CFD2` bit 0 conditionally; `13:DE63` reads `FE88/FE89` for `CF31`, sets bit 1 conditionally. `13:C8A4` and `18:D712` include conditional flag clearing. |
 | Incoming packet framing | **Partial byte evidence; open** | Bank-13 candidate buffer length formula `(buffer[1] & 7F) + 3`; transport and checksum acceptance not established |
 | Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
 | Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
@@ -51,7 +52,7 @@ Firmware has several distinct paths using `CFDA`:
 
 ## Research priorities
 
-1. Trace the upstream `D8FE`/`C693` state and second receive slot, plus physical ingress behind `CEE1`/`CF31`/`CFD8`, using **passive or read-only** evidence.
+1. Trace upstream `D8FE`/`C693` state and physical ingress behind the **two identified receive register paths** (`FF24/FF25` and `FE88/FE89`) using **passive or read-only** evidence.
 2. Follow physical joystick input to a **true selection event** for service actions 23/24.
 3. Correlate selection, request-bit updates and the bank-18 state machine.
 4. Determine verified recovery and hardware-test procedures before considering any modified firmware.

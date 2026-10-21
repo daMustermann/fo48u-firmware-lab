@@ -78,6 +78,8 @@ An additional **conditional indirect XDATA write path** is visible in the origin
 
 The receive path at `13:DD7A` reads XDATA `FF25` and calls `13:EF0D`. That helper retrieves the selected base and computed index, then calls the common routine at `0:36C0`, whose `R3 == 01` branch writes through a computed `DPTR` using `MOVX @DPTR,A` at `0:36CF`. **`CFDA..CFDF` lie at offsets 2..7 of the `CFD8` buffer**, making this a concrete potential writer route that direct DPTR reference scans alone would miss. The original instructions are pinned by `analysis/audit_ddcci_ingress.py`.
 
+A **second receive path is now verified** in bank 13. `13:EAF5` checks `(FE87 & FE) == 6E`; `13:EB04` passes XDATA base **`CF31`** to `13:DE63`. That routine seeds the buffer from **`FE88`**, reads subsequent bytes from **`FE89`** (`13:DEB3`), and uses the *same* indirect writer `13:EF0D`. It checks status bytes `FE8B`/`FE8D`, imposes an 80-byte capacity (`13:DEA2`), and returns `R7=1` on its completed-length path or `R7=0` otherwise (`13:DEFA..DEFF`). The first receiver analogously uses `FF24`/`FF25`, status `FF27`/`FF29`, and returns `R7=1` or `0` (`13:DDBE..DDC3`). This demonstrates two separate **firmware register paths**; their underlying hardware or external transport is not identified.
+
 Further stock-byte checkpoints explain the candidate frame structure: `13:DD3C` seeds the receiver with a byte from `FF24`; `13:EF23` obtains byte 1 of the selected buffer and computes `(byte & 0x7F) + 3`. This is compatible with a length-coded protocol; its physical origin and full frame validation remain open. At `13:DDA4`, conditional code compares selected-buffer offsets 3 and 2 to `FC` and `03`, respectively. A separate path at `13:DEB3` feeds a byte read from XDATA `FE89` into the same `13:EF0D` helper. At `13:C8BF`, another bank-13 routine copies `CFDA/CFDB` to `C9C4/C9C5`; this is an observed consumer/copy, without a proven link to bank 12. These additional original byte ranges are checked by `analysis/audit_ddcci_ingress.py`.
 
 ### Conditional buffer handoff
@@ -86,7 +88,11 @@ Two cross-bank helpers read the same state byte, XDATA **`D8FE`**, via logical b
 
 The bank-18 stage at `18:E22D` iterates **bits 0 then 1** of `CFD2`. On the first enabled bit, `18:E24E` calls `0:2A58 → 4:FE6D`, which also returns `D8FE`. When that value is nonzero, `18:E254..E270` calls the common memory copier (`0:35FC`) with an 80-byte XDATA source at **`CEE1 + slot × 0x50`** and destination **`CFD8`**. The dispatch table `0:359A` selects XDATA-to-XDATA implementation `0:35CF`. Thus slot 0 starts at `CEE1`; slot 1 starts at `CF31`. The selected index is stored at `CFD1` even when the `D8FE` test skips copying.
 
-Bank 18 calls this stage at `18:D6C6` **before** its bank-7 and bank-12 calls. This identifies a conditional *internal* buffer-to-dispatcher handoff and a shared `D8FE` control dependency, checked by `analysis/audit_buffer_handoff.py`. It does **not** prove that an actual external frame reaches the source buffers, that both slots are populated, or that the later bank-12 service guard accepts it. The inputs driving `D8FE` and the second 80-byte source slot require additional tracing.
+The receive-result handling also explains **both `CFD2` low bits**. After `13:DD24`, `13:E3D4` combines its final `R7=0/1` with `CFD2 & FE`, writing bit 0. After `13:DE63`, `13:EB0D` calls `13:F7B0`, which doubles the final `R7=0/1` and combines it with `CFD2 & FD`, writing bit 1. Further conditional processing by `13:C8A4` may clear bit 0 (`13:E3E8`) or bit 1 (`13:EB1F`). Bank 18 clears the selected bit using `CFD1` at `18:D712..D72C`. These are **receive completion/processing flags**, not proof that either frame passed every validation stage. The two paths have a common `(buffer[1] & 7F) + 3` computed length, and both contain the conditional `FC 03` check, but exact acceptance semantics remain open.
+
+`13:C8A4` reads command fields from `CFD8` when `D8FE==0`, or from `CEE3 + slot × 0x50` when nonzero (offset 2 of the selected 80-byte slot). This is a further verified link between the receive buffers and downstream field processing; it does not establish a valid APCS/AOCS invocation. The new byte-level evidence is guarded by `analysis/audit_dual_ingress.py` alongside `analysis/audit_buffer_handoff.py`.
+
+Bank 18 calls the handoff at `18:D6C6` **before** its bank-7 and bank-12 calls. The origin of `D8FE`, physical framing, hardware register meanings, checksum acceptance and end-to-end service-command reachability are still unresolved.
 
 These findings are evidence for conditional buffer selection, a possible length field, and an internal bank-18 buffer handoff. The physical DDC/CI framing, checksum acceptance, which transport fills `FF25`/`FE89`, and the end-to-end conditions for a successful bank-12 command remain unverified.
 
@@ -101,6 +107,7 @@ python analysis/audit_8051_opcodes.py
 python analysis/audit_ddcci_ingress.py
 python analysis/audit_bank12_entry_trampoline.py
 python analysis/audit_buffer_handoff.py
+python analysis/audit_dual_ingress.py
 python analysis/audit_menu_reachability.py
 python analysis/audit_joystick_event_chain.py
 python analysis/audit_packet_field_usage.py

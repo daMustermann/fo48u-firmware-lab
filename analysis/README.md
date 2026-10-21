@@ -56,6 +56,10 @@ Bank 12 holds a 100-entry indirect command table near `5D85..5EB0`. The APCS and
 
 The surrounding dispatch path examines `CFDB == E0` and `CFDA` values including `01`/`03`. The **source and complete framing of incoming bytes are unknown**. `CFDE` is used as an operand/index elsewhere in firmware; it is not identified as a universal service-mode flag.
 
+The bank-12 dispatcher also has a **verified cross-bank caller**. Bank 18 executes `LCALL 0x2DB2` at `18:D6CE`. Shared stub `0:2DB2` contains `90 53 9D 02 0C 54` (`MOV DPTR,#539D; LJMP 0C54`); `0:0C54` builds a synthetic return address, and `0:5030` selects bank 12 through `0:507E` (selector write to XDATA `FFFF`). Execution enters `12:539D`, runs initialization, and falls through to the `CFDB == E0` guard at `12:53FC` on the normal-return path. The bytes and the sole literal `LCALL 2DB2` occurrence among code banks 0–19 are pinned by `analysis/audit_bank12_entry_trampoline.py`.
+
+That bank-18 call has **additional gates**: `18:D6B2` checks a bit of XDATA `D183`; `18:D6BE` reads `CFD2`, with zero bypassing this path; the calls at `18:D6C9` and `18:D6CE` each have a carry-conditional exit. This demonstrates a firmware call route into bank 12, but does **not** prove which external transport, if any, supplies the incoming fields or that any command is accepted. Raw opcode matching cannot rule out other indirect callers.
+
 Both handlers join at `12:68C6` for the conditional `MOVX @DPTR,A` write to XDATA `D12D`, followed by helper calls. Successful writes then branch to `12:68D4` (`SETB C; RET`); rejecting `CFDE != 02` reaches **the same return** directly. Therefore the returned carry flag alone cannot confirm that a request bit was written, let alone that the panel ran compensation. These byte-level paths are checked by `analysis/audit_refresh_command_table.py`.
 
 Distinct paths interpret `CFDA` differently:
@@ -76,7 +80,7 @@ The receive path at `13:DD7A` reads XDATA `FF25` and calls `13:EF0D`. That helpe
 
 Further stock-byte checkpoints explain the candidate frame structure: `13:DD3C` seeds the receiver with a byte from `FF24`; `13:EF23` obtains byte 1 of the selected buffer and computes `(byte & 0x7F) + 3`. This is compatible with a length-coded protocol; its physical origin and full frame validation remain open. At `13:DDA4`, conditional code compares selected-buffer offsets 3 and 2 to `FC` and `03`, respectively. A separate path at `13:DEB3` feeds a byte read from XDATA `FE89` into the same `13:EF0D` helper. At `13:C8BF`, another bank-13 routine copies `CFDA/CFDB` to `C9C4/C9C5`; this is an observed consumer/copy, without a proven link to bank 12. These additional original byte ranges are checked by `analysis/audit_ddcci_ingress.py`.
 
-This is evidence for a conditional buffer-selection/write mechanism and a candidate length field, **not proof** of a physical DDC/CI frame, checksum acceptance, which transport fills `FF25`/`FE89`, or the path into bank-12 command dispatch at `12:53FC`. The meaning of the `2656` result and full end-to-end framing still require tracing.
+This is evidence for a conditional buffer-selection/write mechanism and a candidate length field, **not proof** of a physical DDC/CI frame, checksum acceptance, which transport fills `FF25`/`FE89`, or the link to the now-identified bank-18 caller. The meaning of the `2656` result and full end-to-end framing still require tracing.
 
 Bank 19 contains a conditional internal path at `80A4` that may set both request bits when `C501 == 0x20` and other state checks pass. No evidence currently connects that condition to an external USB command.
 
@@ -87,6 +91,7 @@ Run from the repository root, using Python 3:
 ```bash
 python analysis/audit_8051_opcodes.py
 python analysis/audit_ddcci_ingress.py
+python analysis/audit_bank12_entry_trampoline.py
 python analysis/audit_menu_reachability.py
 python analysis/audit_joystick_event_chain.py
 python analysis/audit_packet_field_usage.py

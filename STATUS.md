@@ -11,6 +11,7 @@
 | Service-menu entry records | **Verified in bytes** | Bank-9 entries 23/24 call `A14C` / `A1C0` |
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
 | Incoming packet framing | **Open** | Physical packet source of `CFDA..CFDF` not established |
+| Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer and indirect `0:36CF` XDATA writer; no demonstrated link to bank-12 dispatcher |
 | Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
 | Modified firmware / recovery | **Unverified** | No hardware-validated modification and no verified recovery route |
 

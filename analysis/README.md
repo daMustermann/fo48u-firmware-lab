@@ -130,19 +130,100 @@ From the RTD2660 spec (page 355-357 "Bank Switch"):
 - **XDATA_BSTART (0xFFFD)**: start bank for XDATA. **XDATA_BSEL (0xFFFE)**: first XDATA bank.
 - Up to 256×64KB supported in XFR mode; 64KB default.
 
-**In firmware**, bank switch routine at **0x507e** (present in every bank's common prefix):
+**In firmware**, the callable switch routine is **0x6000** (common prefix,
+present in every bank):
 
 ```
-0x507e: xch  a, r0
-0x507f: mov  dptr, #0xffff      ; PBANK_SEL
-0x5082: mov  0x52, a            ; save current bank in IRAM 0x52
-0x5084: lcall 0x0dd0            ; a += IRAM[0x30]  (bank offset adjust)
-0x5087: movx @dptr, a           ; write bank number -> switch bank
-0x5088: mov  a, r0
-0x5089: ret
+0x6000: mov  0x30, r7           ; remember requested bank
+0x6002: clr  EA                 ; disable interrupts while switching
+0x6004: mov  dptr, #0xffff      ; PBANK_SEL
+0x6007: mov  a, r7
+0x6008: movx @dptr, a           ; write bank number -> switch bank
+0x600d: movx a, @dptr           ; read back
+0x600e: jz   0x6013
+0x6010: lcall 0x0000            ; reset if the switch failed
+0x6013: ret
 ```
 
-Callers: `mov a, #bank; lcall 0x507e` (bank number in A).
+Call it as `mov r7, #bank; lcall 0x6000`. The switch is **not** a simple
+`mov a,#bank; lcall 0x507e`: `0x507e` is the shared tail of a set of stubs at
+`0x5060`–`0x507c` that preload `r0` with `0x18`–`0x1f` (the high/data banks),
+and it stores the *stub index* in `0x52`. Only one site in the image calls
+`0x6000` directly (bank 0 `0xfa58`, with the target bank taken from XDATA
+`0xc500`), so cross-bank calls are mostly done by **switching and calling a
+fixed trampoline** or by running the target bank as a separate task.
+
+## Service menu / OSD page descriptors
+
+The page descriptor list is in **bank 9 at `0x9783`**. Each entry is four bytes:
+
+```
+0xFF, addr_hi, addr_lo, count
+```
+
+The list is a **circular carousel of five pages** (it repeats after the fifth
+entry):
+
+| Page | Entries | Contents |
+|---|---|---|
+| `0x9747` | 2 | 16-bit string IDs `0x0100`–`0x0101` (256–257) |
+| `0x974B` | 8 | 258–260, **5** (HDMI), 262–265 |
+| `0x975B` | 13 | **10** (BLACK EQUALIZER), 267–270, **15** (RTS/RPG), 272, **17–19** (READER/sRGB/VIVID), 276, **21** (CUSTOM), **278** (IMAGE STICKING PREVENTION) |
+| `0x9775` | 6 | **279 APCS, 280 AOCS, 281–284** (panel-protection messages) |
+| `0x9781` | 1 | **285** (SENDING TIME) |
+
+Each page entry is a **little-endian 16-bit string ID**. The high byte is `0x01`
+for IDs 256+, `0x00` for IDs below 256 — which is why the sequence looked like
+`(id, flag)` pairs at first. The low IDs (5, 10, 15, 17–19, 21) are genuine
+references to normal strings (input and picture-mode names) that the
+service/factory pages reuse.
+
+This means the **panel-protection items are already present in the service
+menu** (page `0x9775` + the last entry of `0x975B` + `0x9781`). They are hidden
+because the whole descriptor list is only used by the service/factory UI.
+The menu engine's renderer supports 16-bit IDs, so exposing the page is a
+matter of reaching that UI, not of extending the string table.
+
+## Host command mailbox (USB / OSD Sidekick)
+
+- `0xC500` — command code **and** bank selector. `0xFA58` reads it and calls the
+  bank switch at `0x6000` with it, so a host command can select a program bank.
+- `0xC50D` — command source/class (`2`, `4`, or other).
+- `0xC50E` — command index used by the dispatcher.
+- `0xC501` — command payload/argument.
+
+The USB/HID command path is in **bank 16 `0xAFC0`–`0xB063`**. For non-special
+sources it does:
+
+```
+dptr = 0xC50E
+lcall 0x6300            ; bank 19 dispatcher, A = command index
+```
+
+The dispatcher is at **bank 19 `0x6300`**:
+
+```
+0x6300: add a, b        ; A = 3 * index (B = A at entry)
+0x6302: add a, 0xf0     ; (b register operand, not immediate)
+0x6304: xch a, b
+0x6306: jmp @a+dptr
+0x6307: 45-entry table of `ljmp` handlers (0x638e … 0x65a9)
+```
+
+Handlers of interest (bank 19):
+
+| Index | Handler | Action |
+|---|---|---|
+| 7 | `0x63BD` | TSS/popup state logic |
+| 13 | `0x6499` | sets `0xD35E = 0x14` |
+| 37 | `0x64F3` | APCS run-time tick (`0xD380:0xD381`; 60-tick window) |
+| 38 | `0x64A9` | panel-time / "next care" check (36 h, uses `0xD12E`, `0xD13D`, `0xD385`) |
+| 39 | `0x6531` | toggles `P3.1` and sends `r5=0x28`, `r7:r6=0x03E8` |
+| 40 | `0x653B` | calls `0x9824` |
+
+This is a **host-controllable panel-care surface**, but the USB framing that
+reaches it is still unknown. It is not reachable through the advertised
+DDC/CI VCP list (the VCP descriptor at bank 10 `0xB381` has no VCP 0x20).
 
 ## Flash layout (confirmed)
 
@@ -163,14 +244,28 @@ Callers: `mov a, #bank; lcall 0x507e` (bank number in A).
 
 ## Next concrete steps
 
-1. Locate the OSD page/gating for the panel-protection screen (strings exist,
-   menu table not found yet). Candidate state variables: `0xCFDE`, `0xD64E`,
-   `0xD644`, `0xD35B`.
+1. Follow the **carousel pointer**: find the code that walks the descriptor
+   list at bank 9 `0x9783` and the flag that enables the service carousel.
+   The panel page is already defined; only the gate is missing.
 2. Find the boot-time service-mode key check (joystick UP at power-on) and
    retarget it to a remote key, or persist the service flag.
-3. Implement an on-demand APCS/AOCS trigger by calling bank 12 `0x68A9` /
-   `0x68B9` (or setting `0xD12D` bits) from a new key/menu hook.
-4. Patch and rebuild; test on a sacrificial unit.
+3. Verify whether selecting service items 279/280 calls bank 12 `0x68A9` /
+   `0x68B9`. If it does, the `0xCFDE == 2` gate is the reason they appear inert.
+4. Flash the patched variants on a sacrificial unit; keep the original image.
+
+## Patched variants
+
+`analysis/build_variant.py` generates reproducible variants from the original
+image. Each variant is written to `firmware/PATCHED/` with its own MD5 and a
+manifest.
+
+| Variant | Patches | Intent |
+|---|---|---|
+| `F08-unlock` | `unlock_cmd_gate` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`). Intended to make service-menu APCS/AOCS actions work in normal mode. |
+| `F08-care` | `unlock_cmd_gate` + `apcs_2h` + `aocs_750h` + `tss_12h` | Same, plus a more aggressive schedule: APCS every 2 h, AOCS every 750 h, reminder after 12 h. |
+
+**These are untested.** The original image is the recovery baseline
+(`d4324c6c88abea48b1ee896e7e14ee9f`). See `firmware/PATCHED/README.md`.
 
 ## Safety
 

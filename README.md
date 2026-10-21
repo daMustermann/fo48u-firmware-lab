@@ -207,6 +207,15 @@ After that, burn-in / image retention should be cleared.
 
 **Side effect (confirmed):** simply booting into service mode disables auto-dimming (ASBL) until the next power cycle / sleep.
 
+**What is in the service menu (from the firmware):** the panel-protection
+page exists at bank 9 `0x9775` and lists **IMAGE STICKING PREVENTION** (string
+278), **APCS** (279), **AOCS** (280), the panel-protection messages (281–284),
+and **SENDING TIME** (285). **PANEL USAGE TIME** (286), **PIXEL SHIFT** (288),
+**BRIGHTNESS UNIFORMITY** (289) and the **STANDBY QC / QC ON / QC OFF /
+CHARGE OFF** items (290–293) are in the same service string set. If your unit
+shows these entries but they do nothing, see the experimental
+`firmware/PATCHED/` variants and `analysis/README.md`.
+
 ---
 
 ## 🐛 Troubleshooting
@@ -261,6 +270,40 @@ F04, F05 Beta, F06 (2022-08-19), F08/F08b (2022-11-15), plus OSD Sidekick B21.07
 - Fix FreeSync frame-rate drops and HDR color issues.
 - Allow APCS interval tuning (e.g., 36 h like F08b, or user-configurable).
 
+### Progress since the first release
+
+- **String table decoded.** The OSD index table is bank 1 `0xD707` (310 entries
+  × 3 bytes); string data is bank 1 `0x536C`–`0xD4C2`. APCS = ID 279,
+  AOCS = ID 280, IMAGE STICKING PREVENTION = 278.
+- **Panel-protection scheduler found.** All three rules live in bank 13
+  `0xCA4E`–`0xCB60`: APCS every 4 h, AOCS every 1500 h, reminder after 36 h.
+- **Request path mapped.** `0xD12D` bit 0 = APCS, bit 1 = AOCS; consumed by
+  bank 18 `0x92BC` / `0x92F1`; completion helper at bank 18 `0xE5BD`.
+- **Service-menu pages found.** Bank 9 `0x9783` is a five-page descriptor list;
+  page `0x9775` is the panel-protection page (IDs 279–284), and `0x9781`
+  contains "SENDING TIME" (285). The APCS/AOCS items already exist in the
+  service UI.
+- **Host command path found.** Bank 16 `0xAFC0` → bank 19 `0x6300` (45-entry
+  handler table at `0x6307`); `0xC500` doubles as a bank selector.
+- **Patched variants produced.** See `firmware/PATCHED/` — experimental,
+  untested, and clearly labelled.
+
+### Patched firmware variants (experimental)
+
+`analysis/build_variant.py` reproduces two variants from the original F08
+image, with every patch checked against the expected original bytes:
+
+| Variant | MD5 | What it changes |
+|---|---|---|
+| `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Removes the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`). Intended to make the service-menu APCS/AOCS actions work in normal mode. |
+| `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` plus APCS every 2 h, AOCS every 750 h, reminder after 12 h. |
+
+> ⚠️ **Neither variant has been flashed on hardware.** The service-menu gate
+> removal is a hypothesis: it is confirmed that the gate exists, not confirmed
+> that it is the only thing blocking the menu actions. Keep the original image
+> (`d4324c6c88abea48b1ee896f7e14ee9f`) and read
+> [`firmware/PATCHED/README.md`](firmware/PATCHED/README.md) before trying them.
+
 ### Local decompilation quickstart
 
 ```bash
@@ -295,9 +338,21 @@ From the reverse-engineering thread — owners can verify:
 .
 ├── README.md                          # This guide
 ├── firmware/
-│   └── F08-20221115/
-│       ├── FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin   # F08 firmware (2,031,616 bytes)
-│       └── FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.MD5.md5
+│   ├── F08-20221115/
+│   │   ├── FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin   # original F08 (2,031,616 bytes)
+│   │   └── FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.MD5.md5
+│   └── PATCHED/
+│       ├── F08-unlock.bin             # experimental: APCS/AOCS command gate removed
+│       ├── F08-care.bin               # experimental: unlock + faster care schedule
+│       ├── *.bin.md5                  # checksums for the variants
+│       └── MANIFEST.md                # generated patch manifest
+├── analysis/
+│   ├── README.md                      # reverse-engineering notes (strings, banks, panel logic)
+│   ├── panel_protection.md            # APCS/AOCS/TSS write-up
+│   ├── osd_strings.py / osd_strings.txt   # decoded 310-entry OSD string table
+│   ├── build_variant.py               # reproducible patched-firmware builder
+│   ├── patch.py                       # extract/reassemble/patch scaffold
+│   └── banks/bank_0..19.bin           # per-bank 64 KB code extracts
 ├── osd-sidekick/
 │   └── B21.0707.1/
 │       ├── Install.exe                # OSD Sidekick installer

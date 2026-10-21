@@ -2,7 +2,9 @@
 
 This is a reproducible map of the **F08 (2022-11-15)** firmware image used throughout the repository. All offsets below are **bank-relative** unless called out as file offsets; findings concern this particular image and may not transfer to other revisions.
 
-[Overview](../README.md) · [Research status](../STATUS.md) · [OLED scheduler](panel_protection.md)
+[Overview](../README.md) · [Research status](../STATUS.md) · [OLED scheduler](panel_protection.md) · [Sidekick HID evidence](sidekick-protocol.md)
+
+The optional `audit_sidekick_commands.py` verifies official OSD Sidekick UI-handler bytes using a locally installed vendor executable. It is intentionally excluded from CI because the proprietary installer is not bundled. The firmware-only `audit_receiver_origins.py` checks the interrupt entry and paired receiver paths against the stock F08 hash.
 
 ## Image and architecture
 
@@ -86,7 +88,7 @@ Further stock-byte checkpoints explain the candidate frame structure: `13:DD3C` 
 
 Two cross-bank helpers read the same state byte, XDATA **`D8FE`**, via logical bank 4. In the bank-13 receive branch, `13:E3BB` calls `0:2656 → 4:FCFE` to obtain `D8FE` in `R7`. Zero selects the 128-byte buffer at `CFD8`; nonzero selects the 80-byte buffer at `CEE1`. At `13:E3D4`, the code writes `(CFD2 & FE) | R7` back to `CFD2`, but the intervening `13:DD24` can overwrite `R7` (including a read from `FF24`). **The flag written to `CFD2` cannot be assumed to equal `D8FE`.** `D8FE` is mutable: `4:FB1F` writes its input `R7`, `4:E6F3` clears it, and `4:E70B` copies XDATA `C693` into it.
 
-Two concrete callers of setter `4:FB1F` narrow the origin of `D8FE`. At `4:BA29`, the input `R7` is loaded from `C68A`. At `4:F348`, selector `0C` is passed through `0:0FF4 → 3:A98D`; the entry at `3:A9C3 → 3:AA07` loads `D83C`, then `3:AAF1` returns it in `R7` before the setter call. `4:E6D4..E70B` separately **saves the old `D8FE` to `C693`, clears it, then restores that saved value**. The provenance of `C68A` and `D83C`, along with which caller actually runs on a monitor, remains open.
+Two concrete callers of setter `4:FB1F` narrow the origin of `D8FE`. At `4:BA29`, the input `R7` is loaded from `C68A`. An upstream path maps XDATA `D180` to `R7=00/10/20` at `2:FE80`, then passes through `2:FAC5 → 0:2D2E → 4:B9D7` to write `C68A`. At `4:BA31`, a separate selector `0C` writes `C68A` to `D83C` through `3:8AB5`. The getter at `4:F348` uses `0:0FF4 → 3:A98D → 3:AA07` to load `D83C`, returning it in `R7` before the setter call. There are numerous other literal references and writers of `C68A`, so these paths do not establish its exclusive origin. `4:E6D4..E70B` also **saves the old `D8FE` to `C693`, clears it, then restores that saved value**. These byte-level sites are verified by `analysis/audit_d8fe_upstream.py` and `analysis/audit_d8fe_sources.py`.
 
 A different `C693` writer at `3:BF9D..BFA2` uses common trampoline `0:0F52 → 0:0C08 → 0:5020` to enter **bank 8**, `8:EE5E`. That function saves its incoming `R7` in `C6A2`, reads **`D8FE`** through `8:FD3B`, branches on `D8FE == 10/20`, and conditionally examines `D8FC` and `C6A2`. Its direct return sites set `R7` to `03`, `0C`, `0F`, or `10`, which `3:A823` stores in `C693`. Thus this call **uses `D8FE` as an input**, rather than demonstrating its origin. The distinct bank-4 save/restore routine overwrites `C693` before restoring `D8FE`, so these two uses of `C693` cannot be joined into a value-flow claim. See `analysis/audit_d8fe_sources.py` for stock-byte checks.
 
@@ -96,7 +98,7 @@ The receive-result handling also explains **both `CFD2` low bits**. After `13:DD
 
 `13:C8A4` reads command fields from `CFD8` when `D8FE==0`, or from `CEE3 + slot × 0x50` when nonzero (offset 2 of the selected 80-byte slot). This is a further verified link between the receive buffers and downstream field processing; it does not establish a valid APCS/AOCS invocation. The new byte-level evidence is guarded by `analysis/audit_dual_ingress.py` alongside `analysis/audit_buffer_handoff.py`.
 
-Bank 18 calls the handoff at `18:D6C6` **before** its bank-7 and bank-12 calls. Sources feeding `D8FE` have been found, but the origins and live values of `C68A` and `D83C`, physical framing, hardware register meanings, checksum acceptance and end-to-end service-command reachability remain unresolved.
+Bank 18 calls the handoff at `18:D6C6` **before** its bank-7 and bank-12 calls. Paths feeding `D8FE` have been found, but the runtime origin of `D180`, intervening helper side effects, other possible `C68A` writers, live state, physical framing, hardware register meanings, checksum acceptance and end-to-end service-command reachability remain unresolved.
 
 These findings are evidence for conditional buffer selection, a possible length field, and an internal bank-18 buffer handoff. The physical DDC/CI framing, checksum acceptance, which transport fills `FF25`/`FE89`, and the end-to-end conditions for a successful bank-12 command remain unverified.
 
@@ -113,6 +115,7 @@ python analysis/audit_bank12_entry_trampoline.py
 python analysis/audit_buffer_handoff.py
 python analysis/audit_dual_ingress.py
 python analysis/audit_d8fe_sources.py
+python analysis/audit_d8fe_upstream.py
 python analysis/audit_menu_reachability.py
 python analysis/audit_joystick_event_chain.py
 python analysis/audit_packet_field_usage.py

@@ -22,4 +22,3 @@ for func in funcs:
         count += 1
 f.close()
 print("Decompiled %d functions -> %s" % (count, out_path))
-"

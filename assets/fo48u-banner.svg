@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="344" viewBox="0 0 1280 344" role="img" aria-labelledby="title desc">
+<title id="title">FO48U firmware research</title><desc id="desc">Neon OLED-inspired FO48U branding with a 48 monogram.</desc>
+<defs>
+<linearGradient id="bg" x2="1" y2="1"><stop stop-color="#080c18"/><stop offset=".54" stop-color="#10172a"/><stop offset="1" stop-color="#0a1021"/></linearGradient>
+<linearGradient id="neon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3ef7e7"/><stop offset=".5" stop-color="#72bfff"/><stop offset="1" stop-color="#a875ff"/></linearGradient>
+<linearGradient id="sweep" x2="1" y2="0"><stop stop-color="#43f4e6" stop-opacity=".1"/><stop offset=".65" stop-color="#6d9bff" stop-opacity=".2"/><stop offset="1" stop-color="#a174ff" stop-opacity=".03"/></linearGradient>
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+<pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#9ab7dd" stroke-opacity=".065"/></pattern>
+</defs>
+<rect width="1280" height="344" rx="20" fill="url(#bg)"/><rect width="1280" height="344" rx="20" fill="url(#grid)"/>
+<path d="M0 276Q540 108 1280 58V344H0Z" fill="url(#sweep)"/>
+<path d="M0 300H150L196 254M1150 34H1220L1250 64V154M880 313H1020L1076 257H1280" fill="none" stroke="#57d5ff" stroke-opacity=".26" stroke-width="2"/>
+<circle cx="191" cy="171" r="120" fill="#50caff" opacity=".13" filter="url(#glow)"/>
+<circle cx="191" cy="171" r="112" fill="none" stroke="#5ceadf" stroke-opacity=".18" stroke-width="2"/>
+<path d="M105 64H238L280 106V238L238 280H105L63 238V106Z" fill="#0b1827" stroke="url(#neon)" stroke-width="3"/>
+<path d="M113 80H230L264 114V231L231 264H113L79 232V115Z" fill="none" stroke="#b5f6ff" stroke-opacity=".18"/>
+<path d="M87 174H114M251 174H276M172 69V94M172 249V274" stroke="url(#neon)" stroke-width="5" stroke-linecap="round"/>
+<text x="172" y="192" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="85" font-weight="800" letter-spacing="-11" fill="url(#neon)">48</text>
+<path d="M105 218H241" stroke="url(#neon)" stroke-width="3" opacity=".9"/>
+<text x="172" y="237" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" font-weight="700" letter-spacing="4" fill="#a9cce5">OLED</text>
+<text x="350" y="91" font-family="Arial,Helvetica,sans-serif" font-size="16" letter-spacing="6" font-weight="700" fill="#5aebdb">AORUS / GIGABYTE</text>
+<text x="343" y="217" font-family="Arial,Helvetica,sans-serif" font-size="126" font-weight="800" letter-spacing="-7" fill="#edf7ff">FO48U</text>
+<path d="M349 238H1048" stroke="url(#neon)" stroke-width="3"/>
+<text x="351" y="277" font-family="Arial,Helvetica,sans-serif" font-size="19" letter-spacing="4" fill="#c2cfe8">FIRMWARE RESEARCH  /  OLED PANEL CARE</text>
+<text x="1090" y="83" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700" letter-spacing="3" fill="#a1b9db">RTD2718</text>
+<text x="1090" y="105" font-family="monospace" font-size="14" fill="#6aeedc">8051 / F08</text>
+<circle cx="1121" cy="263" r="4" fill="#67f9e7"/><circle cx="1149" cy="263" r="4" fill="#75b8ff"/><circle cx="1177" cy="263" r="4" fill="#ad8dff"/>
+</svg>

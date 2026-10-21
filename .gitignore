@@ -31,4 +31,14 @@ venv/
 
 # Extracted installer payload (regenerate from UpdPack.cab)
 *.7z
+analysis/UpdPack_payload.7z
+analysis/updpack/
 
+# Local AI agent notes (never publish)
+AGENT.md
+agent.md
+
+
+# Offline firmware experiments stay local; only the research policy is public.
+firmware/PATCHED/*
+!firmware/PATCHED/README.md

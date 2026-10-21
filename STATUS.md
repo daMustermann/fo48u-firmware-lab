@@ -1,130 +1,56 @@
-# Project status
+# Current research status
 
-Last updated: 2026-10-21
+**Target:** Gigabyte AORUS FO48U · **Image:** F08 / 2022-11-15 · **Method:** static firmware analysis and read-only host observations.
 
-This page separates **what is confirmed**, **what is experimental**, and
-**what is still unknown**. The main guide is [`README.md`](README.md); the
-reverse-engineering notes are in [`analysis/README.md`](analysis/README.md).
+| Track | Status | Scope |
+| :-- | :-- | :-- |
+| Stock image identity | **Verified** | 2,031,616 B; MD5 `d4324c6c88abea48b1ee896f7e14ee9f` |
+| 8051 bank layout and switch | **Verified in bytes** | Code banks 0–19; PBANK_SEL at `FFFF`; shared switch function `6000` |
+| OLED scheduler | **Verified in bytes** | APCS 4 h / AOCS 1500 h / TSS 36 h in bank 13 |
+| OLED requests | **Verified in bytes** | `D12D` bit 0 APCS, bit 1 AOCS; bank-18 consumers |
+| Service-menu entry records | **Verified in bytes** | Bank-9 entries 23/24 call `A14C` / `A1C0` |
+| Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
+| Incoming packet framing | **Open** | Physical packet source of `CFDA..CFDF` not established |
+| Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
+| Modified firmware / recovery | **Unverified** | No hardware-validated modification and no verified recovery route |
 
-> The FO48U firmware in this repository (F08, 2022-11-15) is an **unreleased
-> private beta**. Everything here is unofficial. Flashing modified firmware
-> can brick the monitor.
+The observations are specific to the hash-identified binary. Static analysis alone cannot establish a reliable manual refresh procedure.
 
----
+## Key addresses
 
-## Confirmed
+| Bank:address / XDATA | Meaning |
+| :-- | :-- |
+| `13:CAA8` | APCS elapsed-use threshold `04h` |
+| `13:CAD3` | AOCS modulo/divisor `05DCh` (1500) |
+| `13:CB1A` | TSS reminder threshold `24h` (36) |
+| `D12D` | APCS / AOCS request bits |
+| `18:92BC` / `18:92F1` | Request consumers |
+| `9:97F0` | Service action dispatch table |
+| `9:A14C` / `9:A1C0` | APCS / AOCS service item handlers |
+| `12:68A9` / `12:68B9` | Command-table APCS / AOCS handlers |
+| `19:80A4` | Conditional state-triggered request for both |
+| `CFDA..CFDF` | Shared protocol fields; usage differs by command family |
 
-| Area | Finding |
-|---|---|
-| Image | `FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin`, 2,031,616 bytes (31 × 64 KiB), MD5 `d4324c6c88abea48b1ee896f7e14ee9f` |
-| CPU / layout | Banked 8051, code banks 0–19, common 21 KB prefix, bank switch via XDATA `0xFFFF` (routine `0x6000`, bank in R7) |
-| Strings | Index table bank 1 `0xD707` (310 entries × 3 bytes), data bank 1 `0x536C`–`0xD4C2`; APCS = 279, AOCS = 280 |
-| Panel protection | Scheduler bank 13 `0xCA4E`–`0xCB60`: APCS every 4 h, AOCS every 1500 h, reminder after 36 h |
-| Request bits | `0xD12D` bit 0 = APCS, bit 1 = AOCS; consumed by bank 18 `0x92BC` / `0x92F1`; completion helper `0xE5BD` |
-| Service pages | Bank 9 `0x9783`: five-page carousel; page `0x9775` = IDs 279–284, page `0x9781` = ID 285 |
-| Service actions | Bank 9 `0x97F0`: 30-entry action table; item 23 (APCS) = `0xA14C`, item 24 (AOCS) = `0xA1C0` |
-| Host mailbox | `0xC500` command/bank selector, `0xC50D` source, `0xC50E` index, `0xC501` payload; USB path bank 16 `0xAFC0` → bank 19 `0x6300` |
-| On-demand command | Payload `0x20` sets `0xD12D |= 0x03` (both refreshes) and `0xD64E |= 1` at bank 19 `0x80A4` |
-| VCP list | Bank 10 `0xB381`; advertised VCPs include `C6 C8 CA CC`, no VCP `0x20` |
+## Host-side evidence
 
-## Experimental
+A read-only DDC/CI probe returned a response to GET-VCP `E0` that resembled the result for `DF`. This **does not prove** an accessible vendor service command: the device does not advertise `E0`, and generic fallback behavior remains plausible. No Set-VCP or USB write tests were performed.
 
-Seven patched images are in [`firmware/PATCHED/`](firmware/PATCHED/). They are
-**built reproducibly** and every patch site is checked against the original
-bytes, but **none has been flashed on hardware**.
+Firmware has several distinct paths using `CFDA`:
 
-| Variant | MD5 | Intent |
-|---|---|---|
-| `F08-unlock.bin` | `c94cf874324c9cf0f76e38f5b22308b1` | Remove the `0xCFDE == 2` gate in front of the APCS/AOCS command entries (bank 12 `0x68AD`, `0x68BD`) |
-| `F08-care.bin` | `741ae5c02f5362304ed1df728daa48f3` | `F08-unlock` + APCS 2 h / AOCS 750 h / reminder 12 h |
-| `F08-quiet.bin` | `15eb5100dd3404a29e58152422808cd6` | `F08-unlock` + APCS 36 h (public F08b popup interval) |
-| `F08-menu.bin` | `fcab11e12a855fe7d7f3622b7b38410e` | `F08-unlock` + service-menu **APCS / AOCS** key paths now set `0xD12D` |
-| `F08-menu-quiet.bin` | `b9716bc3c916492909503d7f5586343e` | `F08-menu` + APCS 36 h |
-| `F08-menu-no-nag.bin` | `1034a9dcc86f19dc1ae3ab35ef88c040` | `F08-menu-quiet` + reminder disabled |
-| `F08-menu-care.bin` | `fdb1a011dfed7b3fed2f0df9f3d666e7` | `F08-menu` + APCS 8 h / AOCS 750 h / reminder 12 h |
+- Bank 18: `01/03/07/0C/F3`, DDC/CI-like path.
+- Bank 7: `C0/D0`.
+- Bank 10: `77/AA` when `CFD8 == 71`.
+- Bank 12: `01/03` alongside `CFDB == E0`.
 
-Rebuild and verify:
+`CFDE` is also a numerical operand or index in other handlers. The `CFDE == 2` test alone does not identify a global service unlock.
 
-```powershell
-python analysis/build_variant.py --verify
-python analysis/build_variant.py
-python analysis/build_custom.py --verify
-python analysis/build_custom.py --preset all
-```
+## Research priorities
 
-### Service-menu action patch
+1. Trace the physical ingress that fills `CFDA..CFDF` and establish frame boundaries using **passive or read-only** evidence.
+2. Follow physical joystick input to a **true selection event** for service actions 23/24.
+3. Correlate selection, request-bit updates and the bank-18 state machine.
+4. Determine verified recovery and hardware-test procedures before considering any modified firmware.
 
-The stock APCS/AOCS service handlers only toggle test bits (`0x0BAD` /
-`0x0BAE`). `--menu-actions` redirects their key paths through a 14-byte
-trampoline in erased bank-9 flash:
+The detailed evidence and commands live in [analysis/README.md](analysis/README.md) and [analysis/panel_protection.md](analysis/panel_protection.md).
 
-- APCS key path (`0xA161`): `orl 0xD12D,#0x01`, then resume at `0xA165`
-- AOCS key path (`0xA1D5`): `orl 0xD12D,#0x02`, then resume at `0xA1D9`
-
-The draw path and the stock key handler are preserved. The request is
-volatile; the schedule is unchanged.
-
-## Unknown / open
-
-1. **Service-menu gate.** The panel-protection page is defined, but the code
-   that enables the service carousel (and the boot-time joystick-UP check)
-   has not been located. `0xD64E` bit 0 is a panel-care/OSD state flag, not a
-   confirmed service flag.
-2. **Whether the service APCS/AOCS items actually start a refresh.** The stock
-   handlers at `0xA14C` / `0xA1C0` toggle state bits; the real request is
-   `0xD12D`. The `--menu-actions` patch adds the direct `0xD12D` request, but
-   it is still unverified on hardware. The stock link between the two is not
-   proven.
-3. **AOCS/APCS completion bookkeeping.** The AOCS consumer at bank 18 `0x92F1`
-   calls `0xE5BD`, which clears the APCS request, copies the current hours to
-   the last-APCS record, and increments the APCS counter. Because the AOCS path
-   does not re-check the APCS bit before the call, this can record an APCS that
-   never ran. The visible effect is not proven; updating the last-APCS record
-   would tend to hide an APCS request, not create an extra popup. The power-on
-   nag is better explained by the 4 h APCS / 36 h reminder schedule and the
-   minute-slot check at `0xCB1A`–`0xCB2D`.
-4. **Host framing.** The USB HID / OSD Sidekick packet format that delivers
-   `0xC501 = 0x20` is unknown, so command `0x20` cannot yet be sent from a PC.
-   The next lead is the command-class table at bank 3 `0x8A47` and the
-   power-state path at bank 19 `0x7E60`–`0x7E99` (see
-   [`analysis/README.md`](analysis/README.md)).
-5. **Updater acceptance.** The exact checks OSD Sidekick / the bootloader
-   perform on a modified `.bin` are unknown. A successful write is not
-   guaranteed.
-6. **Recovery.** No verified recovery path for a failed flash on this model.
-
-## Recommended next steps
-
-- Capture USB traffic from OSD Sidekick while the service/panel-care actions
-  are used; look for payload `0x20`.
-- Trace the caller of the bank 9 menu renderer and the flag that selects the
-  service carousel.
-- Test the patch variants on a sacrificial unit with a hardware flash backup.
-- If a variant works, record the exact OSD Sidekick version, USB port, and
-  post-flash behavior in an issue.
-
-## How to help capture the host protocol
-
-The monitor's vendor HID is Realtek `0BDA:1100`. To capture OSD Sidekick
-traffic on Windows:
-
-1. Install **USBPcap** and **Wireshark**.
-2. Start a capture on the root hub that owns the monitor (USBPcap1/2/3).
-3. Filter with `usb.idVendor == 0x0bda && usb.idProduct == 0x1100`.
-4. Run OSD Sidekick, trigger the panel-care/service action, then stop the
-   capture.
-5. Save the `.pcapng` and open an issue with it (redact serial numbers).
-
-The firmware reads `0xC50D` (source/class), `0xC50E` (command index), and
-`0xC501` (payload). A payload of `0x20` requests both APCS and AOCS. Look for
-HID output reports whose bytes change when the action is triggered.
-
-Do not flash anything while capturing.
-
-## Safety
-
-- Keep the original image and its MD5 on a second device.
-- Do not interrupt power during a flash.
-- Do not flash a modified image if you cannot recover the monitor.
-- OLED protection logic (APCS/AOCS/ABL) is deliberately left functional; the
-  variants change *when* it runs, not *whether* it exists.
+> **Safety:** OLED compensation is part of panel maintenance. Do not disable it or flash research images based only on static analysis.

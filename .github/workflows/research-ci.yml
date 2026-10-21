@@ -47,6 +47,7 @@ jobs:
         run: |
           python -B analysis/audit_ddcci_ingress.py
           python -B analysis/audit_bank12_entry_trampoline.py
+          python -B analysis/audit_buffer_handoff.py
           python -B analysis/audit_joystick_event_chain.py
           python -B analysis/audit_menu_reachability.py
           python -B analysis/audit_packet_field_usage.py

@@ -66,6 +66,14 @@ Distinct paths interpret `CFDA` differently:
 | `12:53FC` | `01 03`, with `CFDB == E0` | Bank-12 service-command path |
 | `7:B226` | Copies `CFDB..CFDE` to `CF84..CF87` | Buffer handoff |
 
+### Candidate receive-buffer writer
+
+An additional **conditional indirect XDATA write path** is visible in the original F08 bytes. At `13:E3B1`, the code checks `(XDATA FF23 & FE) == 6E`, a value compatible with a DDC/CI address comparison. After calling the shared routine at `2656`, `13:E3BB..E3D1` selects an 0x80-byte buffer beginning at XDATA `CFD8` when `R7 == 0`; the other branch selects an 0x50-byte buffer at `CEE1`. At `13:DD24`, the selection parameters are saved to `C9C2..C9C5`.
+
+The receive path at `13:DD7A` reads XDATA `FF25` and calls `13:EF0D`. That helper retrieves the selected base and computed index, then calls the common routine at `0:36C0`, whose `R3 == 01` branch writes through a computed `DPTR` using `MOVX @DPTR,A` at `0:36CF`. **`CFDA..CFDF` lie at offsets 2..7 of the `CFD8` buffer**, making this a concrete potential writer route that direct DPTR reference scans alone would miss. The original instructions are pinned by `analysis/audit_ddcci_ingress.py`.
+
+This is evidence for a buffer-selection/write mechanism, **not proof** of a physical DDC/CI frame, which transport fills `FF25`, or the path into bank-12 command dispatch at `12:53FC`. The meaning of the `2656` result and the full framing/checksum conditions still require tracing.
+
 Bank 19 contains a conditional internal path at `80A4` that may set both request bits when `C501 == 0x20` and other state checks pass. No evidence currently connects that condition to an external USB command.
 
 ## Reproduction

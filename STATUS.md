@@ -11,6 +11,7 @@
 | Service-menu entry records | **Verified in bytes** | Bank-9 entries 23/24 call `A14C` / `A1C0` |
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
 | Official Sidekick APCS/AOCS commands | **Verified in application bytes; device execution open** | `GOSD.OLEDSet.SetOSD(3)` constructs `E0 80 00 02` (APCS) / `E0 82 00 02` (AOCS) inside Realtek-HID frames. See [Sidekick protocol](analysis/sidekick-protocol.md). |
+| Sidekick-frame firmware alignment | **Byte-verified conditional mapping; physical path open** | An intact 8-byte frame placed at `CFD8` meets the RX length rule and yields `CFDA..CFDE = 03 E0 80/82 00 02`, matching the guarded bank-12 command table. `analysis/audit_sidekick_f08_handoff.py` verifies the byte anchors; no live receive proven. |
 | Bank-12 caller | **Verified in bytes; input origin open** | Conditional `18:D6CE` call via shared `0:2DB2` trampoline to `12:539D`, then `12:53FC` |
 | Internal buffer handoff | **Verified conditional byte path** | `13:E3BB` tests `D8FE`; `18:E22D` can copy 80 B from `CEE1` or `CF31` into `CFD8` before bank-12 dispatch |
 | `D8FE` source paths | **Verified byte routes; runtime state open** | `2:FE80` maps `D180` to `00/10/20`, reaching `4:B9D7` through a bank-switch path that writes `C68A`. `4:BA29` feeds `C68A` to the `D8FE` setter; `4:BA31` stores `C68A` in `D83C`, which `4:F348` can read back. Other writers of `C68A` exist. |

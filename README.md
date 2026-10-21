@@ -79,6 +79,7 @@ These are **firmware code thresholds**, not verified measurements of how often t
 - **The real request flags exist.** `0xD12D` bit 0 requests APCS; bit 1 requests AOCS.
 - **Dedicated command handlers exist.** Bank-12 entries `68A9` / `68B9` require command operand `CFDE == 2`. The surrounding table uses `CFDB = E0` and `CFDA = 03`.
 - **Official Sidekick contains explicit APCS/AOCS commands.** Its byte-verified Realtek-HID frames contain `E0 80 00 02` / `E0 82 00 02`, aligning with the firmware command codes. The full transport-to-handler path is still under investigation. [See the protocol evidence](analysis/sidekick-protocol.md).
+- **The received-frame layout is consistent.** If either complete eight-byte Sidekick frame reaches firmware buffer `CFD8`, its fields match the conditional bank-12 handlers for APCS/AOCS. The actual HID-to-buffer delivery and successful execution are still open.
 - **The complete physical-input path is unresolved.** Neither a reliable joystick-driven selection route nor the incoming packet framing has been established. The `9:E0E2` call path only handles action IDs **11/14**, so it cannot establish manual APCS/AOCS activation.
 
 **Result:** the code is mapped well enough to guide deeper investigation, but it does **not** demonstrate a working manual-refresh unlock. No potentially destructive host commands have been sent during the documented probes.

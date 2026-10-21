@@ -262,6 +262,29 @@ call. The actual request is made elsewhere (the `0xD12D` bits above). This is
 why the service items can look inert: they flip an enable/state bit, while the
 refresh itself is driven by the scheduler or by host command `0x20`.
 
+### Host command class table (bank 3)
+
+Bank 3 `0x8A37` is a second-level dispatcher:
+
+```
+0x8A37  a = r7
+0x8A38  cjne a,#0x1F,...     ; only 0..0x1E are valid
+0x8A40  dptr = 0x8A47
+0x8A43  r0 = a
+0x8A44  add a,r0
+0x8A45  add a,r0
+0x8A46  jmp @a+dptr
+0x8A47  30-entry table of ljmp handlers (0x8AA4, 0x8B96, 0x8BCF, ...)
+```
+
+Bank 19 `0x7E60`–`0x7E99` feeds this path: it sets a power-state bit flag in
+`r7` (`0x01`, `0x02`, `0x03`, `0x04`, `0x08`, `0x10`, `0x20`, `0x40`), sets
+`r5 = 0x07`, and jumps to `0x8BCF`. `0x8BCF` writes `r5` to `0xC500`, tests a
+change flag at `0xD8B3`/`0xD8B4`, and conditionally calls `0x80A4` (the
+`0xC501 == 0x20` on-demand refresh handler). This is the strongest lead for
+recovering the host framing, but the exact byte layout of the USB/HID report
+that reaches it is still unknown.
+
 ### `0xD64E` bit 0
 
 `0xD64E` bit 0 is set by the `0xC501 == 0x20` command above. It is checked in

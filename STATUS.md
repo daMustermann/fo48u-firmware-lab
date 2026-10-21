@@ -57,6 +57,9 @@ python analysis/build_variant.py
    `0xD12D`. The link between the two is not proven.
 3. **Host framing.** The USB HID / OSD Sidekick packet format that delivers
    `0xC501 = 0x20` is unknown, so command `0x20` cannot yet be sent from a PC.
+   The next lead is the command-class table at bank 3 `0x8A47` and the
+   power-state path at bank 19 `0x7E60`–`0x7E99` (see
+   [`analysis/README.md`](analysis/README.md)).
 4. **Updater acceptance.** The exact checks OSD Sidekick / the bootloader
    perform on a modified `.bin` are unknown. A successful write is not
    guaranteed.
@@ -71,6 +74,24 @@ python analysis/build_variant.py
 - Test the patch variants on a sacrificial unit with a hardware flash backup.
 - If a variant works, record the exact OSD Sidekick version, USB port, and
   post-flash behavior in an issue.
+
+## How to help capture the host protocol
+
+The monitor's vendor HID is Realtek `0BDA:1100`. To capture OSD Sidekick
+traffic on Windows:
+
+1. Install **USBPcap** and **Wireshark**.
+2. Start a capture on the root hub that owns the monitor (USBPcap1/2/3).
+3. Filter with `usb.idVendor == 0x0bda && usb.idProduct == 0x1100`.
+4. Run OSD Sidekick, trigger the panel-care/service action, then stop the
+   capture.
+5. Save the `.pcapng` and open an issue with it (redact serial numbers).
+
+The firmware reads `0xC50D` (source/class), `0xC50E` (command index), and
+`0xC501` (payload). A payload of `0x20` requests both APCS and AOCS. Look for
+HID output reports whose bytes change when the action is triggered.
+
+Do not flash anything while capturing.
 
 ## Safety
 

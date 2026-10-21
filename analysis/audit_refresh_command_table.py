@@ -64,6 +64,13 @@ def audit(image: bytes | None = None) -> dict[str, object]:
     expect(original, 12, 0x68B9,
            "90 cf de e0 b4 02 14 90 d1 2d e0 44 02 f0")
 
+    # The accepted commands converge at 68C6 (MOVX @DPTR,A), followed by
+    # helper calls and a jump to 68D4 (SETB C; RET). Failed CFDE=2 checks
+    # branch directly to the same return. Carry alone is not an ACK of a
+    # successful refresh request or panel operation.
+    expect(original, 12, 0x68C6, "f0 12 2c 50 12 2b 9c 80 05")
+    expect(original, 12, 0x68D4, "d3 22")
+
     # A separate bank-19 state-processing path can set both request bits.
     # 7E3B branches on D8B3 == 0x20 to 7E85, which passes R7=0x20
     # to 8BCF. That handler checks a D8B3/D8B4 transition before CALL 80A4.
@@ -82,6 +89,7 @@ def audit(image: bytes | None = None) -> dict[str, object]:
         "apcs_command": (0x80, entries[0x80]),
         "aocs_command": (0x82, entries[0x82]),
         "bank12_guards": ("CFDB == E0", "CFDA == 3", "CFDE == 2"),
+        "bank12_return": "SETB C on guarded write and rejected operand; not a success ACK",
         "bank19_state_path": "D8B3=20 -> R7=20 -> 8BCF -> 80A4 (conditional)",
     }
 

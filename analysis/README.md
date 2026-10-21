@@ -54,6 +54,8 @@ Bank 12 holds a 100-entry indirect command table near `5D85..5EB0`. The APCS and
 
 The surrounding dispatch path examines `CFDB == E0` and `CFDA` values including `01`/`03`. The **source and complete framing of incoming bytes are unknown**. `CFDE` is used as an operand/index elsewhere in firmware; it is not identified as a universal service-mode flag.
 
+Both handlers join at `12:68C6` for the conditional `MOVX @DPTR,A` write to XDATA `D12D`, followed by helper calls. Successful writes then branch to `12:68D4` (`SETB C; RET`); rejecting `CFDE != 02` reaches **the same return** directly. Therefore the returned carry flag alone cannot confirm that a request bit was written, let alone that the panel ran compensation. These byte-level paths are checked by `analysis/audit_refresh_command_table.py`.
+
 Distinct paths interpret `CFDA` differently:
 
 | Location | Values / guard | Notes |

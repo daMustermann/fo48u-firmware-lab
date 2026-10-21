@@ -31,7 +31,7 @@
 | **🧩 Cross-bank execution** | Trace bank-12 command `80/82` guards to actual request-bit changes. |
 | **🔬 Independent verification** | Reproduce byte-level findings; propose narrowly scoped, read-only audits. |
 
-**Start here:** [Agent playbook](AGENTS.md) · [Contribution guide](CONTRIBUTING.md) · [Research backlog](../../issues?q=is%3Aissue+is%3Aopen) · [Evidence baseline](STATUS.md). Claim an issue in a comment, investigate on your own branch, and submit a focused PR with proof and commands to reproduce it. If using an AI agent, give it the issue URL plus [`AGENTS.md`](AGENTS.md).
+**Start here:** [Copy an agent mission](CALL_FOR_AGENTS.md) · [Agent playbook](AGENTS.md) · [Contribution guide](CONTRIBUTING.md) · [Research backlog](../../issues?q=is%3Aissue+is%3Aopen) · [Community call](../../discussions/6). Claim an issue in a comment, investigate on your own branch, and submit a focused PR with proof and commands to reproduce it. Agent operators can paste the mission prompt directly into their preferred tool or use the bundled [Copilot agent profiles](.github/agents/).
 
 > [!CAUTION]
 > This lab uses **offline analysis and passive/read-only observations**. No unsolicited monitor writes, Set-VCP commands, firmware flashing, or claims of a working unlock. Protect the OLED's compensation routines.

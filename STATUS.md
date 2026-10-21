@@ -10,9 +10,10 @@
 | OLED requests | **Verified in bytes** | `D12D` bit 0 APCS, bit 1 AOCS; bank-18 consumers |
 | Service-menu entry records | **Verified in bytes** | Bank-9 entries 23/24 call `A14C` / `A1C0` |
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
+| Official Sidekick APCS/AOCS commands | **Verified in application bytes; device execution open** | `GOSD.OLEDSet.SetOSD(3)` constructs `E0 80 00 02` (APCS) / `E0 82 00 02` (AOCS) inside Realtek-HID frames. See [Sidekick protocol](analysis/sidekick-protocol.md). |
 | Bank-12 caller | **Verified in bytes; input origin open** | Conditional `18:D6CE` call via shared `0:2DB2` trampoline to `12:539D`, then `12:53FC` |
 | Internal buffer handoff | **Verified conditional byte path** | `13:E3BB` tests `D8FE`; `18:E22D` can copy 80 B from `CEE1` or `CF31` into `CFD8` before bank-12 dispatch |
-| `D8FE` source paths | **Verified in bytes; upstream state open** | `4:BA29` passes `C68A` to setter `4:FB1F`; `4:F348` gets `D83C` via `3:A98D` selector `0C` and calls the same setter. `4:E6D4..E70B` temporarily saves, clears, then restores `D8FE`. |
+| `D8FE` source paths | **Verified byte routes; runtime state open** | `2:FE80` maps `D180` to `00/10/20`, reaching `4:B9D7` through a bank-switch path that writes `C68A`. `4:BA29` feeds `C68A` to the `D8FE` setter; `4:BA31` stores `C68A` in `D83C`, which `4:F348` can read back. Other writers of `C68A` exist. |
 | Dual receive slots and completion flags | **Verified in bytes** | `13:DD24` reads `FF24/FF25` for `CFD8` or `CEE1`, sets `CFD2` bit 0 conditionally; `13:DE63` reads `FE88/FE89` for `CF31`, sets bit 1 conditionally. `13:C8A4` and `18:D712` include conditional flag clearing. |
 | Incoming packet framing | **Partial byte evidence; open** | Bank-13 candidate buffer length formula `(buffer[1] & 7F) + 3`; transport and checksum acceptance not established |
 | Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
@@ -41,6 +42,8 @@ The observations are specific to the hash-identified binary. Static analysis alo
 
 ## Host-side evidence
 
+A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; neither a response value nor compensation execution has been demonstrated. The FO48U model maps to the Realtek HID branch in the executable. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
+
 A read-only DDC/CI probe returned a response to GET-VCP `E0` that resembled the result for `DF`. This **does not prove** an accessible vendor service command: the device does not advertise `E0`, and generic fallback behavior remains plausible. No Set-VCP or USB write tests were performed.
 
 Firmware has several distinct paths using `CFDA`:
@@ -54,7 +57,7 @@ Firmware has several distinct paths using `CFDA`:
 
 ## Research priorities
 
-1. Trace writers and meaning of `C68A`/`D83C`, then physical ingress behind the **two identified receive register paths** (`FF24/FF25` and `FE88/FE89`), using **passive or read-only** evidence.
+1. Determine the runtime origin of `D180` and the other `C68A` writers, then physical ingress behind the **two identified receive register paths** (`FF24/FF25` and `FE88/FE89`), using **passive or read-only** evidence.
 2. Follow physical joystick input to a **true selection event** for service actions 23/24.
 3. Correlate selection, request-bit updates and the bank-18 state machine.
 4. Determine verified recovery and hardware-test procedures before considering any modified firmware.

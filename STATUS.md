@@ -11,6 +11,7 @@
 | Service-menu entry records | **Verified in bytes** | Bank-9 entries 23/24 call `A14C` / `A1C0` |
 | Bank-12 commands | **Verified in bytes** | `80` → `68A9`; `82` → `68B9`; handler operand `CFDE == 2` |
 | Bank-12 caller | **Verified in bytes; input origin open** | Conditional `18:D6CE` call via shared `0:2DB2` trampoline to `12:539D`, then `12:53FC` |
+| Internal buffer handoff | **Verified conditional byte path** | `13:E3BB` tests `D8FE`; `18:E22D` can copy 80 B from `CEE1` or `CF31` into `CFD8` before bank-12 dispatch |
 | Incoming packet framing | **Partial byte evidence; open** | Bank-13 candidate buffer length formula `(buffer[1] & 7F) + 3`; transport and checksum acceptance not established |
 | Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
 | Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
@@ -31,6 +32,7 @@ The observations are specific to the hash-identified binary. Static analysis alo
 | `9:A14C` / `9:A1C0` | APCS / AOCS service item handlers |
 | `12:68A9` / `12:68B9` | Command-table APCS / AOCS handlers |
 | `18:D6CE` → `0:2DB2` → `12:539D` | Guarded cross-bank entry into bank-12 protocol setup |
+| `18:E254` → `0:35FC` → `0:35CF` | Conditional 80-byte XDATA copy into `CFD8`; enabled by `CFD2` bit 0/1 and `D8FE` |
 | `19:80A4` | Conditional state-triggered request for both |
 | `CFDA..CFDF` | Shared protocol fields; usage differs by command family |
 
@@ -49,7 +51,7 @@ Firmware has several distinct paths using `CFDA`:
 
 ## Research priorities
 
-1. Trace the physical ingress that fills `CFDA..CFDF` and establish frame boundaries using **passive or read-only** evidence.
+1. Trace the upstream `D8FE`/`C693` state and second receive slot, plus physical ingress behind `CEE1`/`CF31`/`CFD8`, using **passive or read-only** evidence.
 2. Follow physical joystick input to a **true selection event** for service actions 23/24.
 3. Correlate selection, request-bit updates and the bank-18 state machine.
 4. Determine verified recovery and hardware-test procedures before considering any modified firmware.

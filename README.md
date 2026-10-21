@@ -12,9 +12,29 @@
 ![Hardware](https://img.shields.io/badge/MODIFIED%20FLASH-UNTESTED-8f3958)
 [![License](https://img.shields.io/badge/CODE-MIT-493c73)](LICENSE)
 
-[**Findings**](STATUS.md) · [**Technical analysis**](analysis/README.md) · [**Panel-care internals**](analysis/panel_protection.md) · [**Research tools**](analysis/)
+[**Findings**](STATUS.md) · [**Technical analysis**](analysis/README.md) · [**Panel-care internals**](analysis/panel_protection.md) · [**Join the agent lab**](CONTRIBUTING.md) · [**Open tasks**](../../issues)
 
 </div>
+
+---
+
+## 🤖 Calling all reverse-engineering agents
+
+**Human researchers, autonomous coding agents and their operators are welcome.** Help unravel the FO48U's hidden service paths with **reproducible, byte-backed evidence**. Bring Ghidra, radare2, Python, REA or a fresh perspective. Every contribution arrives as a **pull request**, where it can be checked before publication.
+
+[![AI agents welcome](https://img.shields.io/badge/AI%20AGENTS-WELCOME-2b9e91?style=for-the-badge)](AGENTS.md) [![Pick a task](https://img.shields.io/badge/OPEN%20RESEARCH-HELP%20WANTED-4258af?style=for-the-badge)](../../issues?q=is%3Aissue+is%3Aopen) [![Contribute via PR](https://img.shields.io/badge/CONTRIBUTE-PULL%20REQUESTS-893f9c?style=for-the-badge)](CONTRIBUTING.md)
+
+| Research mission | What would move the investigation forward? |
+| :-- | :-- |
+| **📡 Protocol archaeology** | Find the incoming packet boundary and writer path for `CFDA..CFDF`. |
+| **🎮 Joystick to service action** | Establish whether a real selection event reaches bank-9 actions `23/24`. |
+| **🧩 Cross-bank execution** | Trace bank-12 command `80/82` guards to actual request-bit changes. |
+| **🔬 Independent verification** | Reproduce byte-level findings; propose narrowly scoped, read-only audits. |
+
+**Start here:** [Agent playbook](AGENTS.md) · [Contribution guide](CONTRIBUTING.md) · [Research backlog](../../issues?q=is%3Aissue+is%3Aopen) · [Evidence baseline](STATUS.md). Claim an issue in a comment, investigate on your own branch, and submit a focused PR with proof and commands to reproduce it. If using an AI agent, give it the issue URL plus [`AGENTS.md`](AGENTS.md).
+
+> [!CAUTION]
+> This lab uses **offline analysis and passive/read-only observations**. No unsolicited monitor writes, Set-VCP commands, firmware flashing, or claims of a working unlock. Protect the OLED's compensation routines.
 
 ---
 

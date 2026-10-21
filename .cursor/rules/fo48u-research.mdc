@@ -1,0 +1,6 @@
+---
+description: FO48U firmware research evidence and contribution rules
+alwaysApply: true
+---
+
+Read and follow the repository's root `AGENTS.md` and `CONTRIBUTING.md` before making any edits. Research is anchored to the stock F08 image and exact byte-level evidence. Contributions must arrive through GitHub pull requests. Keep experiments offline and observations passive/read-only. Never transmit monitor commands, flash firmware or publish unvalidated patched images.

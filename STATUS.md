@@ -15,6 +15,7 @@
 | Internal buffer handoff | **Verified conditional byte path** | `13:E3BB` tests `D8FE`; `18:E22D` can copy 80 B from `CEE1` or `CF31` into `CFD8` before bank-12 dispatch |
 | `D8FE` source paths | **Verified byte routes; runtime state open** | `2:FE80` maps `D180` to `00/10/20`, reaching `4:B9D7` through a bank-switch path that writes `C68A`. `4:BA29` feeds `C68A` to the `D8FE` setter; `4:BA31` stores `C68A` in `D83C`, which `4:F348` can read back. Other writers of `C68A` exist. |
 | Dual receive slots and completion flags | **Verified in bytes** | `13:DD24` reads `FF24/FF25` for `CFD8` or `CEE1`, sets `CFD2` bit 0 conditionally; `13:DE63` reads `FE88/FE89` for `CF31`, sets bit 1 conditionally. `13:C8A4` and `18:D712` include conditional flag clearing. |
+| Firmware interrupt entry | **Verified in bytes; peripheral open** | 8051 INT1 vector `0:0013 → 0:520B` conditionally calls bank-13 receiver routines or bank-7 `BA52`, gated by `D183` bit 2 and IRAM `0x27.5`. See `analysis/audit_receiver_origins.py`. |
 | Incoming packet framing | **Partial byte evidence; open** | Bank-13 candidate buffer length formula `(buffer[1] & 7F) + 3`; transport and checksum acceptance not established |
 | Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
 | Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
@@ -42,7 +43,7 @@ The observations are specific to the hash-identified binary. Static analysis alo
 
 ## Host-side evidence
 
-A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; neither a response value nor compensation execution has been demonstrated. The FO48U model maps to the Realtek HID branch in the executable. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
+A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; neither a response value nor compensation execution has been demonstrated. Its Realtek-HID model branch uses VID:PID `0BDA:1100`, and Windows enumerates that HID interface, though the process-to-device handle remains unobserved. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
 
 A read-only DDC/CI probe returned a response to GET-VCP `E0` that resembled the result for `DF`. This **does not prove** an accessible vendor service command: the device does not advertise `E0`, and generic fallback behavior remains plausible. No Set-VCP or USB write tests were performed.
 

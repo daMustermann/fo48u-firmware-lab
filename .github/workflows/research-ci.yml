@@ -51,6 +51,7 @@ jobs:
           python -B analysis/audit_dual_ingress.py
           python -B analysis/audit_d8fe_sources.py
           python -B analysis/audit_d8fe_upstream.py
+          python -B analysis/audit_receiver_origins.py
           python -B analysis/audit_joystick_event_chain.py
           python -B analysis/audit_menu_reachability.py
           python -B analysis/audit_packet_field_usage.py

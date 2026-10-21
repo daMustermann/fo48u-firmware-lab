@@ -13,6 +13,8 @@ Both click handlers call `GOSD.OLEDSet.SetOSD(3, ...)`. Their original IL is loc
 
 The program maps **FO48U** to monitor identifier **GBT4800** and its Realtek HID branch, which searches VID `0x0BDA`, PID `0x1100`. This is evidence of the program's intended device selection, subject to independent hardware-endpoint attribution.
 
+Windows also enumerates a present `HID\VID_0BDA&PID_1100` device, with vendor-defined usage `FFDA/00DA` and the Microsoft `HidUsb` driver, downstream of a Realtek `0BDA:5411` USB hub. The Sidekick native DLL explicitly checks VID/PID using `HidD_GetAttributes` and SetupAPI. The final live `CreateFile` handle connecting this specific interface to the observed Sidekick traffic has not yet been captured. The display's `DISPLAY\GBT4800` EDID instance does not independently prove the USB path.
+
 ## Readback selectors
 
 `GetOSD(2, ...)` uses `E0 7F` for panel hours, `E0 80` for APCS status, `E0 81` for APCS count, `E0 82` for AOCS status, and `E0 83` for AOCS count. The Realtek query has prefix `51 83 01 E0 XX XOR`, padded to 36 bytes and followed by `HID_i2cread(0x51, 1, buffer, 36, 0x6E, 0, 100)`.
@@ -20,6 +22,12 @@ The program maps **FO48U** to monitor identifier **GBT4800** and its Realtek HID
 A passive trace of the connected Sidekick process captured the native **query**, `HID_i2cwrite(..., 36, 0x6E, 0)`, with bytes `51 83 01 E0 50 63`, followed by `HID_i2cread(0x51, 1, ..., 36, 0x6E, 0, 100)` and HID output/input-report calls. The capture confirms this host-side transport is actively used; it did **not** establish the returned panel bytes or observe an APCS/AOCS execution command. It also does not independently identify the physical HID interface that handled the query.
 
 One UI caveat: `APCS_EXE_Click` checks `AOCS_exe == 1` (as does `AOCS_EXE_Click`). The reason for the shared gate, and its effect on actual execution, remain unverified.
+
+To reproduce the method-byte audit with your own official installed executable (no hardware access):
+
+```powershell
+python -B analysis/audit_sidekick_commands.py 'C:\Program Files (x86)\Gigabyte\OSDSidekick\AORUS\osdsidekick.exe'
+```
 
 ## Relationship to F08 firmware
 

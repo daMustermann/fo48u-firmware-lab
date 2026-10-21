@@ -4,6 +4,8 @@ This is a reproducible map of the **F08 (2022-11-15)** firmware image used throu
 
 [Overview](../README.md) · [Research status](../STATUS.md) · [OLED scheduler](panel_protection.md) · [Sidekick HID evidence](sidekick-protocol.md)
 
+The optional `audit_sidekick_commands.py` verifies official OSD Sidekick UI-handler bytes using a locally installed vendor executable. It is intentionally excluded from CI because the proprietary installer is not bundled. The firmware-only `audit_receiver_origins.py` checks the interrupt entry and paired receiver paths against the stock F08 hash.
+
 ## Image and architecture
 
 | Image property | Finding |

@@ -152,3 +152,7 @@ Disassembly from 18:7BFE reads CFDB and passes it to helper 3C49. This is anothe
 ## bank18:85A4 CFDB copy
 
 Disassembly from 18:85A4 reads CFDB and stores it at XDATA 0xC985, forwarding packet state to another buffer.
+
+## bank18:DBE9 CFDB dispatch
+
+Disassembly from 18:DBE9 reads CFDB and dispatches on values derived from 0xFE, 0xFB and 0x03. This is another packet-family selector site.

@@ -368,3 +368,7 @@ Disassembly from 13:C971 writes R7 to XDATA 0xCF8A. This is a 0xCF8A state-updat
 ## bank12:5951 0xCF8B write
 
 Disassembly from 12:5951 writes 0 or 0x04 to XDATA 0xCF8B depending on D142. This is a 0xCF8B state-update site.
+
+## bank12:5968 0xCF8C write
+
+Disassembly from 12:5968 writes 0, 1 or 2 to XDATA 0xCF8C depending on D142. This is a 0xCF8C state-update site.

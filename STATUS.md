@@ -220,3 +220,7 @@ Disassembly from 15:7848 reads D8FE and compares it to 0x10. This is a D8FE-depe
 ## bank15:B8A7 D8FE check
 
 Disassembly from 15:B8A7 reads D8FE and, if nonzero, jumps to B9E5. This is a D8FE-dependent path.
+
+## bank15:B934 D8FE handling
+
+Disassembly from 15:B934 reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x50. This is a D8FE-dependent value selection.

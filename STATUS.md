@@ -120,3 +120,7 @@ Disassembly from 4:E678 shows a routine that reads D8FE, tests bit 0, conditiona
 ## bank10:F801 CFD2/CFD8/CFDA checks
 
 Disassembly from 10:F7F0 reads CFD2, CFD8 and CFDA, comparing against constants 0x71, 0x77 and 0xAA. This is a concrete packet-validation site.
+
+## bank10:F23A CFDC/CFDB validation
+
+Disassembly from 10:F220 reads CFDC into R3 and CFDB into R6, then validates against R4/R5. This is another packet-validation site.

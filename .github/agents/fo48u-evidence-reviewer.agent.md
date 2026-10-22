@@ -28,8 +28,18 @@ Never interact with a monitor, send active commands or flash a firmware image. N
 
 ### Stop Proliferating One-Off `analysis/audit_*.py` Scripts — Use/Build Reusable Indexing
 - We already have 17+ narrow scripts. Instead of writing a brand-new `audit_*.py` for every XDATA address or call chain:
-  - **Data-Flow First (Global XDATA Index):** On this Realtek scaler, state is passed primarily via global `XDATA` variables (`MOV DPTR, #0xXXXX` followed by `MOVX A, @DPTR` [`0xE0`] read or `MOVX @DPTR, A` [`0xF0`] write, plus sequential `INC DPTR` [`0xA3`] accesses). Query or build a reusable cross-bank XDATA Read/Write index across all `analysis/banks/bank_*.bin` files so any `0xXXXX` address immediately lists all reading and writing `(bank, offset)` sites in one command.
+  - **Data-Flow First (Global XDATA Index):** On this Realtek scaler, state is passed primarily via global `XDATA` variables (`MOV DPTR, #0xXXXX` followed by `MOVX A, @DPTR` [`0xE0`] read or `MOVX @DPTR, A` [`0xF0`] write, plus sequential `INC DPTR` [`0xA3`] accesses). Use `analysis/xref_xdata.py` as the **primary tool** for cross-bank XDATA read/write/index lookups. Query or build a reusable cross-bank XDATA Read/Write index across all `analysis/banks/bank_*.bin` files so any `0xXXXX` address immediately lists all reading and writing `(bank, offset)` sites in one command.
   - **Shared Knowledge Base:** Record every verified function role, trampoline target, SFR, and XDATA address in a central machine-readable index (or `STATUS.md` / `analysis/README.md`) with exact `(bank, offset)` evidence so subsequent agents never re-reverse the same address twice.
+
+### Use `analysis/xref_xdata.py` as Primary Tool for XDATA/ROM Pointer Analysis
+- **Primary tool:** `analysis/xref_xdata.py` is the reusable cross-bank XDATA/ROM-pointer/index scanner for `analysis/banks/bank_*.bin`. Prefer it over ad-hoc greps/scripts.
+- **Usage:**
+  - `python3 analysis/xref_xdata.py 0xD8FE -C 5` — find direct MOVX reads/writes to a specific XDATA address with disassembly context
+  - `python3 analysis/xref_xdata.py 0xD8FE --rom-ptrs --include-indexed -C 5` — also show ROM pointer references and base+offset indexed accesses
+  - `python3 analysis/xref_xdata.py 0xD8F0-0xD8FF` — range scanning across an XDATA range
+  - `python3 analysis/xref_xdata.py --find-switches` — locate Keil inline switch/case jump tables
+  - `python3 analysis/xref_xdata.py --dump-json analysis/xdata_index.json` — export full cross-bank index (reads/writes/rom_ptrs/indexed/switches) to JSON
+- When indirect/base+offset access is suspected (no direct `MOV DPTR,#0xXXXX` hits), run with `--include-indexed`. When scanning for call/dispatch tables, use `--rom-ptrs` and `--find-switches`.
 
 ### Indirect Table Lookups Over Direct Address Searches
 - If a direct search for `MOV DPTR, #0xXXXX` yields no writers/readers, check immediately for:

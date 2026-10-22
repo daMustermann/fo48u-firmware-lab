@@ -276,3 +276,7 @@ Disassembly from 10:E16A reads D8FE and dispatches on values derived from 0x20 a
 ## bank10:CE02 D8FE handling
 
 Disassembly from 10:CE02 reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x50. This is a D8FE-dependent value selection.
+
+## bank10:CDAA D8FE handling
+
+Disassembly from 10:CDAA reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x50. This is another D8FE-dependent value selection.

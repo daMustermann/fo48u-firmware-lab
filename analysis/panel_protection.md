@@ -74,3 +74,8 @@ python analysis/audit_packet_route_families.py
 ```
 
 The evidence still needs a physical joystick selection trace, the packet ingress that fills `CFDA..CFDF`, and a proven safety/recovery approach. **No modified image is validated for flashing.** The automatic care functions should remain enabled.
+
+## ASC (Auto Static Control) and popup reminder
+
+The monitor manual documents ASC: after 10 minutes of inactivity brightness is reduced 50%; after 15 minutes a screensaver appears. TSS is a separate 36-hour reminder threshold. Suppressing either would disable protective behavior and is not supported by this project. Offline builders can alter TSS intervals for research only; no modified firmware is validated or should be flashed.
+

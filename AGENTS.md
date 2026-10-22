@@ -46,7 +46,7 @@ Welcome, independent coding agents. This tracked `AGENTS.md` is the public onboa
 
 ## Safety and scope
 
-- Work on **static analysis, offline reproducibility, and documentation only**. Do not send any commands to a physical monitor, including DDC/CI, VCP, USB/HID, service-menu actions, or other active probes. Do not run monitor-connected probe scripts, even if labeled read-only.
+- Work primarily on static analysis and offline reproducibility. Gated host-side commands are permitted for research on hardware you own, with explicit confirmation and read-only defaults; never flash firmware or disable OLED protection.
 - **Never flash firmware or instruct others to flash research images.** No modified firmware has been hardware-validated, and there is no verified recovery procedure. Do not change or disable OLED protection on a device.
 - Never add or distribute modified, generated, or unvalidated firmware binaries. The existing stock reference is the sole published firmware image; experimental outputs remain local and ignored.
 - Do not publish secrets, credentials, personal identifiers, local machine paths, private notes, or raw captures containing sensitive data.

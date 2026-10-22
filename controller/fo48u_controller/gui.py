@@ -66,6 +66,8 @@ PAGES = [
     ("Gaming", "🎮"),
     ("Crosshair", "🎯"),
     ("Firmware", "💾"),
+    ("EDID", "🧾"),
+    ("Research", "🔬"),
     ("Hardware", "📈"),
     ("Profiles", "📁"),
     ("Diagnostics", "🧪"),
@@ -162,6 +164,8 @@ class Fo48uGui:
         self.pages["Gaming"] = self._page_gaming()
         self.pages["Crosshair"] = self._page_crosshair()
         self.pages["Firmware"] = self._page_firmware()
+        self.pages["EDID"] = self._page_edid()
+        self.pages["Research"] = self._page_research()
         self.pages["Hardware"] = self._page_hardware()
         self.pages["Profiles"] = self._page_profiles()
         self.pages["Diagnostics"] = self._page_diagnostics()
@@ -379,6 +383,48 @@ class Fo48uGui:
         expected = "3dd2e95afce675d3b299dc29bffa1bf43aaee5efdad12d88a562442804bfdf5f"
         self.fw_text.set("MATCH" if digest == expected else f"MISMATCH: {digest}")
         self.log(f"Firmware hash: {digest}")
+
+    def _page_edid(self) -> ctk.CTkFrame:
+        page = ctk.CTkFrame(self.page_container, fg_color="transparent")
+        ctk.CTkLabel(page, text="EDID (read-only)", font=ctk.CTkFont(size=22, weight="bold")).pack(anchor="w", padx=14, pady=(14, 8))
+        card = ctk.CTkFrame(page, corner_radius=14)
+        card.pack(fill="both", expand=True, padx=14, pady=8)
+        self.edid_text = ctk.StringVar(value="Not read")
+        ctk.CTkLabel(card, textvariable=self.edid_text, justify="left", text_color="#9aa3b2").pack(anchor="w", padx=14, pady=8)
+        ctk.CTkButton(card, text="Read EDID", command=self._read_edid).pack(anchor="w", padx=14, pady=8)
+        return page
+
+    def _read_edid(self) -> None:
+        def work():
+            lines = []
+            try:
+                import subprocess
+                ps = "Get-CimInstance -Namespace root\\wmi -ClassName WmiMonitorDescriptor | ForEach-Object { $_.SerialNumberID -join '' }"
+                out = subprocess.check_output(["powershell", "-NoProfile", "-Command", ps], text=True, stderr=subprocess.DEVNULL)
+                lines.append("Serial: " + out.strip())
+            except Exception:
+                lines.append("Serial: unavailable")
+            try:
+                import subprocess
+                ps = "Get-CimInstance -Namespace root\\wmi -ClassName WmiMonitorBasicDisplayParams | ForEach-Object { 'Max res: ' + $_.MaxHorizontalImageSize.ToString() + 'x' + $_.MaxVerticalImageSize.ToString() + ' cm' }"
+                out = subprocess.check_output(["powershell", "-NoProfile", "-Command", ps], text=True, stderr=subprocess.DEVNULL)
+                lines.append(out.strip())
+            except Exception:
+                lines.append("Display params: unavailable")
+            self.root.after(0, lambda: self.edid_text.set("\n".join(lines)))
+
+        self._start_worker(work)
+
+    def _page_research(self) -> ctk.CTkFrame:
+        page = ctk.CTkFrame(self.page_container, fg_color="transparent")
+        ctk.CTkLabel(page, text="Research (offline only)", font=ctk.CTkFont(size=22, weight="bold")).pack(anchor="w", padx=14, pady=(14, 8))
+        card = ctk.CTkFrame(page, corner_radius=14)
+        card.pack(fill="x", padx=14, pady=8)
+        text = ("Offline audit scripts are in analysis/. Run them from the repository root. "
+                "No firmware is generated or flashed by this application. "
+                "OLED compensation remains enabled; do not attempt to bypass it.")
+        ctk.CTkLabel(card, text=text, text_color="#9aa3b2", wraplength=900, justify="left").pack(anchor="w", padx=14, pady=12)
+        return page
 
     def _page_hardware(self) -> ctk.CTkFrame:
         page = ctk.CTkFrame(self.page_container, fg_color="transparent")

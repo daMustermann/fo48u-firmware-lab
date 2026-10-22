@@ -320,3 +320,7 @@ Disassembly from 12:F5B0 reads D8FE and, if nonzero, writes 0x1D1A and calls B1F
 ## bank12:F601 D8FE handling
 
 Disassembly from 12:F601 reads D8FE and, if nonzero, writes 0x7A1A and calls B584. This is a D8FE-dependent path.
+
+## bank13:CADE D12D bit check
+
+Disassembly from 13:CADE reads D12D and tests bit 0. This is a D12D-dependent path.

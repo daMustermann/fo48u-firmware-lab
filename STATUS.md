@@ -76,3 +76,7 @@ The detailed evidence and commands live in [analysis/README.md](analysis/README.
 ## XDATA 0xD180 readers
 
 nalysis/xref_xdata.py 0xD180 lists 36+ direct reads and no direct MOVX @DPTR,A writer. D180 is likely state/ingress updated through indirect or bit-addressable paths.
+
+## XDATA 0xD8FE
+
+nalysis/xref_xdata.py 0xD8FE finds 50+ direct reads and exactly one direct writer at ank4:E6F4. This is a strong candidate for D8FE initialization/state updates.

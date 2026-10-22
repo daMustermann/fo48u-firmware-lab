@@ -196,3 +196,7 @@ Disassembly from 18:79B9 tests D180; if zero it calls E5F2 and conditionally cle
 ## bank18:9144 D180 handling
 
 Disassembly from 18:9144 reads D180 and, if nonzero, calls helper 2E6C. This is another D180-dependent path.
+
+## bank18:CA9B D180 handling
+
+Disassembly from 18:CA9B reads D180 at 18:CA9E and calls helpers FC24, FC42, FB0E and FC4E. This is a D180-dependent output path.

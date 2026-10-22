@@ -412,3 +412,7 @@ Disassembly from 12:59DA writes 0 or 1 to XDATA 0xCF97 depending on D141. This i
 ## bank12:59EC 0xCF98 write
 
 Disassembly from 12:59EC writes D129 & 0x01 to XDATA 0xCF98. This is a 0xCF98 state-update site.
+
+## bank12:5B11 0xCF99 write
+
+Disassembly from 12:5B11 writes D134 & 0x01 to XDATA 0xCF99. This is a 0xCF99 state-update site.

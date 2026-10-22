@@ -280,3 +280,7 @@ Disassembly from 10:CE02 reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x
 ## bank10:CDAA D8FE handling
 
 Disassembly from 10:CDAA reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x50. This is another D8FE-dependent value selection.
+
+## bank10:BA89 D8FE handling
+
+Disassembly from 10:BA89 reads D8FE and returns D8FE-0x10. This is a D8FE-dependent value transform.

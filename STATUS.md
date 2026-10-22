@@ -232,3 +232,7 @@ Disassembly from 15:B9AD reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x
 ## bank15:C4D0 D8FE handling
 
 Disassembly from 15:C4D0 reads D8FE and, if nonzero, sets R5=0x02 and calls helper 111A. This is a D8FE-dependent path.
+
+## bank15:C54A D8FE handling
+
+Disassembly from 15:C54A reads D8FE and, if nonzero, sets R5=0x02 and calls helper 111A. This is another D8FE-dependent path.

@@ -288,3 +288,7 @@ Disassembly from 10:BA89 reads D8FE and returns D8FE-0x10. This is a D8FE-depend
 ## bank11:9D78 D8FE handling
 
 Disassembly from 11:9D78 reads D8FE and, if nonzero, checks bit 1 of XDATA 0x0043 before continuing. This is a D8FE-dependent path.
+
+## bank11:A022 D8FE handling
+
+Disassembly from 11:A022 reads D8FE and, if nonzero, jumps away; otherwise it checks bit 1 of XDATA 0x0043 before continuing. This is a D8FE-dependent path.

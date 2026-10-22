@@ -20,7 +20,7 @@
 | Incoming packet framing | **Byte-verified; acceptance rule established** | Bank-13 paths: length `(buffer[1]&7F)+3` in register bank 2 (IRAM 0x17), counter in IRAM 0x58. The `FC`/`03` comparison pair returns `R7=1` on both arms (cannot reject), the matching arm's `LCALL 13:F4B0` writes no XDATA, only buffer offsets 1,2,3 are read (no inbound checksum). Path B merges the last-compared byte into `CFD2` bit 1 via `13:F7B0`. Transport (`FF24/FF25`/`FE88/FE89`) and the second CJNE's `R4` remain open. `analysis/audit_rx_acceptance.py` |
 | Candidate incoming buffer writer | **Verified in bytes; route open** | Conditional bank-13 `CFD8` buffer, `FF24` seed, `FF25`/`FE89` feed and indirect `0:36CF` XDATA writer; its connection to the bank-18 caller is open |
 | Manual joystick selection | **Open** | Actual user-event path to APCS/AOCS not demonstrated |
-| Host-side APCS trigger | **Verified on hardware** | Controller sends `51 85 03 E0 80 00 02 B5`; user confirmed APCS execution on their FO48U |
+| ASC auto-dimming | **Documented** | Manual documents 10-min 50% dim and 15-min screensaver; not a verified firmware patch target |
 
 The observations are specific to the hash-identified binary. Static analysis alone cannot establish a reliable manual refresh procedure.
 

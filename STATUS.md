@@ -260,3 +260,7 @@ Disassembly from 15:E8DF reads D8FE and, if nonzero, calls helper 114A and check
 ## bank15:EE59 D8FE dispatch
 
 Disassembly from 15:EE59 reads D8FE and dispatches on values derived from 0x10. This is a D8FE-dependent path.
+
+## bank15:F4C7 D8FE dispatch
+
+Disassembly from 15:F4C7 reads D8FE and dispatches on values derived from 0x90 and 0x50. This is a D8FE-dependent path.

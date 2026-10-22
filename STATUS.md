@@ -324,3 +324,7 @@ Disassembly from 12:F601 reads D8FE and, if nonzero, writes 0x7A1A and calls B58
 ## bank13:CADE D12D bit check
 
 Disassembly from 13:CADE reads D12D and tests bit 0. This is a D12D-dependent path.
+
+## bank10:CD98 D8FE/0x006C handling
+
+Disassembly from 10:CD98 writes and reads XDATA 0x006C, then reads D8FE. This is a D8FE/0x006C-dependent path.

@@ -248,3 +248,7 @@ Disassembly from 15:D265 reads D8FE and, if nonzero, checks D2F1 against 0x04. T
 ## bank15:D64C D8FE dispatch
 
 Disassembly from 15:D64C reads D8FE and dispatches on values derived from 0x10. This is a D8FE-dependent path.
+
+## bank15:DE42 D8FE handling
+
+Disassembly from 15:DE42 reads D8FE, writes it to 0x0009, then reads D2F3 and writes it to 0x000A. This is a D8FE/D2F3-dependent path.

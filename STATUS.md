@@ -380,3 +380,7 @@ Disassembly from 12:5987 writes a value derived from D125 to XDATA 0xCF8D. This 
 ## bank12:5992 0xCF8E write
 
 Disassembly from 12:5992 writes D127 & 0x1F to XDATA 0xCF8E. This is a 0xCF8E state-update site.
+
+## bank12:599A 0xCF8F write
+
+Disassembly from 12:599A writes D127 to XDATA 0xCF8F. This is a 0xCF8F state-update site.

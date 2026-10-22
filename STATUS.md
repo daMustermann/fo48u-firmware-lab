@@ -136,3 +136,7 @@ Disassembly from 13:C8BF copies CFDA to XDATA 0xC9C4 and CFDB to 0xC9C5, forward
 ## bank7:6945 CFDA checks
 
 Disassembly from 7:6930 sets up registers, reads CFDA, and rejects values 0xC0 and 0xD0 before continuing. This is another packet-gate site.
+
+## bank7:6C96 CFDA check
+
+Disassembly from 7:6C96 reads CFDA and rejects 0xD0 before continuing. This is another packet-gate site.

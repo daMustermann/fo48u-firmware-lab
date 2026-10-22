@@ -372,3 +372,7 @@ Disassembly from 12:5951 writes 0 or 0x04 to XDATA 0xCF8B depending on D142. Thi
 ## bank12:5968 0xCF8C write
 
 Disassembly from 12:5968 writes 0, 1 or 2 to XDATA 0xCF8C depending on D142. This is a 0xCF8C state-update site.
+
+## bank12:5987 0xCF8D write
+
+Disassembly from 12:5987 writes a value derived from D125 to XDATA 0xCF8D. This is a 0xCF8D state-update site.

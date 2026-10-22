@@ -124,3 +124,7 @@ Disassembly from 10:F7F0 reads CFD2, CFD8 and CFDA, comparing against constants 
 ## bank10:F23A CFDC/CFDB validation
 
 Disassembly from 10:F220 reads CFDC into R3 and CFDB into R6, then validates against R4/R5. This is another packet-validation site.
+
+## bank12:53FC CFDB/CFDA checks
+
+Disassembly from 12:53FC reads CFDB and requires 0xE0, then reads CFDA and requires 0x01 before continuing. This is a packet-gate site.

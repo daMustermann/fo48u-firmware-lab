@@ -332,3 +332,7 @@ Disassembly from 10:CD98 writes and reads XDATA 0x006C, then reads D8FE. This is
 ## XDATA 0xD31B
 
 nalysis/xref_xdata.py 0xD31B finds 18+ direct reads and one direct writer at ank4:A12B. D31B is a state byte with a single writer.
+
+## bank4:A12B D31B writer
+
+Disassembly from 4:A12B writes R7 to XDATA 0xD31B, then checks helper 1084. This is the sole direct writer of D31B.

@@ -168,3 +168,7 @@ Disassembly from 18:911D reads D180 and, if nonzero, calls helper 2B0C. This is 
 ## bank18:9298 D180 check
 
 Disassembly from 18:9298 reads D180 and, if nonzero, calls helper FC2A. This is another D180-dependent path.
+
+## bank18:AD42 D180 handling
+
+Disassembly from 18:AD42 reads D180 and calls helpers FC24, FC5A, FC30, FC42 and FB0E. This is a D180-dependent output path.

@@ -420,3 +420,7 @@ Disassembly from 12:5B11 writes D134 & 0x01 to XDATA 0xCF99. This is a 0xCF99 st
 ## bank12:59FC 0xCF9A write
 
 Disassembly from 12:59FC writes a derived value to XDATA 0xCF9A. This is a 0xCF9A state-update site.
+
+## bank12:5A24 0xCFA0 write
+
+Disassembly from 12:5A24 writes R7 to XDATA 0xCFA0. This is a 0xCFA0 state-update site.

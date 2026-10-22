@@ -304,7 +304,15 @@ class Fo48uGui:
             ctk.CTkSlider(row, from_=0, to=maximum if maximum > 0 else 255, variable=var).pack(side="left", fill="x", expand=True, padx=8)
             ctk.CTkButton(row, text="Apply", width=70, command=lambda c=code, v=var: self._apply_all_vcp(c, v.get())).pack(side="right", padx=8)
 
-        ctk.CTkButton(page, text="Read all VCP", command=self._read_vcp).pack(anchor="w", padx=14, pady=8)
+        presets = ctk.CTkFrame(page, corner_radius=14)
+        presets.pack(fill="x", padx=14, pady=8)
+        ctk.CTkLabel(presets, text="Quick presets", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", padx=14, pady=(10, 6))
+        prow = ctk.CTkFrame(presets, fg_color="transparent")
+        prow.pack(fill="x", padx=14, pady=6)
+        ctk.CTkButton(prow, text="Game", command=lambda: self._apply_preset("game")).pack(side="left", padx=4)
+        ctk.CTkButton(prow, text="Movie", command=lambda: self._apply_preset("movie")).pack(side="left", padx=4)
+        ctk.CTkButton(prow, text="sRGB", command=lambda: self._apply_preset("srgb")).pack(side="left", padx=4)
+        ctk.CTkButton(prow, text="Read all VCP", command=self._read_vcp).pack(anchor="w", padx=14, pady=8)
         return page
 
     def _vcp_row(self, parent, name, code):
@@ -984,6 +992,34 @@ class Fo48uGui:
         if self.connected.get():
             self._refresh_all()
         self.root.after(30000, self._schedule_auto_refresh)
+
+    def _apply_preset(self, name: str) -> None:
+        if self.ddc is None:
+            from tkinter import messagebox
+            messagebox.showinfo("Not connected", "Connect to the monitor first.")
+            return
+        if not self.write_enabled.get():
+            from tkinter import messagebox
+            messagebox.showinfo("Read-only", "Enable write access first.")
+            return
+        presets = {
+            "game": [(0x10, 80), (0x12, 70), (0x14, 11), (0x87, 8)],
+            "movie": [(0x10, 40), (0x12, 50), (0x14, 2), (0x87, 5)],
+            "srgb": [(0x10, 50), (0x12, 50), (0x14, 8), (0x87, 5)],
+        }
+        from tkinter import messagebox
+        if not messagebox.askyesno("Confirm", f"Apply {name} preset?"):
+            return
+
+        def work():
+            ok = True
+            for code, value in presets[name]:
+                for phys in self.ddc.physical_monitors():
+                    ok = self.ddc.set_vcp(phys.hPhysicalMonitor, code, value) and ok
+            self.root.after(0, lambda: self.log(f"Preset {name} applied: {ok}"))
+            self.root.after(0, self._read_vcp)
+
+        self._start_worker(work)
 
     # --------------------------------------------------------------- worker
     def _start_worker(self, work: Callable[[], None]) -> None:

@@ -128,3 +128,7 @@ Disassembly from 10:F220 reads CFDC into R3 and CFDB into R6, then validates aga
 ## bank12:53FC CFDB/CFDA checks
 
 Disassembly from 12:53FC reads CFDB and requires 0xE0, then reads CFDA and requires 0x01 before continuing. This is a packet-gate site.
+
+## bank13:C8BF CFDA/CFDB copy
+
+Disassembly from 13:C8BF copies CFDA to XDATA 0xC9C4 and CFDB to 0xC9C5, forwarding packet bytes to another buffer.

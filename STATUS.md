@@ -364,3 +364,7 @@ Disassembly from 13:C976 reads 0xCF85 and XORs it with 0xB4, then reads 0xCF89 a
 ## bank13:C971 0xCF8A write
 
 Disassembly from 13:C971 writes R7 to XDATA 0xCF8A. This is a 0xCF8A state-update site.
+
+## bank12:5951 0xCF8B write
+
+Disassembly from 12:5951 writes 0 or 0x04 to XDATA 0xCF8B depending on D142. This is a 0xCF8B state-update site.

@@ -100,3 +100,7 @@ At 4:E6D4 the code reads D8FE, then at 4:E6F4 and 4:E712 writes D8FE (MOV DPTR,#
 ## XDATA 0xCFDB
 
 nalysis/xref_xdata.py 0xCFDB finds 18 direct reads and no direct writer. CFDB is populated indirectly or via hardware.
+
+## XDATA 0xCFDE
+
+nalysis/xref_xdata.py 0xCFDE finds 3 direct reads in bank 12 and no direct writer. CFDE is populated indirectly or via hardware.

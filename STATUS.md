@@ -176,3 +176,7 @@ Disassembly from 18:AD42 reads D180 and calls helpers FC24, FC5A, FC30, FC42 and
 ## bank18:D978 D180 dispatch
 
 Disassembly from 18:D978 reads D180 and dispatches on values 0, 1 and 2. This is a D180-dependent control path.
+
+## bank18:E584 D180/D160 handling
+
+Disassembly from 18:E584 tests D180; if zero it reads D160 bit 0 and continues only when D160 bit 0 is set. This is a D180/D160-dependent path.

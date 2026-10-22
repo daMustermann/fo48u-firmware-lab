@@ -240,3 +240,7 @@ Disassembly from 15:C54A reads D8FE and, if nonzero, sets R5=0x02 and calls help
 ## bank15:D225 D8FE handling
 
 Disassembly from 15:D225 reads D8FE and, if nonzero, sets R5=0x10 and calls helper 1D5C. This is another D8FE-dependent path.
+
+## bank15:D265 D8FE handling
+
+Disassembly from 15:D265 reads D8FE and, if nonzero, checks D2F1 against 0x04. This is a D8FE-dependent path.

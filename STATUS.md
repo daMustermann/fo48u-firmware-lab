@@ -216,3 +216,7 @@ Disassembly from 15:77F4 reads D8FE and calls helper 104E, then updates XDATA 0x
 ## bank15:7848 D8FE check
 
 Disassembly from 15:7848 reads D8FE and compares it to 0x10. This is a D8FE-dependent path.
+
+## bank15:B8A7 D8FE check
+
+Disassembly from 15:B8A7 reads D8FE and, if nonzero, jumps to B9E5. This is a D8FE-dependent path.

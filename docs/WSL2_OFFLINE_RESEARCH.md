@@ -88,6 +88,8 @@ else
 fi
 ```
 
+On a working Linux/WSL2 installation, setting `REA_BINWALK_COMMAND` to a Linux `binwalk` on `PATH` lets `rea inspect-firmware-regions` run (it was verified in this environment with `binwalk 3.1.0`). A missing or misconfigured REA/Binwalk pair can still fall back to the standalone `binwalk` scans above; no REA result is required to reproduce the Python audits.
+
 Observed results differ by Binwalk version and scan mode:
 
 | Executable / invocation | Observed on stock F08 | What it establishes |

@@ -144,3 +144,7 @@ Disassembly from 7:6C96 reads CFDA and rejects 0xD0 before continuing. This is a
 ## bank18:D6D3 CFDA dispatch
 
 Disassembly from 18:D6D3 reads CFDA and dispatches on 0xFD, 0xFC, 0xFB and 0x19. This is a packet-family selector site.
+
+## bank18:7BFE CFDB read
+
+Disassembly from 18:7BFE reads CFDB and passes it to helper 3C49. This is another packet-state consumer.

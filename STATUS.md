@@ -67,3 +67,8 @@ Firmware has several distinct paths using `CFDA`:
 The detailed evidence and commands live in [analysis/README.md](analysis/README.md) and [analysis/panel_protection.md](analysis/panel_protection.md).
 
 > **Safety:** OLED compensation is part of panel maintenance. Do not disable it or flash research images based only on static analysis.
+
+## XDATA 0xD12D readers
+
+nalysis/xref_xdata.py 0xD12D lists 20 direct reads across banks 0, 7, 11-13, 18-19 and no direct MOVX @DPTR,A writer. Request bits are therefore likely set through bit-addressable/indirect operations or hardware-mapped paths, not a simple direct store.
+

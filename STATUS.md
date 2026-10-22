@@ -344,3 +344,7 @@ Disassembly from 10:C50E calls helper BD4C and writes the result to XDATA 0x0043
 ## bank10:CD98 0x006C update
 
 Disassembly from 10:CD98 reads 0x006C, clears bit 0, ORs R7, and writes it back. This is a 0x006C state-update site.
+
+## bank13:C8C3 0xC9C4/0xC9C5 copy
+
+Disassembly from 13:C8C3 copies CFDA to 0xC9C4 and CFDB to 0xC9C5. This is a packet-forwarding site.

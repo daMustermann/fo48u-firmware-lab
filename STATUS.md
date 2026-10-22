@@ -404,3 +404,7 @@ Disassembly from 12:59C6 writes R7 to XDATA 0xCF95. This is a 0xCF95 state-updat
 ## bank12:59CE 0xCF96 write
 
 Disassembly from 12:59CE writes a value to XDATA 0xCF96 after testing D141. This is a 0xCF96 state-update site.
+
+## bank12:59DA 0xCF97 write
+
+Disassembly from 12:59DA writes 0 or 1 to XDATA 0xCF97 depending on D141. This is a 0xCF97 state-update site.

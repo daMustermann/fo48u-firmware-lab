@@ -108,3 +108,7 @@ At 4:E6D4 the code reads D8FE, then at 4:E6F4 and 4:E712 writes D8FE (MOV DPTR,#
 ## XDATA 0xFF24
 
 nalysis/xref_xdata.py 0xFF24 finds 2 direct reads and no direct writer. FF24 is likely hardware-mapped or indirectly set.
+
+## XDATA 0xFE88
+
+nalysis/xref_xdata.py 0xFE88 finds one direct read at ank13:DE7B and no direct writer. FE88 is likely hardware-mapped or indirectly set.

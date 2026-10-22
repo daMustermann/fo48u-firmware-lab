@@ -408,3 +408,7 @@ Disassembly from 12:59CE writes a value to XDATA 0xCF96 after testing D141. This
 ## bank12:59DA 0xCF97 write
 
 Disassembly from 12:59DA writes 0 or 1 to XDATA 0xCF97 depending on D141. This is a 0xCF97 state-update site.
+
+## bank12:59EC 0xCF98 write
+
+Disassembly from 12:59EC writes D129 & 0x01 to XDATA 0xCF98. This is a 0xCF98 state-update site.

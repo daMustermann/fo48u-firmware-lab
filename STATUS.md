@@ -148,3 +148,7 @@ Disassembly from 18:D6D3 reads CFDA and dispatches on 0xFD, 0xFC, 0xFB and 0x19.
 ## bank18:7BFE CFDB read
 
 Disassembly from 18:7BFE reads CFDB and passes it to helper 3C49. This is another packet-state consumer.
+
+## bank18:85A4 CFDB copy
+
+Disassembly from 18:85A4 reads CFDB and stores it at XDATA 0xC985, forwarding packet state to another buffer.

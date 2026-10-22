@@ -156,3 +156,7 @@ Disassembly from 18:85A4 reads CFDB and stores it at XDATA 0xC985, forwarding pa
 ## bank18:DBE9 CFDB dispatch
 
 Disassembly from 18:DBE9 reads CFDB and dispatches on values derived from 0xFE, 0xFB and 0x03. This is another packet-family selector site.
+
+## bank13:CAAF D12D bit handling
+
+Disassembly from 13:CA98 checks R6/R7 against 0x0400, then reads D12D and sets bit 0 under a condition. This is a D12D state-update site.

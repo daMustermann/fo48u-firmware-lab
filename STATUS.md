@@ -316,3 +316,7 @@ Disassembly from 12:999C reads D8FE and, if zero, jumps away; otherwise it conti
 ## bank12:F5B0 D8FE handling
 
 Disassembly from 12:F5B0 reads D8FE and, if nonzero, writes 0x1D1A and calls B1F3. This is a D8FE-dependent path.
+
+## bank12:F601 D8FE handling
+
+Disassembly from 12:F601 reads D8FE and, if nonzero, writes 0x7A1A and calls B584. This is a D8FE-dependent path.

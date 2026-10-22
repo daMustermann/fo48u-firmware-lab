@@ -140,3 +140,7 @@ Disassembly from 7:6930 sets up registers, reads CFDA, and rejects values 0xC0 a
 ## bank7:6C96 CFDA check
 
 Disassembly from 7:6C96 reads CFDA and rejects 0xD0 before continuing. This is another packet-gate site.
+
+## bank18:D6D3 CFDA dispatch
+
+Disassembly from 18:D6D3 reads CFDA and dispatches on 0xFD, 0xFC, 0xFB and 0x19. This is a packet-family selector site.

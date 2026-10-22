@@ -151,7 +151,7 @@ Disassembly from 18:7BFE reads CFDB and passes it to helper 3C49. This is anothe
 
 ## bank18:85A4 CFDB copy
 
-Disassembly from 18:85A4 reads CFDB and stores it at XDATA 0xC985, forwarding packet state to another buffer.
+Disassembly from 18:85A4 reads CFDB and stores it at XDATA 0xCF85, forwarding packet state to another buffer.
 
 ## bank18:DBE9 CFDB dispatch
 
@@ -348,3 +348,7 @@ Disassembly from 10:CD98 reads 0x006C, clears bit 0, ORs R7, and writes it back.
 ## bank13:C8C3 0xC9C4/0xC9C5 copy
 
 Disassembly from 13:C8C3 copies CFDA to 0xC9C4 and CFDB to 0xC9C5. This is a packet-forwarding site.
+
+## bank13:C953 CFDB copy to 0xCF85
+
+Disassembly from 13:C953 reads CFDB and writes it to XDATA 0xCF85. This is a packet-forwarding site.

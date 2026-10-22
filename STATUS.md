@@ -84,3 +84,7 @@ The detailed evidence and commands live in [analysis/README.md](analysis/README.
 ## bank4:E6F4 D8FE writer bytes
 
 ank_4.bin at `0xE6F4`: 90 D8 FE F0 (MOV DPTR,#0xD8FE; MOVX @DPTR,A). Surrounding bytes: E4 90 D8 FE F0 E4 FD 7F 02 .... This is the only direct writer of D8FE in the code banks.
+
+## bank4 D8FE access snippet
+
+At 4:E6D4 the code reads D8FE, then at 4:E6F4 and 4:E712 writes D8FE (MOV DPTR,#0xD8FE; MOVX @DPTR,A). This localizes D8FE state updates to a small bank-4 routine.

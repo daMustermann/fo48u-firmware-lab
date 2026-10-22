@@ -336,3 +336,7 @@ Disassembly from 10:CD98 writes and reads XDATA 0x006C, then reads D8FE. This is
 ## bank4:A12B D31B writer
 
 Disassembly from 4:A12B writes R7 to XDATA 0xD31B, then checks helper 1084. This is the sole direct writer of D31B.
+
+## bank10:C50E 0x0043 writer
+
+Disassembly from 10:C50E calls helper BD4C and writes the result to XDATA 0x0043. This is the sole direct writer of 0x0043.

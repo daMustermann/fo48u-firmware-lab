@@ -129,8 +129,34 @@ Use `python analysis/osd_strings.py` for OSD string-table research. More disasse
 | [`firmware/PATCHED/README.md`](firmware/PATCHED/README.md) | Offline research output policy |
 | [`controller/`](controller/) | Experimental host-side controller skeleton (dry-run by default) |
 
+
+## Host controller (experimental)
+
+controller/ contains a Python/customtkinter replacement for OSD Sidekick. It wraps the byte-verified Realtek-HID frames and standard DDC/CI.
+
+Confirmed working (tested):
+- Read panel hours / APCS / AOCS selectors.
+- APCS manual trigger (51 85 03 E0 80 00 02 B5).
+- DDC/CI readout of all responding VCP codes.
+- Hardware crosshair preset selection (E0 55 <index>).
+
+Safety: read-only by default; write access requires explicit toggle and confirmation. OLED execution remains gated and experimental.
+
+Setup:
+`powershell
+cd controller
+pip install -r requirements.txt
+pip install customtkinter
+cd helper
+dotnet publish -c Release -r win-x86 --self-contained false
+cd ..
+python run_gui.py
+`
+
+Controls: OLED care, display/audio/gaming/crosshair, profiles, diagnostics (full VCP dump), EDID, firmware hash verification, display tests.
+
 ## Open research questions
 
 **Which physical input selects a service action?** **Where are `CFDA..CFDF` populated?** **Can the exact manufacturer command frame be proven through passive captures?** The priority is establishing these paths through disassembly and read-only tracing, then evaluating safety and recovery separately.
 
-> **Unofficial community research.** Not affiliated with Gigabyte, Realtek or LG Display. Reverse-engineering findings and tools are offered as-is under the repository's [MIT license](LICENSE). Modified firmware may permanently damage the monitor.
+> **Unofficial community research.** Not affiliated with Gigabyte, Realtek or LG Display. Reverse-engineering findings and tools are offered as-is under the repository's [MIT license](LICENSE). Modified firmware is untested; treat it as potentially damaging until independently validated.

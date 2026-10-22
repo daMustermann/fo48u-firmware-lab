@@ -59,3 +59,5 @@ jobs:
           python -B analysis/audit_packet_route_families.py
           python -B analysis/audit_refresh_command_table.py
           python -B analysis/audit_service_dispatch.py
+          python -B analysis/audit_rx_acceptance.py
+          python -B analysis/audit_rx_acceptance.py --self-test

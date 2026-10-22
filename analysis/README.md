@@ -6,6 +6,7 @@ This is a reproducible map of the **F08 (2022-11-15)** firmware image used throu
 
 The optional `audit_sidekick_commands.py` verifies official OSD Sidekick UI-handler bytes using a locally installed vendor executable. It is intentionally excluded from CI because the proprietary installer is not bundled. The firmware-only `audit_receiver_origins.py` checks the interrupt entry and paired receiver paths against the stock F08 hash.
 The offline `audit_sidekick_f08_handoff.py` also verifies the **conditional** field alignment and 8051 handler route for the Sidekick reference frames; it does not establish physical HID ingress or monitor behavior. See [Sidekick protocol](sidekick-protocol.md).
+The offline `audit_rx_acceptance.py` decodes the two bank-13 receive paths and re-checks the **acceptance rule** (length gate, the `FC`/`03` comparison, and the absence of an inbound checksum) against the stock F08 hash. Its `--self-test` mode mutates an in-memory copy of the image and re-runs the audit, so a changed byte is rejected by a derived check even when the SHA-256 pin is recomputed.
 
 ## Image and architecture
 
@@ -85,6 +86,29 @@ A **second receive path is now verified** in bank 13. `13:EAF5` checks `(FE87 & 
 
 Further stock-byte checkpoints explain the candidate frame structure: `13:DD3C` seeds the receiver with a byte from `FF24`; `13:EF23` obtains byte 1 of the selected buffer and computes `(byte & 0x7F) + 3`. This is compatible with a length-coded protocol; its physical origin and full frame validation remain open. At `13:DDA4`, conditional code compares selected-buffer offsets 3 and 2 to `FC` and `03`, respectively. A separate path at `13:DEB3` feeds a byte read from XDATA `FE89` into the same `13:EF0D` helper. At `13:C8BF`, another bank-13 routine copies `CFDA/CFDB` to `C9C4/C9C5`; this is an observed consumer/copy, without a proven link to bank 12. These additional original byte ranges are checked by `analysis/audit_ddcci_ingress.py`.
 
+### Receive-path acceptance rule (bank 13)
+
+Both ISR-driven receive paths were decoded instruction by instruction, so the acceptance rule is byte-verified rather than open. `analysis/audit_rx_acceptance.py` re-checks every byte and every derived claim below.
+
+| Claim | Stock-byte evidence |
+| :-- | :-- |
+| Frame length is `(buffer[1] & 0x7F) + 3` | shared helper `13:EF0D`: `13:EF29` `54 7f`, `13:EF2B` `24 03`, `13:EF2D` `ff` (`MOV R7,A`) |
+| The length is compared with the received-byte counter | `0:5215` `75 d0 10` selects **register bank 2**, so IRAM `0x17` is R7; `13:DD84` `b5 17 d4` is `CJNE A,0x17`; the counter is IRAM `0x58` (`13:DD68` `78 58 e6`) |
+| The `FC`/`03` pair is the only frame-content test | comparison census of `13:DD24..13:DDC3` and `13:DE63..13:DEFF`: the length gate (`13:DD84`/`13:DD88`, `13:DEBD`/`13:DEC1`) plus `b4 fc 0e` and `b4 03 05` only |
+| The `FC`/`03` pair cannot reject a frame | all three outcomes end at `13:DDBE` / `13:DEFA` = `7f 01 22` (`MOV R7,#1`) |
+| The matching arm changes no observable state | `13:F8CE` forces `R7 = 0x16` (`af 16`); `13:F4B0` writes XDATA only in the branch needing `(R7 & 7) == 0`, and `0x16 & 7 = 6` |
+| No inbound checksum | only buffer offsets 1, 2 and 3 are read; offset 0 and offsets 4..7 never are |
+
+The `FC`/`03` comparison is therefore **value preserving**: the immediates `0xFC` and `0x03` at `13:DDAD` / `13:DDB6` (and `13:DEE9` / `13:DEF2`) only select between two arms that both return `R7 = 1`, and the extra work of the matching arm (`LCALL 13:F4B0`) writes nothing. The pair cannot reject a frame. In path A it cannot influence the accept flag either, because `13:E3D4..13:E3D8` merges the returned `R7` into XDATA `CFD2` bit 0 and `R7` is 1 on every path.
+
+Path B differs in one respect: `13:EB0D` calls `13:F7B0`, which loads `R7` from the buffer byte the comparison read last (`base + 3` or `base + 2`) and writes it into XDATA `CFD2` bit 1, so that flag still depends on the comparison while the receive return value itself is discarded there.
+
+For the official Sidekick frames (`analysis/audit_sidekick_f08_handoff.py`) the length byte `0x85` yields 8 bytes, which matches the frame size; buffer offset 3 is `0xE0`, so such a frame takes the mismatch arm, which returns the same `R7 = 1`; and the trailing XOR byte (offset 7) is never compared by these paths.
+
+The only checksum in the mapped ingress and dispatch code is **outbound**: `13:C976` computes XDATA `CF8B = CF8A ^ CF89 ^ CF85 ^ 0xB4`.
+
+Limits: the transport behind XDATA `FF24`/`FF25`/`FE88`/`FE89` is still unknown; the second `CJNE` of the length gate (`13:DD88` / `13:DEC1`) compares IRAM `0x16` (R6) with `R4`, whose value in this context is not established here; and a relative branch into `13:DDB6` from `13:DB37..13:DD23` is not excluded by the audit.
+
 ### Conditional buffer handoff
 
 Two cross-bank helpers read the same state byte, XDATA **`D8FE`**, via logical bank 4. In the bank-13 receive branch, `13:E3BB` calls `0:2656 → 4:FCFE` to obtain `D8FE` in `R7`. Zero selects the 128-byte buffer at `CFD8`; nonzero selects the 80-byte buffer at `CEE1`. At `13:E3D4`, the code writes `(CFD2 & FE) | R7` back to `CFD2`, but the intervening `13:DD24` can overwrite `R7` (including a read from `FF24`). **The flag written to `CFD2` cannot be assumed to equal `D8FE`.** `D8FE` is mutable: `4:FB1F` writes its input `R7`, `4:E6F3` clears it, and `4:E70B` copies XDATA `C693` into it.
@@ -95,13 +119,13 @@ A different `C693` writer at `3:BF9D..BFA2` uses common trampoline `0:0F52 → 0
 
 The bank-18 stage at `18:E22D` iterates **bits 0 then 1** of `CFD2`. On the first enabled bit, `18:E24E` calls `0:2A58 → 4:FE6D`, which also returns `D8FE`. When that value is nonzero, `18:E254..E270` calls the common memory copier (`0:35FC`) with an 80-byte XDATA source at **`CEE1 + slot × 0x50`** and destination **`CFD8`**. The dispatch table `0:359A` selects XDATA-to-XDATA implementation `0:35CF`. Thus slot 0 starts at `CEE1`; slot 1 starts at `CF31`. The selected index is stored at `CFD1` even when the `D8FE` test skips copying.
 
-The receive-result handling also explains **both `CFD2` low bits**. After `13:DD24`, `13:E3D4` combines its final `R7=0/1` with `CFD2 & FE`, writing bit 0. After `13:DE63`, `13:EB0D` calls `13:F7B0`, which doubles the final `R7=0/1` and combines it with `CFD2 & FD`, writing bit 1. Further conditional processing by `13:C8A4` may clear bit 0 (`13:E3E8`) or bit 1 (`13:EB1F`). Bank 18 clears the selected bit using `CFD1` at `18:D712..D72C`. These are **receive completion/processing flags**, not proof that either frame passed every validation stage. The two paths have a common `(buffer[1] & 7F) + 3` computed length, and both contain the conditional `FC 03` check, but exact acceptance semantics remain open.
+The receive-result handling also explains **both `CFD2` low bits**. After `13:DD24`, `13:E3D4` combines its final `R7=0/1` with `CFD2 & FE`, writing bit 0. After `13:DE63`, `13:EB0D` calls `13:F7B0`, whose `ADD A,#0x25` result is overwritten by `MOVX A,@DPTR` before `MOV R7,A`; `R7` therefore holds the buffer byte the comparison read last, and `13:F7B0` combines it with `CFD2 & FD`, writing bit 1. Further conditional processing by `13:C8A4` may clear bit 0 (`13:E3E8`) or bit 1 (`13:EB1F`). Bank 18 clears the selected bit using `CFD1` at `18:D712..D72C`. These are **receive completion/processing flags**, not proof that either frame passed every validation stage. The two paths have a common `(buffer[1] & 7F) + 3` computed length, and both contain the conditional `FC 03` check, whose acceptance semantics are now byte-verified: it cannot reject a frame (see [Receive-path acceptance rule](#receive-path-acceptance-rule-bank-13)).
 
 `13:C8A4` reads command fields from `CFD8` when `D8FE==0`, or from `CEE3 + slot × 0x50` when nonzero (offset 2 of the selected 80-byte slot). This is a further verified link between the receive buffers and downstream field processing; it does not establish a valid APCS/AOCS invocation. The new byte-level evidence is guarded by `analysis/audit_dual_ingress.py` alongside `analysis/audit_buffer_handoff.py`.
 
-Bank 18 calls the handoff at `18:D6C6` **before** its bank-7 and bank-12 calls. Paths feeding `D8FE` have been found, but the runtime origin of `D180`, intervening helper side effects, other possible `C68A` writers, live state, physical framing, hardware register meanings, checksum acceptance and end-to-end service-command reachability remain unresolved.
+Bank 18 calls the handoff at `18:D6C6` **before** its bank-7 and bank-12 calls. Paths feeding `D8FE` have been found, but the runtime origin of `D180`, intervening helper side effects, other possible `C68A` writers, live state, physical framing, hardware register meanings and end-to-end service-command reachability remain unresolved.
 
-These findings are evidence for conditional buffer selection, a possible length field, and an internal bank-18 buffer handoff. The physical DDC/CI framing, checksum acceptance, which transport fills `FF25`/`FE89`, and the end-to-end conditions for a successful bank-12 command remain unverified.
+These findings are evidence for conditional buffer selection, a computed length field, and an internal bank-18 buffer handoff. The physical DDC/CI framing, which transport fills `FF25`/`FE89`, and the end-to-end conditions for a successful bank-12 command remain unverified; the two mapped receive paths validate no inbound checksum.
 
 Bank 19 contains a conditional internal path at `80A4` that may set both request bits when `C501 == 0x20` and other state checks pass. No evidence currently connects that condition to an external USB command.
 
@@ -123,6 +147,8 @@ python analysis/audit_packet_field_usage.py
 python analysis/audit_packet_route_families.py
 python analysis/audit_refresh_command_table.py
 python analysis/audit_service_dispatch.py
+python analysis/audit_rx_acceptance.py
+python analysis/audit_rx_acceptance.py --self-test
 python analysis/build_variant.py --verify
 python analysis/build_custom.py --verify
 ```
@@ -146,6 +172,6 @@ else
 fi
 ```
 
-The REA invocation requires a Linux-compatible installation and was **not independently completed** in the recorded WSL2 test; the standalone Binwalk scan was tested. A short `gpg_signed`-like signature candidate at `0x5A3F5` lies inside apparent table data and **does not establish the presence of a signed GPG payload**. Treat signature scans as leads rather than proof of embedded formats.
+The REA invocation requires a Linux-compatible installation. On WSL2/Linux it works when `REA_BINWALK_COMMAND` points to a Linux `binwalk` on `PATH` (the example above sets it with `readlink -f`); no REA scan result is guaranteed in every environment, and the standalone Binwalk scan remains the tested fallback. A short `gpg_signed`-like signature candidate at file offset `0x5A3F5` lies inside apparent table data and **does not establish the presence of a signed GPG payload**. Treat signature scans as leads rather than proof of embedded formats.
 
 A monitor-connected read-only GET-VCP `E0` probe also yielded a generic-looking reply. It does not prove a callable vendor command. The active work is mapping packet ingress and joystick selection; no firmware is considered ready for hardware flashing.

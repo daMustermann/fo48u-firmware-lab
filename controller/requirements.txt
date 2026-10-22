@@ -1,0 +1,6 @@
+# Optional dependencies for future transports:
+# pyusb
+# hidapi
+# monitorcontrol
+# python-ddcci
+PY

@@ -1,0 +1,26 @@
+{
+  "0:0C54": {
+    "type": "shared_stub",
+    "pattern": "e5 52 54 1f 23 23 c0 e0 74 50 c0 e0 c0 82 c0 83 02 50 30"
+  },
+  "0:0BBC": {
+    "type": "shared_stub",
+    "pattern": "e5 52 54 1f 23 23 c0 e0 74 50 c0 e0 c0 82 c0 83 02 50 10"
+  },
+  "0:0BA9": {
+    "type": "shared_stub",
+    "pattern": "e5 52 54 1f 23 23 c0 e0 74 50 c0 e0 c0 82 c0 83 02 50 0c"
+  },
+  "0:0BF5": {
+    "type": "shared_stub",
+    "pattern": "e5 52 54 1f 23 23 c0 e0 74 50 c0 e0 c0 82 c0 83 02 50 1c"
+  },
+  "0:0C67": {
+    "type": "shared_stub",
+    "pattern": "e5 52 54 1f 23 23 c0 e0 74 50 c0 e0 c0 82 c0 83 02 50 34"
+  },
+  "0:0C7A": {
+    "type": "shared_stub",
+    "pattern": "e5 52 54 1f 23 23 c0 e0 74 50 c0 e0 c0 82 c0 83 02 50 38"
+  }
+}

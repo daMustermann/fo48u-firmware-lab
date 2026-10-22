@@ -38,3 +38,40 @@ The Sidekick reference frames have **eight bytes** each, exactly matching the st
 The physical USB bridge → `FF24/FF25` or `FE88/FE89` mapping, incoming checksum acceptance, relevant live state and successful panel compensation remain unverified.
 
 Research remains confined to official application inspection, offline firmware audits and passive observations. See [firmware anatomy](README.md) and [current status](../STATUS.md).
+
+## Decompiled control flow (AORUS `osdsidekick.exe`)
+
+`Window_Loaded` calls `GetAPCS_Enable()` (selector `E0 80`) and `GetAOCS_Enable()` (selector `E0 82`), storing the results in `APCS_exe` and `AOCS_exe`. Both `APCS_EXE_Click` and `AOCS_EXE_Click` return immediately unless `AOCS_exe == 1`; otherwise they call `SetOSD(3, [E0, 80/82, 02])`.
+
+Readback selectors used by the UI:
+
+| Method | Selector bytes | Response value |
+| :-- | :-- | :-- |
+| `GetPanel_Time` | `E0 7F` | panel hours |
+| `GetAPCS_Time` | `E0 81` | APCS elapsed time |
+| `GetAOCS_Time` | `E0 83` | AOCS elapsed time |
+| `GetAPCS_Enable` | `E0 80` | APCS enable/status |
+| `GetAOCS_Enable` | `E0 82` | AOCS enable/status |
+
+`GetOSD` sends a Realtek-HID query frame `51 83 01 E0 <selector> <xor>` padded to 36 bytes, sleeps, calls `HID_i2cread(0x51, 1, buffer, 36, 0x6E, 0, 100)`, and decodes the returned uint16 from response bytes 8 and 9 (big-endian). If the Realtek device is absent it falls back to the `GUSB.dll` route: write `6E 51 84 03 E0 <selector> 01 <xor>` (7 bytes) with `G_usb_control_msg(dev, 0x40, 0xB2, 0, 0, buffer, 7, 1000)`, then read 12 bytes with request type `0xC0`, request `0xA2`, index `0x6F`.
+
+`SetOSD` execution buffers:
+
+- Realtek: `51 85 03 E0 <selector> 00 02 <xor>` (8 bytes), padded to 32 bytes, sent with `HID_i2cwrite(buffer, 32, 0x6E, 0)`.
+- USB: `6E 51 84 03 E0 <selector> 02` (7 bytes), sent with `G_usb_control_msg(dev, 0x40, 0xB2, 0, 0, buffer, 7, 1000)`.
+
+Device selection uses VID `0x0BDA`, PID `0x1100` via `Get_mutiHID`/`Open_mutiHID`; the USB path operates on the `dev` handle obtained elsewhere in `MainWindow`.
+
+## Verified host-side readback
+
+The controller in controller/ successfully reads panel hours using the documented 51 83 01 E0 7F query frame and decodes response bytes 8/9. This confirms the transport and frame layout on at least one FO48U unit; execution commands remain unverified.
+
+
+## Hardware crosshair
+
+Crosshair_Click builds a 3-byte frame E0 55 <index> and sends it through the same SetOSD path. Realtek-HID execution form: 51 85 03 E0 55 00 <index> <xor> (padded to 32 bytes). The controller exposes this as OledCare.set_crosshair(index).
+
+
+## Hardware-verified execution
+
+On 2026-10-22, the controller's APCS trigger (51 85 03 E0 80 00 02 B5) was executed successfully on a real FO48U. This confirms the host-to-firmware APCS path for that device and image; AOCS and other commands remain to be validated per device.

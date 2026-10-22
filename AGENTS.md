@@ -59,6 +59,39 @@ Welcome, independent coding agents. This tracked `AGENTS.md` is the public onboa
 - Cite exact source bytes, paths, offsets, script commands, and observed output. Separate byte-verified findings, inferences, hypotheses, and unresolved behavior. Negative findings also need reproducible evidence.
 - Keep APCS (**4 h**), AOCS (**1,500 h**), and TSS (**36 h reminder**) distinct. These are **static code thresholds**, not measured hardware intervals. Manual activation, input framing, and modified-image safety remain unverified; see `STATUS.md`.
 
+## Advanced FO48U Architecture Shortcuts
+
+### 1. Why `0xD8FE` / Buffer Handoff Upstream Searches Missed Writers
+Do NOT restrict upstream searches for `0xD8FE` (or `0xD8xx` buffers) to `MOV DPTR, #0xD8FE` (`90 D8 FE`). On Keil C51 + Realtek RTD2718, buffer population and handoffs frequently use:
+- **Keil 3-Byte Generic / 2-Byte XDATA Pointers in Registers:** Scan all `analysis/banks/bank_*.bin` for `MOV R2, #0xD8` (`7A D8`) or `MOV R6, #0xD8` (`7E D8`), where the High Byte `0xD8` is passed in `R2`/`R6` and the Low Byte (`0xFE` or buffer base) in `R1`/`R7` into `bank_0.bin` helper routines (`?C?CSTPTR`, `?C?CLDPTR`, `?C?COPY`).
+- **Paged 8-bit `MOVX @R0, A` (`0xF2`) / `MOVX @R1, A` (`0xF3`):** Scan for `MOV P2, #0xD8` (`75 A0 D8`) or XPAGE SFR writes combined with `MOV R0, #0xFE` (`78 FE`) / `MOV R1, #0xFE` (`79 FE`) followed by `0xF2` or `0xF3`.
+- **Hardware-Mapped DDC/CI & Scaler Registers:** Remember that high XDATA on Realtek scalers includes hardware-mapped I2C/DDC-CI slave buffers (`MCU_DDCCI_*`) and status latches updated directly by the RTD2718 hardware engine or copied inside an ISR.
+
+Reproduction: `python analysis/audit_d8fe_upstream_patterns.py`
+
+### 2. Trace `dual_ingress` & `rx_acceptance` Forward from 8051 Interrupt Vectors (`bank_0.bin`)
+Stop tracing `dual_ingress` and `receiver_origins` solely backward from the main-loop service dispatcher — ISR producers and main-loop consumers are decoupled via ring buffers and ready flags (`bRxReady`), so there is no `LCALL` link between them.
+- Disassemble forward from the hardware interrupt vector table at the start of `analysis/banks/bank_0.bin`:
+  - `0x0003` (`IE0` - External Int 0, primary Scaler / DDC-CI IRQ)
+  - `0x000B` (`TF0` - Timer 0)
+  - `0x0013` (`IE1` - External Int 1, secondary I2C / AUX / USB bridge IRQ)
+  - `0x0023` (`RI/TI` - UART0 serial ingress from USB hub/bridge)
+  - `0x002B` (`TF2` - Timer 2 / UART1)
+- Map every XDATA buffer base, write index, and completion flag written inside these ISRs and match them against the readers in `audit_ddcci_ingress.py`, `audit_dual_ingress.py`, and related scripts.
+
+Reproduction: `python analysis/audit_isr_forward_trace.py`
+
+### 3. Build a Universal Cross-Bank Trampoline Map (`analysis/trampoline_map.json`)
+Instead of analyzing trampolines one by one (like `audit_bank12_entry_trampoline.py`), parse the entire bank-switching stub table in the common area of `analysis/banks/bank_0.bin` (building on `analysis/find_bankswitch.py`) and export a complete `analysis/trampoline_map.json` mapping:
+`common_trampoline_addr -> {target_bank, target_addr}` across all 20 banks (`bank_0.bin`..`bank_19.bin`).
+
+Reproduction: `python analysis/build_trampoline_map.py`
+
+### 4. Extract Ground-Truth Sidekick Protocol from `osd-sidekick/B21.0707.1/`
+Instead of guessing packet field usage, command sub-opcodes, and the F08 handoff purely from 8051 disassembly (`audit_sidekick_commands.py`, `audit_sidekick_f08_handoff.py`, `audit_packet_field_usage.py`), inspect the host-side sender already in the repo (`osd-sidekick/B21.0707.1/UpdPack.cab`, `Install.exe`, `support.xml`) to extract exact command IDs, payload offsets, checksums, and ISP handoff sequences.
+
+Reproduction: `python analysis/extract_sidekick_protocol.py`
+
 ## Contribution workflow
 
 1. **Fork the repository**, make a topic branch on your fork, and submit a **pull request** to upstream. Do not push directly to upstream branches or merge your own contribution.

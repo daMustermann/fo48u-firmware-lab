@@ -127,7 +127,7 @@ Use `python analysis/osd_strings.py` for OSD string-table research. More disasse
 | [`analysis/`](analysis/) | Byte-level audit scripts, extracted banks and disassembly |
 | [`firmware/F08-20221115/`](firmware/F08-20221115/) | Hash-identified reference firmware |
 | [`firmware/PATCHED/README.md`](firmware/PATCHED/README.md) | Offline research output policy |
-| [`osd-sidekick/`](osd-sidekick/) | Archived installer reference material |
+| [`controller/`](controller/) | Experimental host-side controller skeleton (dry-run by default) |
 
 ## Open research questions
 

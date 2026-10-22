@@ -184,3 +184,7 @@ Disassembly from 18:E584 tests D180; if zero it reads D160 bit 0 and continues o
 ## bank18:F35C D180 check
 
 Disassembly from 18:F35C reads D180 and, if nonzero, calls helper FC2A. This is another D180-dependent path.
+
+## bank18:F0A2 D180/D160 handling
+
+Disassembly from 18:F0A2 tests D180; if nonzero it reads D160, clears bit 3, and calls 2D4C. This is a D180/D160-dependent path.

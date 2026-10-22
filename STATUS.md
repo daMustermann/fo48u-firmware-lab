@@ -352,3 +352,7 @@ Disassembly from 13:C8C3 copies CFDA to 0xC9C4 and CFDB to 0xC9C5. This is a pac
 ## bank13:C953 CFDB copy to 0xCF85
 
 Disassembly from 13:C953 reads CFDB and writes it to XDATA 0xCF85. This is a packet-forwarding site.
+
+## bank13:C961 0xCF89 write
+
+Disassembly from 13:C961 writes R7 to XDATA 0xCF89, then reads 0xCFD1. This is a 0xCF89 state-update site.

@@ -296,3 +296,7 @@ Disassembly from 11:A022 reads D8FE and, if nonzero, jumps away; otherwise it ch
 ## bank11:BB69 D8FE handling
 
 Disassembly from 11:BB69 reads D8FE and, if it equals 0x10, calls helper C56E. This is a D8FE-dependent path.
+
+## bank11:E665 D8FE dispatch
+
+Disassembly from 11:E665 reads D8FE and dispatches on values derived from 0x10. This is a D8FE-dependent path.

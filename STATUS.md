@@ -164,3 +164,7 @@ Disassembly from 13:CA98 checks R6/R7 against 0x0400, then reads D12D and sets b
 ## bank18:911D D180 check
 
 Disassembly from 18:911D reads D180 and, if nonzero, calls helper 2B0C. This is a D180-dependent path.
+
+## bank18:9298 D180 check
+
+Disassembly from 18:9298 reads D180 and, if nonzero, calls helper FC2A. This is another D180-dependent path.

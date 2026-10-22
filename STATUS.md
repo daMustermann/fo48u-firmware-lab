@@ -208,3 +208,7 @@ Disassembly from 18:C499 checks D380/D381, then tests D12D bit 0. This is a D12D
 ## bank15:9EE3 D8FE check
 
 Disassembly from 15:9EE3 reads D8FE and, if nonzero, jumps to 9F8D. This is a D8FE-dependent path.
+
+## bank15:77F4 D8FE handling
+
+Disassembly from 15:77F4 reads D8FE and calls helper 104E, then updates XDATA 0x0043 and 0xD327. This is a D8FE-dependent output path.

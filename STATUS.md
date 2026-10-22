@@ -92,3 +92,7 @@ At 4:E6D4 the code reads D8FE, then at 4:E6F4 and 4:E712 writes D8FE (MOV DPTR,#
 ## XDATA 0xCFD8
 
 nalysis/xref_xdata.py 0xCFD8 finds one direct read at ank10:F801 and no direct writer. CFD8 is likely populated indirectly.
+
+## XDATA 0xCFDA
+
+nalysis/xref_xdata.py 0xCFDA finds 8 direct reads and no direct writer. CFDA is populated indirectly or via hardware.

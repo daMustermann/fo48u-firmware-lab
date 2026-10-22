@@ -204,3 +204,7 @@ Disassembly from 18:CA9B reads D180 at 18:CA9E and calls helpers FC24, FC42, FB0
 ## bank18:C499 D12D/D380 handling
 
 Disassembly from 18:C499 checks D380/D381, then tests D12D bit 0. This is a D12D/D380-dependent path.
+
+## bank15:9EE3 D8FE check
+
+Disassembly from 15:9EE3 reads D8FE and, if nonzero, jumps to 9F8D. This is a D8FE-dependent path.

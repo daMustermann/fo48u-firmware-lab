@@ -356,3 +356,7 @@ Disassembly from 13:C953 reads CFDB and writes it to XDATA 0xCF85. This is a pac
 ## bank13:C961 0xCF89 write
 
 Disassembly from 13:C961 writes R7 to XDATA 0xCF89, then reads 0xCFD1. This is a 0xCF89 state-update site.
+
+## bank13:C976 0xCF85/0xCF89 handling
+
+Disassembly from 13:C976 reads 0xCF85 and XORs it with 0xB4, then reads 0xCF89 and XORs it with 0x6F. This is a 0xCF85/0xCF89-dependent path.

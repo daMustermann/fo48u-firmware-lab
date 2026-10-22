@@ -224,3 +224,7 @@ Disassembly from 15:B8A7 reads D8FE and, if nonzero, jumps to B9E5. This is a D8
 ## bank15:B934 D8FE handling
 
 Disassembly from 15:B934 reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x50. This is a D8FE-dependent value selection.
+
+## bank15:B9AD D8FE handling
+
+Disassembly from 15:B9AD reads D8FE and sets R7 to 0x55 if nonzero, otherwise 0x50. This is another D8FE-dependent value selection.

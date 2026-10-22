@@ -160,3 +160,7 @@ Disassembly from 18:DBE9 reads CFDB and dispatches on values derived from 0xFE, 
 ## bank13:CAAF D12D bit handling
 
 Disassembly from 13:CA98 checks R6/R7 against 0x0400, then reads D12D and sets bit 0 under a condition. This is a D12D state-update site.
+
+## bank18:911D D180 check
+
+Disassembly from 18:911D reads D180 and, if nonzero, calls helper 2B0C. This is a D180-dependent path.

@@ -268,3 +268,7 @@ Disassembly from 15:F4C7 reads D8FE and dispatches on values derived from 0x90 a
 ## bank10:F327 D8FE dispatch
 
 Disassembly from 10:F327 reads D8FE and dispatches on values derived from 0x20 and 0x10. This is a D8FE-dependent path.
+
+## bank10:E16A D8FE dispatch
+
+Disassembly from 10:E16A reads D8FE and dispatches on values derived from 0x20 and 0x10. This is a D8FE-dependent path.

@@ -340,3 +340,7 @@ Disassembly from 4:A12B writes R7 to XDATA 0xD31B, then checks helper 1084. This
 ## bank10:C50E 0x0043 writer
 
 Disassembly from 10:C50E calls helper BD4C and writes the result to XDATA 0x0043. This is the sole direct writer of 0x0043.
+
+## bank10:CD98 0x006C update
+
+Disassembly from 10:CD98 reads 0x006C, clears bit 0, ORs R7, and writes it back. This is a 0x006C state-update site.

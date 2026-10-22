@@ -388,3 +388,7 @@ Disassembly from 12:599A writes D127 to XDATA 0xCF8F. This is a 0xCF8F state-upd
 ## bank12:59A4 0xCF90 write
 
 Disassembly from 12:59A4 writes D129 & 0x01 to XDATA 0xCF90. This is a 0xCF90 state-update site.
+
+## bank12:59AC 0xCF91 write
+
+Disassembly from 12:59AC writes D129 to XDATA 0xCF91. This is a 0xCF91 state-update site.

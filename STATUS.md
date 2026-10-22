@@ -192,3 +192,7 @@ Disassembly from 18:F0A2 tests D180; if nonzero it reads D160, clears bit 3, and
 ## bank18:79B9 D180 handling
 
 Disassembly from 18:79B9 tests D180; if zero it calls E5F2 and conditionally clears bit 0. This is a D180-dependent path.
+
+## bank18:9144 D180 handling
+
+Disassembly from 18:9144 reads D180 and, if nonzero, calls helper 2E6C. This is another D180-dependent path.

@@ -132,3 +132,7 @@ Disassembly from 12:53FC reads CFDB and requires 0xE0, then reads CFDA and requi
 ## bank13:C8BF CFDA/CFDB copy
 
 Disassembly from 13:C8BF copies CFDA to XDATA 0xC9C4 and CFDB to 0xC9C5, forwarding packet bytes to another buffer.
+
+## bank7:6945 CFDA checks
+
+Disassembly from 7:6930 sets up registers, reads CFDA, and rejects values 0xC0 and 0xD0 before continuing. This is another packet-gate site.

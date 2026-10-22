@@ -112,3 +112,7 @@ At 4:E6D4 the code reads D8FE, then at 4:E6F4 and 4:E712 writes D8FE (MOV DPTR,#
 ## XDATA 0xFE88
 
 nalysis/xref_xdata.py 0xFE88 finds one direct read at ank13:DE7B and no direct writer. FE88 is likely hardware-mapped or indirectly set.
+
+## bank4:E678 D8FE state handling
+
+Disassembly from 4:E678 shows a routine that reads D8FE, tests bit 0, conditionally sets bit 5, and writes D8FE at 4:E6F4 and 4:E712. It is a concrete D8FE state-update site.

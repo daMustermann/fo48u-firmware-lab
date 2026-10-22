@@ -328,3 +328,7 @@ Disassembly from 13:CADE reads D12D and tests bit 0. This is a D12D-dependent pa
 ## bank10:CD98 D8FE/0x006C handling
 
 Disassembly from 10:CD98 writes and reads XDATA 0x006C, then reads D8FE. This is a D8FE/0x006C-dependent path.
+
+## XDATA 0xD31B
+
+nalysis/xref_xdata.py 0xD31B finds 18+ direct reads and one direct writer at ank4:A12B. D31B is a state byte with a single writer.

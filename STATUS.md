@@ -308,3 +308,7 @@ Disassembly from 11:FAD9 reads D8FE and dispatches on values derived from 0x10 a
 ## bank12:94AF D8FE handling
 
 Disassembly from 12:94AF reads D8FE and, if zero, jumps away; otherwise it continues to 956F. This is a D8FE-dependent path.
+
+## bank12:999C D8FE handling
+
+Disassembly from 12:999C reads D8FE and, if zero, jumps away; otherwise it continues to 9A5C. This is a D8FE-dependent path.

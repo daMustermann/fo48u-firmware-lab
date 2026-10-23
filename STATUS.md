@@ -476,3 +476,7 @@ Disassembly from 0:FC1F writes 0 to XDATA 0xCFD7. This is a 0xCFD7 state-update 
 ## XDATA 0xCFDF
 
 nalysis/xref_xdata.py 0xCFDF finds 18+ direct reads and no direct writer. CFDF is likely populated indirectly or via hardware.
+
+## XDATA 0xCFE0
+
+nalysis/xref_xdata.py 0xCFE0 finds one direct read and no direct writer. CFE0 is likely populated indirectly or via hardware.

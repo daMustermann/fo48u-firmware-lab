@@ -532,3 +532,7 @@ Disassembly from 3:DA07 reads FFF1 and copies it to 0xC6CA, then checks 0xC6C9. 
 ## bank0:ACF4 FFF2 handling
 
 Disassembly from 0:ACF4 reads FFF2 and sets bits 0-5. This is an FFF2-dependent path.
+
+## bank8:DD93 FFF3 write
+
+Disassembly from 8:DD93 writes 0x10 to XDATA 0xFFF3 when 0xC704 is nonzero. This is a FFF3 state-update site.

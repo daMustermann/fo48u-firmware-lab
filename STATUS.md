@@ -528,3 +528,7 @@ Disassembly from 6:D17C calls helper BB6C and writes the result to XDATA 0xFFF0.
 ## bank3:DA07 FFF1 handling
 
 Disassembly from 3:DA07 reads FFF1 and copies it to 0xC6CA, then checks 0xC6C9. This is an FFF1-dependent path.
+
+## bank0:ACF4 FFF2 handling
+
+Disassembly from 0:ACF4 reads FFF2 and sets bits 0-5. This is an FFF2-dependent path.

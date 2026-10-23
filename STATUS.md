@@ -568,3 +568,7 @@ Disassembly from 19:8416 writes 0 to XDATA 0xFFFD. This is a 0xFFFD state-update
 ## bank0:FDB2 0xFFEC write
 
 Disassembly from 0:FDB2 writes 0x94 or 0xFC to XDATA 0xFFEC depending on A. This is a 0xFFEC state-update site.
+
+## XDATA 0xFFE9
+
+nalysis/xref_xdata.py 0xFFE9 finds 6 direct reads and no direct writer. FFE9 is likely hardware-mapped or updated through indirect paths.

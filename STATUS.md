@@ -504,3 +504,7 @@ Disassembly from 0:508A reads FFF4, writes it to C9C7, clears TF2, and updates F
 ## ISR TF0 (0:5246) FFF4 handling
 
 Disassembly from 0:5246 reads FFF4 and writes it back. This is a Timer0 ISR-side path.
+
+## XDATA 0xFFEB
+
+nalysis/xref_xdata.py 0xFFEB finds 20+ direct reads across all banks and no direct writer. FFEB is likely hardware-mapped or updated through indirect paths.

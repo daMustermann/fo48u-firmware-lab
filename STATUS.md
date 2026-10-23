@@ -560,3 +560,7 @@ Disassembly from 8:DD67 writes 0, 2 or 3 to XDATA 0xFFFB depending on C706. This
 ## bank19:8416 0xFFFD write
 
 Disassembly from 19:8416 writes 0 to XDATA 0xFFFD. This is a 0xFFFD state-update site.
+
+## XDATA 0xFFFF
+
+nalysis/xref_xdata.py 0xFFFF finds many direct reads and no direct writer. FFFF is likely hardware-mapped or updated through indirect paths.

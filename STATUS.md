@@ -444,3 +444,7 @@ Disassembly from 18:D729 writes a derived value to XDATA 0xCFD2. This is a 0xCFD
 ## bank7:A938 0xCFD3 write
 
 Disassembly from 7:A938 writes 0 to XDATA 0xCFD3. This is a 0xCFD3 state-update site.
+
+## bank13:E3AD 0xCFD4 write
+
+Disassembly from 13:E3AD writes 0 to XDATA 0xCFD4 under a condition. This is a 0xCFD4 state-update site.

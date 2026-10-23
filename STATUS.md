@@ -524,3 +524,7 @@ Disassembly from 0:5246 reads FFF4 and writes it back. This is a Timer0 ISR-side
 ## bank6:D17C 0xFFF0 write
 
 Disassembly from 6:D17C calls helper BB6C and writes the result to XDATA 0xFFF0. This is a 0xFFF0 state-update site.
+
+## bank3:DA07 FFF1 handling
+
+Disassembly from 3:DA07 reads FFF1 and copies it to 0xC6CA, then checks 0xC6C9. This is an FFF1-dependent path.

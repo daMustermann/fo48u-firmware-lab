@@ -576,3 +576,7 @@ Disassembly from 0:FDB2 writes 0x94 or 0xFC to XDATA 0xFFEC depending on A. This
 ## bank6:D1A2 0xFFE8 write
 
 Disassembly from 6:D1A2 calls helper BB6C and writes the result to XDATA 0xFFE8. This is a 0xFFE8 state-update site.
+
+## XDATA 0xFFE7
+
+nalysis/xref_xdata.py 0xFFE7 finds 12 direct reads and no direct writer. FFE7 is likely hardware-mapped or updated through indirect paths.

@@ -548,3 +548,7 @@ Disassembly from 8:DD3D writes C701 to XDATA 0xFFF6. This is a FFF6 state-update
 ## bank18:BE86 0xFFF8 write
 
 Disassembly from 18:BE86 calls helper 3681 and writes the result to XDATA 0xFFF8. This is a 0xFFF8 state-update site.
+
+## bank8:DD67 FFFB write
+
+Disassembly from 8:DD67 writes 0, 2 or 3 to XDATA 0xFFFB depending on C706. This is a FFFB state-update site.

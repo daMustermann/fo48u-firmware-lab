@@ -496,3 +496,7 @@ Disassembly from 0:510F reads D8F9 and dispatches on values 0x03 and 0x01, calli
 ## ISR IE1 (0:520B) FFF4 handling
 
 Disassembly from 0:520B reads FFF4, writes it to C9C1, and calls helpers at 0ED4/0EDA/0EE0/0EE6. This is an ISR-side path.
+
+## ISR TF2 (0:508A) FFF4 handling
+
+Disassembly from 0:508A reads FFF4, writes it to C9C7, clears TF2, and updates FFEB/FFEA. This is an ISR-side path.

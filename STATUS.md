@@ -460,3 +460,7 @@ Disassembly from 13:EAF6 writes 0 to XDATA 0xCFD5 under a condition. This is a 0
 ## bank0:FC1F 0xCFD7 write
 
 Disassembly from 0:FC1F writes 0 to XDATA 0xCFD7. This is a 0xCFD7 state-update site.
+
+## XDATA 0xCFD9
+
+nalysis/xref_xdata.py 0xCFD9 finds 3 direct reads and no direct writer. CFD9 is likely populated indirectly or via hardware.

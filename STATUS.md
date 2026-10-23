@@ -488,3 +488,7 @@ Disassembly from 0:FC1F writes 0 to XDATA 0xCFD7. This is a 0xCFD7 state-update 
 ## XDATA 0xD12D (indexed scan)
 
 nalysis/xref_xdata.py 0xD12D --include-indexed finds 19 direct reads and no direct or indexed writer. D12D is likely hardware-mapped or updated through bit-addressable operations.
+
+## ISR IE0 (0:510F) D8F9 handling
+
+Disassembly from 0:510F reads D8F9 and dispatches on values 0x03 and 0x01, calling helpers at 0EBC/0EC2. This is an ISR-side D8F9 path.

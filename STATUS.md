@@ -500,3 +500,7 @@ Disassembly from 0:520B reads FFF4, writes it to C9C1, and calls helpers at 0ED4
 ## ISR TF2 (0:508A) FFF4 handling
 
 Disassembly from 0:508A reads FFF4, writes it to C9C7, clears TF2, and updates FFEB/FFEA. This is an ISR-side path.
+
+## ISR TF0 (0:5246) FFF4 handling
+
+Disassembly from 0:5246 reads FFF4 and writes it back. This is a Timer0 ISR-side path.

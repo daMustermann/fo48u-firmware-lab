@@ -484,3 +484,7 @@ Disassembly from 0:FC1F writes 0 to XDATA 0xCFD7. This is a 0xCFD7 state-update 
 ## XDATA 0xCFE1
 
 nalysis/xref_xdata.py 0xCFE1 finds 2 direct reads and no direct writer. CFE1 is likely populated indirectly or via hardware.
+
+## XDATA 0xD12D (indexed scan)
+
+nalysis/xref_xdata.py 0xD12D --include-indexed finds 19 direct reads and no direct or indexed writer. D12D is likely hardware-mapped or updated through bit-addressable operations.

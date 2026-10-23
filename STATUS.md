@@ -424,3 +424,7 @@ Disassembly from 12:59FC writes a derived value to XDATA 0xCF9A. This is a 0xCF9
 ## bank12:5A24 0xCFA0 write
 
 Disassembly from 12:5A24 writes R7 to XDATA 0xCFA0. This is a 0xCFA0 state-update site.
+
+## bank7:7CE5 0xCFB8 write
+
+Disassembly from 7:7CE5 writes R7 to XDATA 0xCFB8 when CFDB != 0x74. This is a 0xCFB8 state-update site.

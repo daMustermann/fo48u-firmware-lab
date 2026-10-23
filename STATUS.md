@@ -436,3 +436,7 @@ Disassembly from 7:7CD3 writes R7 to XDATA 0xCFC8 when CFDE != 0x40. This is a 0
 ## bank18:E277 0xCFD1 write
 
 Disassembly from 18:E277 writes 0x50 to XDATA 0xCFD1. This is a 0xCFD1 state-update site.
+
+## bank18:D729 0xCFD2 write
+
+Disassembly from 18:D729 writes a derived value to XDATA 0xCFD2. This is a 0xCFD2 state-update site.

@@ -448,3 +448,7 @@ Disassembly from 7:A938 writes 0 to XDATA 0xCFD3. This is a 0xCFD3 state-update 
 ## bank13:E3AD 0xCFD4 write
 
 Disassembly from 13:E3AD writes 0 to XDATA 0xCFD4 under a condition. This is a 0xCFD4 state-update site.
+
+## bank13:EAF6 0xCFD5 write
+
+Disassembly from 13:EAF6 writes 0 to XDATA 0xCFD5 under a condition. This is a 0xCFD5 state-update site.

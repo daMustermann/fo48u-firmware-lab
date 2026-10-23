@@ -432,3 +432,7 @@ Disassembly from 7:7CE5 writes R7 to XDATA 0xCFB8 when CFDB != 0x74. This is a 0
 ## bank7:7CD3 0xCFC8 write
 
 Disassembly from 7:7CD3 writes R7 to XDATA 0xCFC8 when CFDE != 0x40. This is a 0xCFC8 state-update site.
+
+## bank18:E277 0xCFD1 write
+
+Disassembly from 18:E277 writes 0x50 to XDATA 0xCFD1. This is a 0xCFD1 state-update site.

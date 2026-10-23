@@ -552,3 +552,7 @@ Disassembly from 18:BE86 calls helper 3681 and writes the result to XDATA 0xFFF8
 ## bank8:DD67 FFFB write
 
 Disassembly from 8:DD67 writes 0, 2 or 3 to XDATA 0xFFFB depending on C706. This is a FFFB state-update site.
+
+## XDATA 0xFFFC
+
+nalysis/xref_xdata.py 0xFFFC finds 3 direct reads and no direct writer. FFFC is likely populated indirectly or via hardware.

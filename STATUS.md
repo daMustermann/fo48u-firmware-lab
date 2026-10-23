@@ -540,3 +540,7 @@ Disassembly from 8:DD93 writes 0x10 to XDATA 0xFFF3 when 0xC704 is nonzero. This
 ## bank0:4470 FFF4 write
 
 Disassembly from 0:4470 reads D618 and writes it to FFF4. This is a FFF4 state-update site.
+
+## bank8:DD3D FFF6 write
+
+Disassembly from 8:DD3D writes C701 to XDATA 0xFFF6. This is a FFF6 state-update site.

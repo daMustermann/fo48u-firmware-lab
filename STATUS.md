@@ -536,3 +536,7 @@ Disassembly from 0:ACF4 reads FFF2 and sets bits 0-5. This is an FFF2-dependent 
 ## bank8:DD93 FFF3 write
 
 Disassembly from 8:DD93 writes 0x10 to XDATA 0xFFF3 when 0xC704 is nonzero. This is a FFF3 state-update site.
+
+## bank0:4470 FFF4 write
+
+Disassembly from 0:4470 reads D618 and writes it to FFF4. This is a FFF4 state-update site.

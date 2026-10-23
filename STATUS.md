@@ -520,3 +520,7 @@ Disassembly from 0:5246 reads FFF4 and writes it back. This is a Timer0 ISR-side
 ## XDATA 0xFFEE
 
 nalysis/xref_xdata.py 0xFFEE finds 2 direct reads and no direct writer. FFEE is likely hardware-mapped or updated through indirect paths.
+
+## bank6:D17C 0xFFF0 write
+
+Disassembly from 6:D17C calls helper BB6C and writes the result to XDATA 0xFFF0. This is a 0xFFF0 state-update site.

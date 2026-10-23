@@ -544,3 +544,7 @@ Disassembly from 0:4470 reads D618 and writes it to FFF4. This is a FFF4 state-u
 ## bank8:DD3D FFF6 write
 
 Disassembly from 8:DD3D writes C701 to XDATA 0xFFF6. This is a FFF6 state-update site.
+
+## bank18:BE86 0xFFF8 write
+
+Disassembly from 18:BE86 calls helper 3681 and writes the result to XDATA 0xFFF8. This is a 0xFFF8 state-update site.

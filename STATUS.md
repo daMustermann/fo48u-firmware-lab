@@ -592,3 +592,7 @@ Disassembly from 1:EAB9 writes 0 to XDATA 0xFFE5. This is a FFE5 state-update si
 ## bank0:E3E7 FFC4 handling
 
 Disassembly from 0:E3E7 reads FFC4, masks 0xF8, writes it back, then sets bit 0. This is a FFC4 state-update site.
+
+## XDATA 0xFFB0
+
+nalysis/xref_xdata.py 0xFFB0 finds 6 direct reads and no direct writer. FFB0 is likely hardware-mapped or updated through indirect paths.

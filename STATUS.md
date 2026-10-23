@@ -440,3 +440,7 @@ Disassembly from 18:E277 writes 0x50 to XDATA 0xCFD1. This is a 0xCFD1 state-upd
 ## bank18:D729 0xCFD2 write
 
 Disassembly from 18:D729 writes a derived value to XDATA 0xCFD2. This is a 0xCFD2 state-update site.
+
+## bank7:A938 0xCFD3 write
+
+Disassembly from 7:A938 writes 0 to XDATA 0xCFD3. This is a 0xCFD3 state-update site.

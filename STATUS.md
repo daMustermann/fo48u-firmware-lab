@@ -492,3 +492,7 @@ Disassembly from 0:FC1F writes 0 to XDATA 0xCFD7. This is a 0xCFD7 state-update 
 ## ISR IE0 (0:510F) D8F9 handling
 
 Disassembly from 0:510F reads D8F9 and dispatches on values 0x03 and 0x01, calling helpers at 0EBC/0EC2. This is an ISR-side D8F9 path.
+
+## ISR IE1 (0:520B) FFF4 handling
+
+Disassembly from 0:520B reads FFF4, writes it to C9C1, and calls helpers at 0ED4/0EDA/0EE0/0EE6. This is an ISR-side path.

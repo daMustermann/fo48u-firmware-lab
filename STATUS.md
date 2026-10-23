@@ -516,3 +516,7 @@ Disassembly from 0:5246 reads FFF4 and writes it back. This is a Timer0 ISR-side
 ## XDATA 0xFFED
 
 nalysis/xref_xdata.py 0xFFED finds 10+ direct reads and no direct writer. FFED is likely hardware-mapped or updated through indirect paths.
+
+## XDATA 0xFFEE
+
+nalysis/xref_xdata.py 0xFFEE finds 2 direct reads and no direct writer. FFEE is likely hardware-mapped or updated through indirect paths.

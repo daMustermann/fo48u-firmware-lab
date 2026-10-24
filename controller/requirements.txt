@@ -1,6 +1,2 @@
-# Optional dependencies for future transports:
-# pyusb
-# hidapi
-# monitorcontrol
-# python-ddcci
-PY
+# GUI dependency; offline analysis and diagnostic scripts use the standard library.
+customtkinter>=5.2,<6

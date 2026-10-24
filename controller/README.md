@@ -35,8 +35,9 @@ python run_gui.py
 The GUI is read-only by default. Enable "Connect to monitor" for readback and
 "Enable write access" (plus confirmation) before any execution attempt.
 Standard DDC/CI uses real Win32 Dxva2 calls. HID failures now raise instead of
-becoming numeric zero readings. OLED decoding still lacks validated response
-headers, selector echo, freshness and checksum; those results remain provisional.
+becoming numeric zero readings. OLED/status decoding now validates headers,
+length, result, selector echo and XOR before exposing values. Transaction
+freshness and counter units remain unproved.
 The GUI's AOCS execution action is unavailable and sends no command. Editable
 sliders/profile values are settings, not proof of successful hardware reads.
 ## 32-bit helper
@@ -67,7 +68,7 @@ minutes; Ctrl+C preserves the completed results.
 
 Set `--firmware-label` to the installed version reported by the owner or monitor
 OSD; this is an annotation, not device verification. Omit it when unknown. The
-current unit runs F06 (owner-reported), while the static atlas/patch references
+current unit runs F06 (also confirmed by a validated E0/38 HID reply), while the static atlas/patch references
 describe F08. Live F06 results do not validate F08 behavior.
 
 Run the offline regressions from the repository root:
@@ -75,4 +76,24 @@ Run the offline regressions from the repository root:
 ```powershell
 python -m unittest discover -s controller -p test_live_probe.py -v
 ```
+
+## Enforced status-only HID diagnostic
+
+```powershell
+dotnet publish controller/helper/helper.csproj -c Release -r win-x86 --self-contained false
+python controller/live_hid_probe.py --firmware-label F06 --compare-vcp --output controller/live-hid-probe.json
+python -m unittest discover -s controller -p 'test_*.py' -v
+```
+
+The helper itself blocks arbitrary I2C commands in `--read-only` mode. The probe
+uses only byte-verified firmware, black-equalizer, gamma and OLED-counter GETs.
+HID output reports carry those read requests; they are not settings writes.
+Replies must pass framing, selector and checksum checks. Published F06 results
+are in `analysis/observations/f06-hid-status-2026-10-24.json`. The probe has no
+support for the offline F08 E0/FE control-hook prototype.
+
+`--compare-vcp` also validates seven allowlisted standard GETs through HID.
+The F06 E0 reply has vendor rather than standard shape and is correctly rejected;
+the command returns nonzero and preserves that anomaly in JSON. Codes 6C/6E/70
+are RGB video black levels, while the Sidekick gamma query is E0/07.
 

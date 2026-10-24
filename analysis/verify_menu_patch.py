@@ -29,6 +29,33 @@ exec(compile(_audit_src, "audit_menu_reachability.py", "exec"), _audit_ns)
 audit = _audit_ns["audit"]
 
 
+def selector_evidence(source):
+    """True service-record selectors, distinct from a physical selection event."""
+    bank = source[9 * 65536:10 * 65536]
+    assert bank[0xE481:0xE49A] == bytes.fromhex(
+        "25 E0 25 E0 24 83 F5 82 E4 34 97 F5 83 E4 93 FB 74 01 93 FA 74 02 93 F9 22")
+    assert bank[0xE4B8:0xE4C7] == bytes.fromhex("E0 75 F0 02 A4 F5 82 85 F0 83 12 36 81 FF 22")
+    assert bank[0xE4C7:0xE4DA] == bytes.fromhex("ED 75 F0 02 A4 FF E9 2F F9 EA 35 F0 FA 90 00 01 02 36 81")
+    pages = []
+    for page in range(5):
+        record = bank[0x9783 + 4*page:0x9787 + 4*page]
+        space, hi, lo, count = record
+        assert space == 0xFF
+        pointer = hi * 256 + lo
+        assert pointer >= 0x9747 and (pointer - 0x9747) % 2 == 0
+        first = (pointer - 0x9747) // 2
+        pages.append(list(range(first, first + count)))
+    assert sorted(item for page in pages for item in page) == list(range(30))
+    assert pages[3] == list(range(23, 29))
+    for item, handler in ((23, 0xA14C), (24, 0xA1C0)):
+        assert bank[0x9747+2*item:0x9749+2*item] == bytes((item, 1))
+        assert bank[0x97F0+3*item:0x97F3+3*item] == bytes((2, handler >> 8, handler & 255))
+    return {"page": 3, "records": ["9:9775", "9:9777"],
+            "page_pointer_selector": "9:E481", "item_id_selector": "9:E4B8",
+            "item_flag_selector": "9:E4C7", "dispatcher": "9:97DB",
+            "limitation": "page enumeration is reachable; deliberate joystick selection remains unproved"}
+
+
 def run_wrapper(firmware: bytes, item: int, key: int, event: int, flags: int) -> tuple[int, int]:
     xdata = {0xD12D: flags}
     pc, dptr, a = MENU_UI_TRAMPOLINE, 0, 0
@@ -70,6 +97,7 @@ def run_wrapper(firmware: bytes, item: int, key: int, event: int, flags: int) ->
 
 def main() -> None:
     source = load_source()
+    print("PASS: upstream service selectors:", selector_evidence(source))
     reachability = audit(source)
     assert reachability["reachable_action_ids"] == [11, 14]
     modified = bytearray(source)

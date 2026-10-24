@@ -26,6 +26,7 @@ __pycache__/
 # Local hardware diagnostics can contain per-device state.
 live-probe*.json
 controller/live-probe*.json
+live-hid-probe*.json
 .venv/
 venv/
 
@@ -50,5 +51,3 @@ firmware/PATCHED/*
 # Controller build outputs
 controller/helper/bin/
 controller/helper/obj/
-__pycache__/
-*.pyc

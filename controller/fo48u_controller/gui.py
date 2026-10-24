@@ -38,9 +38,9 @@ VCP_NAMES = {
     0x52: "Active control",
     0x60: "Input select",
     0x62: "Volume",
-    0x6C: "Black level",
-    0x6E: "Black stabilizer",
-    0x70: "Gamma",
+    0x6C: "Video black level: Red",
+    0x6E: "Video black level: Green",
+    0x70: "Video black level: Blue",
     0x86: "Display scaling",
     0x87: "Sharpness",
     0xAC: "Horizontal frequency",
@@ -53,7 +53,7 @@ VCP_NAMES = {
     0xCA: "OSD / button control",
     0xCC: "OSD language",
     0xD6: "Power mode",
-    0xDF: "Manufacturer specific",
+    0xDF: "MCCS/VCP version",
     0xE0: "Manufacturer specific",
     0xEC: "Manufacturer specific",
 }
@@ -246,8 +246,8 @@ class Fo48uGui:
         scroll.pack(fill="both", expand=True, padx=14, pady=8)
 
         for name, code in [("Brightness", 0x10), ("Contrast", 0x12), ("Red gain", 0x16), ("Green gain", 0x18),
-                           ("Blue gain", 0x1A), ("Sharpness", 0x87), ("Black level", 0x6C), ("Black stabilizer", 0x6E),
-                           ("Volume", 0x62), ("Gamma", 0x70)]:
+                           ("Blue gain", 0x1A), ("Sharpness", 0x87), ("Red black level", 0x6C), ("Green black level", 0x6E),
+                           ("Volume", 0x62), ("Blue black level", 0x70)]:
             self._vcp_row(scroll, name, code)
 
         # Extended controls
@@ -346,7 +346,7 @@ class Fo48uGui:
         card = ctk.CTkFrame(page, corner_radius=14)
         card.pack(fill="x", padx=14, pady=8)
         ctk.CTkLabel(card, text="Game-oriented controls", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", padx=14, pady=(10, 6))
-        for name, code in [("Black stabilizer", 0x6E), ("Sharpness", 0x87), ("Color preset", 0x14)]:
+        for name, code in [("Green black level", 0x6E), ("Sharpness", 0x87), ("Color preset", 0x14)]:
             self._vcp_row(card, name, code)
         ctk.CTkLabel(card, text="Use Custom VCP for overdrive / aim stabilizer vendor codes.", text_color="#9aa3b2").pack(anchor="w", padx=14, pady=8)
         return page

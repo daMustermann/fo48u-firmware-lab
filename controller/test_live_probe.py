@@ -2,6 +2,7 @@
 import ast
 import ctypes
 import json
+import io
 from pathlib import Path
 import sys
 import tempfile
@@ -11,7 +12,7 @@ from unittest.mock import Mock, patch
 import live_probe as probe
 from fo48u_controller.cli import _NullTransport, main as cli_main
 from fo48u_controller.helper_transport import HelperTransport
-from fo48u_controller.oled import OledCare
+from fo48u_controller.oled import OledCare, decode_status_reply, decode_standard_reply
 from fo48u_controller.transport import RtHidTransport
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "analysis"))
@@ -153,11 +154,41 @@ class TransportTests(unittest.TestCase):
 
     def test_stale_helper_is_rejected_before_hardware_open(self):
         process = Mock()
-        process.stdout.readline.return_value = '{"ready":true}\n'
+        process.stdout = io.StringIO('{"ready":true}\n')
         with patch("fo48u_controller.helper_transport.subprocess.Popen", return_value=process):
             with self.assertRaisesRegex(RuntimeError, "protocol 2 required"):
                 HelperTransport("unused.exe")
         process.terminate.assert_called_once()
+
+    def test_status_frame_validates_checksum_echo_and_framing(self):
+        # Fixed captured F06 version frame; trailing bridge buffer data is opaque.
+        frame = list(bytes.fromhex('6E 88 02 00 E0 38 FF FF 46 06 2C')) + [0] * 25
+        self.assertEqual(decode_status_reply(frame, 0x38)['value'], 0x4606)
+        for index in range(11):
+            changed = list(frame)
+            changed[index] ^= 1
+            with self.assertRaises(OSError):
+                decode_status_reply(changed, 0x38)
+        with self.assertRaises(OSError):
+            decode_status_reply(frame, 0x7F)
+
+    def test_standard_get_rejects_vendor_shaped_e0_reply(self):
+        df = list(bytes.fromhex('6E 88 02 00 DF 00 FF FF 02 02 6B')) + [0]*25
+        self.assertEqual(decode_standard_reply(df, 0xDF)['value'], 0x0202)
+        vendor = list(bytes.fromhex('6E 88 02 00 E0 32 00 07 00 01 60')) + [0]*25
+        with self.assertRaisesRegex(OSError, 'type'):
+            decode_standard_reply(vendor, 0xE0)
+        with self.assertRaisesRegex(OSError, 'echo'):
+            decode_standard_reply(df, 0xE0)
+
+    def test_read_only_helper_rejects_arbitrary_selectors_locally(self):
+        helper = object.__new__(HelperTransport)
+        helper.read_only = True
+        helper._send = Mock()
+        for selector in (0x55, 0xEC, -1, 256):
+            with self.assertRaises(ValueError):
+                helper.status_query(selector)
+        helper._send.assert_not_called()
 
     def test_oled_rejects_empty_or_malformed_replies(self):
         transport = Mock()

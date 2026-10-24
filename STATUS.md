@@ -1,6 +1,6 @@
 # Current research status
 
-**Target:** Gigabyte AORUS FO48U · **Static image:** F08 / 2022-11-15 · **Live monitor:** F06 (owner-reported; not updated to F08) · **Method:** static firmware analysis and read-only host observations.
+**Target:** Gigabyte AORUS FO48U · **Static image:** F08 / 2022-11-15 · **Live monitor:** F06 (confirmed by validated E0/38 status reply) · **Method:** static firmware analysis and read-only host observations.
 
 | Track | Status | Scope |
 | :-- | :-- | :-- |
@@ -24,29 +24,36 @@
 
 The observations are specific to the hash-identified binary. Static analysis alone cannot establish a reliable manual refresh procedure.
 
-## Post-build safety audit (2026-10-24)
+## Post-build safety audit and follow-up (2026-10-24)
 
-Base commit `5fa02eb` has **no flash-safety approval**. The `full-control`
-profile changes only the same five command-gate bytes as `unlock`. Fixed patch
-sites pass local instruction-boundary and relative-branch checks, but global
-stack safety, AOCS carry propagation, recovery and hardware execution remain
-unproved. The menu hook remains unreachable for actions 23/24. The generic
-`patch.py` scaffold can resize banks and is outside the fixed-site guarantee.
+**Release verdict remains FAIL / DO NOT FLASH.** The AOCS replacement is now
+`12:68BD C3 74 02` (CLR C; MOV A,#2), matching accepted stock state in 131,072
+cases. The generic patch tool rejects bank/length/bounds/overlap/stock mismatches
+and input overwrites. Reassembly preserves stock banks 20–30. The exact installed
+Sidekick host bank CRC-8 is implemented and matched against isolated native
+emulation; all boot checks are not established.
 
-The independent GET-only probe completed on the attached FO48U running **F06**
-(owner-reported): **37 responses
-and 219 failures across 256 codes**, with no Set-VCP, HID or compensation request.
-Unadvertised `E0` again matched advertised `DF` (`0202/FFFF`), so this does not
-prove a vendor unlock. Controller failure-status/buffer handling and dry-run
-isolation were corrected; full OLED reply validation and selected-monitor GUI
-writes remain incomplete. The updated helper requires protocol 2 and rejects
-stale builds. See the [full audit](analysis/POST_BUILD_AUDIT.md),
-[complete byte tables](analysis/PATCH_BYTE_TABLES.md), and local ignored JSON
-report at `controller/live-probe-2026-10-24.json`.
-The [sanitized F06 observation](analysis/observations/f06-vcp-get-2026-10-24.json)
-provides the 256 per-code results without host/device identifiers.
-These live results do not validate F08 behavior. The byte audit covers only the
-F08 reference image; no F06 binary has been supplied for static comparison.
+The true bank-9 page/ID/flag selectors (`E481/E4B8/E4C7`) are verified. Physical
+selection for 23/24 remains open; the old E0E2 menu prototype is still unreachable.
+`full-control` now adds a real **offline E0/FE allowlisted hook prototype** (189
+changed bytes), with 133,376 interpreter cases. It reads D12D/D13D/D13E/D8FE and
+writes only D8FE=00/10/20. Cave ownership, physical ingress and global stack bounds
+remain unproved. It was never flashed or sent to stock F06.
+
+The original [F06 DDC observation](analysis/observations/f06-vcp-get-2026-10-24.json)
+contains 37 responses and 219 failures. The new
+[validated F06 HID status observation](analysis/observations/f06-hid-status-2026-10-24.json)
+independently returns **F06**, panel hours 55, APCS fields 1/56, AOCS fields 0/0,
+black equalizer 10 and gamma 3. The helper enforces status-only selectors; reply
+headers, lengths, result, selector echo and XOR are checked. No settings,
+compensation, EEPROM, reset, ISP or flash command was sent. Counter units and
+transaction freshness remain unproved. These are live F06 observations, not F08
+patch validation; no F06 binary is available.
+
+See the [current audit](analysis/POST_BUILD_AUDIT.md),
+[byte tables](analysis/PATCH_BYTE_TABLES.md), and
+[host checksum evidence](analysis/sidekick-checksum.md). Recovery and complete
+flash safety remain unresolved.
 
 ## Key addresses
 
@@ -68,7 +75,7 @@ F08 reference image; no F06 binary has been supplied for static comparison.
 
 ## Host-side evidence
 
-A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; neither a response value nor compensation execution has been demonstrated. Its Realtek-HID model branch uses VID:PID `0BDA:1100`, and Windows enumerates that HID interface, though the process-to-device handle remains unobserved. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
+A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; validated F06 status response values are now recorded in the HID observation above; compensation execution remains unverified. Its Realtek-HID model branch uses VID:PID `0BDA:1100`, and Windows enumerates that HID interface, though the process-to-device handle remains unobserved. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
 
 A read-only DDC/CI probe returned a response to GET-VCP `E0` that resembled the result for `DF`. This **does not prove** an accessible vendor service command: the device does not advertise `E0`, and generic fallback behavior remains plausible. No Set-VCP or USB write tests were performed.
 

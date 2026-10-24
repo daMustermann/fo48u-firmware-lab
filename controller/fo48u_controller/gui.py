@@ -633,6 +633,14 @@ class Fo48uGui:
                     frame = self.care.execute_aocs(confirmed=True)
                 text = " ".join(f"{b:02x}" for b in frame)
                 self.root.after(0, lambda t=text, k=kind: self.log(f"{k.upper()} frame: {t}"))
+                # verify readback after trigger
+                import time
+                time.sleep(1.0)
+                if kind == "apcs":
+                    val = self.care.read_apcs_time()
+                else:
+                    val = self.care.read_aocs_time()
+                self.root.after(0, lambda v=val, k=kind: self.log(f"{k.upper()} readback: {v}"))
             except Exception as exc:
                 self.root.after(0, lambda e=exc: self.log(f"Error: {e}"))
 

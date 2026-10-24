@@ -596,3 +596,7 @@ Disassembly from 0:E3E7 reads FFC4, masks 0xF8, writes it back, then sets bit 0.
 ## XDATA 0xFFB0
 
 nalysis/xref_xdata.py 0xFFB0 finds 6 direct reads and no direct writer. FFB0 is likely hardware-mapped or updated through indirect paths.
+
+## bank6:A15B 0xFFAE write
+
+Disassembly from 6:A15B writes R5 or 0x01 to XDATA 0xFFAE. This is a 0xFFAE state-update site.

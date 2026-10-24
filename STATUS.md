@@ -608,3 +608,55 @@ Disassembly from 6:A15B writes R5 or 0x01 to XDATA 0xFFAE. This is a 0xFFAE stat
 ## XDATA 0xFFAC
 
 nalysis/xref_xdata.py 0xFFAC finds 3 direct reads and no direct writer. FFAC is likely hardware-mapped or updated through indirect paths.
+
+## Batch xref findings
+
+- XDATA 0XD12D: 20 direct reads, 0 direct writes.
+- XDATA 0XD180: 65 direct reads, 0 direct writes.
+- XDATA 0XD31B: 25 direct reads, 3 direct writes.
+- XDATA 0XD8FE: 80 direct reads, 3 direct writes.
+- XDATA 0XCFD8: 1 direct reads, 0 direct writes.
+- XDATA 0XCFDA: 8 direct reads, 0 direct writes.
+- XDATA 0XCFDB: 38 direct reads, 0 direct writes.
+- XDATA 0XCFDC: 69 direct reads, 0 direct writes.
+- XDATA 0XCFDD: 121 direct reads, 0 direct writes.
+- XDATA 0XCFDE: 77 direct reads, 0 direct writes.
+- XDATA 0XCFDF: 62 direct reads, 0 direct writes.
+- XDATA 0XCFE0: 1 direct reads, 0 direct writes.
+- XDATA 0XCFE1: 2 direct reads, 0 direct writes.
+- XDATA 0XFFEB: 46 direct reads, 0 direct writes.
+- XDATA 0XFFEA: 27 direct reads, 0 direct writes.
+- XDATA 0XFFED: 10 direct reads, 0 direct writes.
+- XDATA 0XFFEE: 2 direct reads, 0 direct writes.
+- XDATA 0XFFEC: 0 direct reads, 1 direct writes.
+- XDATA 0XFFE9: 6 direct reads, 0 direct writes.
+- XDATA 0XFFE8: 0 direct reads, 1 direct writes.
+- XDATA 0XFFE7: 12 direct reads, 0 direct writes.
+- XDATA 0XFFE5: 15 direct reads, 1 direct writes.
+- XDATA 0XFFE4: 15 direct reads, 0 direct writes.
+
+## Batch xref findings
+
+- XDATA 0XD12D: 20 direct reads, 0 direct writes.
+- XDATA 0XD180: 65 direct reads, 0 direct writes.
+- XDATA 0XD31B: 25 direct reads, 3 direct writes.
+- XDATA 0XD8FE: 80 direct reads, 3 direct writes.
+- XDATA 0XCFD8: 1 direct reads, 0 direct writes.
+- XDATA 0XCFDA: 8 direct reads, 0 direct writes.
+- XDATA 0XCFDB: 38 direct reads, 0 direct writes.
+- XDATA 0XCFDC: 69 direct reads, 0 direct writes.
+- XDATA 0XCFDD: 121 direct reads, 0 direct writes.
+- XDATA 0XCFDE: 77 direct reads, 0 direct writes.
+- XDATA 0XCFDF: 62 direct reads, 0 direct writes.
+- XDATA 0XCFE0: 1 direct reads, 0 direct writes.
+- XDATA 0XCFE1: 2 direct reads, 0 direct writes.
+- XDATA 0XFFEB: 46 direct reads, 0 direct writes.
+- XDATA 0XFFEA: 27 direct reads, 0 direct writes.
+- XDATA 0XFFED: 10 direct reads, 0 direct writes.
+- XDATA 0XFFEE: 2 direct reads, 0 direct writes.
+- XDATA 0XFFEC: 0 direct reads, 1 direct writes.
+- XDATA 0XFFE9: 6 direct reads, 0 direct writes.
+- XDATA 0XFFE8: 0 direct reads, 1 direct writes.
+- XDATA 0XFFE7: 12 direct reads, 0 direct writes.
+- XDATA 0XFFE5: 15 direct reads, 1 direct writes.
+- XDATA 0XFFE4: 15 direct reads, 0 direct writes.

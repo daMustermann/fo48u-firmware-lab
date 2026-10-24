@@ -664,3 +664,7 @@ Disassembly from 6:A15B writes R5 or 0x01 to XDATA 0xFFAE. This is a 0xFFAE stat
 ## AOCS execution note
 
 AOCS (1500 h threshold) may not produce a visible action on panels below the degradation threshold. APCS was verified on user hardware; AOCS remains to be validated on a panel that meets the threshold.
+
+## XDATA 0xD618
+
+nalysis/xref_xdata.py 0xD618 finds 18+ direct reads and no direct writer. D618 is likely hardware-mapped or updated through indirect paths.

@@ -24,12 +24,12 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Fetch and verify exact stock F08 image
+      - name: Fetch stock image and analysis banks; verify F08 identity
         env:
           REFERENCE_IMAGE: firmware/F08-20221115/FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin
           EXPECTED_SHA256: 3dd2e95afce675d3b299dc29bffa1bf43aaee5efdad12d88a562442804bfdf5f
         run: |
-          git lfs pull --include="$REFERENCE_IMAGE" --exclude=""
+          git lfs pull --include="$REFERENCE_IMAGE,analysis/banks/bank_*.bin" --exclude=""
           python -B - <<'PY'
           import hashlib
           import os

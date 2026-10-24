@@ -604,3 +604,7 @@ Disassembly from 6:A15B writes R5 or 0x01 to XDATA 0xFFAE. This is a 0xFFAE stat
 ## XDATA 0xFFAD
 
 nalysis/xref_xdata.py 0xFFAD finds 18+ direct reads and no direct writer. FFAD is likely hardware-mapped or updated through indirect paths.
+
+## XDATA 0xFFAC
+
+nalysis/xref_xdata.py 0xFFAC finds 3 direct reads and no direct writer. FFAC is likely hardware-mapped or updated through indirect paths.

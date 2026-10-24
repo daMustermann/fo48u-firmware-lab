@@ -1,0 +1,204 @@
+{
+  "image": {
+    "path": "firmware/F08-20221115/FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin",
+    "size": 2031616,
+    "sha256": "3dd2e95afce675d3b299dc29bffa1bf43aaee5efdad12d88a562442804bfdf5f",
+    "md5": "d4324c6c88abea48b1ee896f7e14ee9f",
+    "scaler": "Realtek RTD2718",
+    "architecture": "banked 8051 (Keil C51)"
+  },
+  "xdata": {
+    "D8FE": {
+      "role": "mutable selector flag for receive-buffer handoff; set/cleared/copied via 4:FB1F/4:E6F3/4:E70B",
+      "bank_offsets": [
+        "4:FB1F",
+        "4:E6F3",
+        "4:E70B",
+        "4:BA29",
+        "8:EE5E"
+      ]
+    },
+    "D12D": {
+      "role": "APCS/AOCS request bits (bit0 APCS, bit1 AOCS)"
+    },
+    "D13D_D13E": {
+      "role": "total panel usage hours (big-endian)"
+    },
+    "D13F": {
+      "role": "panel usage minutes"
+    },
+    "D12E_D12F": {
+      "role": "APCS reference hours (big-endian)"
+    },
+    "CFD8": {
+      "role": "128-byte receive buffer base (offset 0..7 = CFDA..CFDF)"
+    },
+    "CEE1": {
+      "role": "80-byte receive buffer base (slot0); slot1 at CF31"
+    },
+    "CFD1": {
+      "role": "selected receive slot index"
+    },
+    "CFD2": {
+      "role": "receive completion/processing flags (bit0 path A, bit1 path B)"
+    },
+    "C693": {
+      "role": "saved old D8FE / bank-8 derived value (distinct uses)"
+    },
+    "C68A": {
+      "role": "upstream value mapped to D8FE via 2:FE80 path"
+    },
+    "D180": {
+      "role": "upstream source mapped to R7=00/10/20 at 2:FE80"
+    },
+    "D83C": {
+      "role": "bank-4 selector loaded via 3:A98D/3:AA07"
+    },
+    "FF24": {
+      "role": "path A hardware register (address compare 0x6E)"
+    },
+    "FF25": {
+      "role": "path A status register"
+    },
+    "FE88": {
+      "role": "path B buffer base seed"
+    },
+    "FE89": {
+      "role": "path B subsequent byte source"
+    },
+    "C9C2_C9C5": {
+      "role": "receive selection params saved at 13:DD24"
+    },
+    "C501": {
+      "role": "stored incoming R7 at 9:D45C"
+    },
+    "C503_C502": {
+      "role": "descriptor access indices"
+    },
+    "CFDB": {
+      "role": "guarded by E0 in bank-12 dispatch (12:53FC)"
+    },
+    "CFDA": {
+      "role": "command value compared (01/03/...)"
+    },
+    "CFDE": {
+      "role": "operand/index used in command handlers"
+    }
+  },
+  "functions": {
+    "13:CAA8": "APCS threshold compare (4 h)",
+    "13:CAD3": "AOCS threshold (1500 h divisor)",
+    "13:CB1A": "TSS threshold (36 h)",
+    "13:E3B1": "path A receive entry (FF23/FE compare)",
+    "13:E3BB": "path A buffer selection (CFD8 vs CEE1)",
+    "13:DD24": "save selection params to C9C2..C9C5",
+    "13:DD7A": "path A receive driver (FF25)",
+    "13:DE63": "path B receive driver (CF31 base)",
+    "13:EF0D": "shared indirect writer helper",
+    "13:EB0D": "path B calls 13:F7B0 (CFD2 bit1)",
+    "13:F7B0": "writes buffer byte to CFD2 bit1",
+    "13:C8A4": "downstream field processing from CFD8/CEE3",
+    "13:C8BF": "copies CFDA/CFDB to C9C4/C9C5",
+    "13:C976": "outbound XOR checksum (CF8B)",
+    "12:539D": "bank-12 entry (via trampoline)",
+    "12:53FC": "CFDB == E0 guard",
+    "12:68A9": "APCS command handler (cmd 80)",
+    "12:68B9": "AOCS command handler (cmd 82)",
+    "12:68C6": "shared request-bit write to D12D",
+    "9:97DB": "action dispatcher",
+    "9:E0E2": "menu action ID source",
+    "9:D45C": "stores R7 to C501",
+    "9:D516": "page/row traversal",
+    "9:E4B5": "row index -> action ID",
+    "9:A14C": "APCS handler (action 23)",
+    "9:A1C0": "AOCS handler (action 24)",
+    "18:D6CE": "sole LCALL 0x2DB2 caller",
+    "18:E22D": "CFD2 bits 0/1 iteration + buffer copy",
+    "18:D712": "clears selected CFD2 bit using CFD1",
+    "4:FB1F": "D8FE setter (from R7)",
+    "4:E6F3": "D8FE clear",
+    "4:E70B": "D8FE restore from C693",
+    "4:BA29": "D8FE setter caller (R7 from C68A)",
+    "2:FE80": "maps D180 -> R7 00/10/20",
+    "8:EE5E": "bank-8 uses D8FE as input",
+    "0:2DB2": "bank-switch stub (MOV DPTR,#539D; LJMP 0C54)",
+    "0:0C54": "synthetic return builder",
+    "0:5030": "bank selector (bank 12)",
+    "0:507E": "selector write to XDATA FFFF",
+    "0:35FC": "memory copier dispatch",
+    "0:359A": "XDATA->XDATA copier",
+    "0:35CF": "80-byte copy implementation",
+    "0:2656": "helper reading D8FE",
+    "0:36C0": "indirect writer (R3==01 branch)",
+    "13:DEA2": "80-byte capacity check (path B)",
+    "13:DD84": "length gate CJNE (path A)",
+    "13:DEBD": "length gate CJNE (path B)",
+    "13:DDAD": "FC compare (path A)",
+    "13:DDB6": "03 compare (path A)",
+    "13:DEE9": "FC compare (path B)",
+    "13:DEF2": "03 compare (path B)",
+    "13:DDBE": "path A return R7=1",
+    "13:DEFA": "path B return R7=1",
+    "13:F8CE": "forces R7=0x16",
+    "13:F4B0": "conditional XDATA write (R7&7==0)",
+    "13:DD3C": "seeds receiver from FF24",
+    "13:EF23": "computes (byte & 0x7F)+3",
+    "10:F801": "separate guarded protocol (77 AA, CFD8==71)",
+    "7:6945": "alternate command family (C0 D0)",
+    "7:B226": "buffer handoff (CFDB..CFDE -> CF84..CF87)",
+    "18:D6B2": "D183 bit check",
+    "18:D6BE": "CFD2 zero bypass",
+    "18:D6D3": "DDC/CI-like command family (01 03 07 0C F3)"
+  },
+  "trampolines": {
+    "0:2DB2": {
+      "target": "12:539D",
+      "bytes": "90 53 9D 02 0C 54",
+      "caller": "18:D6CE"
+    },
+    "0:0C54": {
+      "role": "builds synthetic return address"
+    },
+    "0:5030": {
+      "role": "selects bank 12 via 0:507E"
+    },
+    "0:507E": {
+      "role": "writes bank selector to XDATA FFFF"
+    }
+  },
+  "command_table": {
+    "bank": 12,
+    "base": "0x5D85",
+    "entries": 100,
+    "80": {
+      "handler": "12:68A9",
+      "request": "D12D |= 01 if CFDE == 2"
+    },
+    "82": {
+      "handler": "12:68B9",
+      "request": "D12D |= 02 if CFDE == 2"
+    }
+  },
+  "panel_protection": {
+    "APCS": {
+      "location": "13:CAA8",
+      "threshold_hours": 4
+    },
+    "AOCS": {
+      "location": "13:CAD3",
+      "threshold_hours": 1500
+    },
+    "TSS": {
+      "location": "13:CB1A",
+      "threshold_hours": 36
+    }
+  },
+  "open_questions": [
+    "Physical transport origin of FF24/FF25/FE88/FE89 and inbound framing",
+    "Runtime value and origin of D180/C68A/D8FE",
+    "Whether any external command reaches bank-12 command handlers",
+    "Joystick/event origin for menu actions 23/24 (unreachable via E057)",
+    "End-to-end validation/checksum of receive frames (none inbound)",
+    "Whether bank-19 0x80A4 path (C501==0x20) connects to external USB"
+  ]
+}

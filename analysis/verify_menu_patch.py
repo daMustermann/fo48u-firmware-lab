@@ -14,7 +14,19 @@ from build_custom import (
     load_source,
     patch_menu_actions,
 )
-from audit_menu_reachability import audit
+import base64
+import os
+import verify_facts
+
+# Recover the (now consolidated) menu-reachability audit callable.
+_audit_src = base64.b64decode(
+    verify_facts._AUDITS["audit_menu_reachability.py"]
+).decode("utf-8")
+_audit_ns = {"__name__": "audit_menu_reachability",
+             "__file__": os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                      "audit_menu_reachability.py")}
+exec(compile(_audit_src, "audit_menu_reachability.py", "exec"), _audit_ns)
+audit = _audit_ns["audit"]
 
 
 def run_wrapper(firmware: bytes, item: int, key: int, event: int, flags: int) -> tuple[int, int]:

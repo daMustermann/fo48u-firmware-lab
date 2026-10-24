@@ -26,14 +26,14 @@ One UI caveat: `APCS_EXE_Click` checks `AOCS_exe == 1` (as does `AOCS_EXE_Click`
 To reproduce the method-byte audit with your own official installed executable (no hardware access):
 
 ```powershell
-python -B analysis/audit_sidekick_commands.py 'C:\Program Files (x86)\Gigabyte\OSDSidekick\AORUS\osdsidekick.exe'
+python -B analysis/verify_facts.py 'C:\Program Files (x86)\Gigabyte\OSDSidekick\AORUS\osdsidekick.exe'
 ```
 
 ## Relationship to F08 firmware
 
 Stock F08 bank 12 maps incoming command codes `80` and `82` to `12:68A9` and `12:68B9`, which conditionally set the APCS/AOCS request bits in XDATA `D12D` when operand `CFDE == 2`. These command codes align with the Sidekick payloads, but a complete **USB/HID → hardware receiver → firmware buffer → bank-12 handler** path has not yet been proven. In particular, no successful manual compensation cycle or safe host-trigger procedure has been demonstrated.
 
-The Sidekick reference frames have **eight bytes** each, exactly matching the stock bank-13 candidate receive-length rule `(frame[1] & 0x7F) + 3` for byte `85`. **If** the frame arrives intact with its first byte at `CFD8`, offsets `2..6` would populate the five downstream fields `CFDA..CFDE` as `03 E0 80 00 02` (APCS), or `03 E0 82 00 02` (AOCS). This is a **conditional buffer-placement match**, not an observed receive event. Firmware bytes further establish the `E0` path through the bank-13 predicate, the bank-7 `CFDA=03` carry-clear return, and bank-12's `80`/`82` dispatch and `CFDE=02` guard. The exact candidate control-flow anchors and reference-frame XOR are reproducible with `python -B analysis/audit_sidekick_f08_handoff.py`.
+The Sidekick reference frames have **eight bytes** each, exactly matching the stock bank-13 candidate receive-length rule `(frame[1] & 0x7F) + 3` for byte `85`. **If** the frame arrives intact with its first byte at `CFD8`, offsets `2..6` would populate the five downstream fields `CFDA..CFDE` as `03 E0 80 00 02` (APCS), or `03 E0 82 00 02` (AOCS). This is a **conditional buffer-placement match**, not an observed receive event. Firmware bytes further establish the `E0` path through the bank-13 predicate, the bank-7 `CFDA=03` carry-clear return, and bank-12's `80`/`82` dispatch and `CFDE=02` guard. The exact candidate control-flow anchors and reference-frame XOR are reproducible with `python -B analysis/verify_facts.py`.
 
 The physical USB bridge → `FF24/FF25` or `FE88/FE89` mapping, incoming checksum acceptance, relevant live state and successful panel compensation remain unverified.
 

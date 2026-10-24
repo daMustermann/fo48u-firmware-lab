@@ -66,11 +66,11 @@ For file offset conversion: `bank * 0x10000 + address`. Bank switching is perfor
 ## Reproducibility and remaining questions
 
 ```bash
-python analysis/audit_refresh_command_table.py
-python analysis/audit_menu_reachability.py
-python analysis/audit_service_dispatch.py
-python analysis/audit_packet_field_usage.py
-python analysis/audit_packet_route_families.py
+python analysis/verify_facts.py
+python analysis/verify_facts.py
+python analysis/verify_facts.py
+python analysis/verify_facts.py
+python analysis/verify_facts.py
 ```
 
 The evidence still needs a physical joystick selection trace, the packet ingress that fills `CFDA..CFDF`, and a proven safety/recovery approach. **No modified image is validated for flashing.** The automatic care functions should remain enabled.

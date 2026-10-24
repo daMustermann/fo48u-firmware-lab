@@ -24,13 +24,8 @@ The known static scheduler thresholds are APCS **4 h**, AOCS **1,500 h**, and TS
 Use Python 3 and the hash-verified stock image. The first check also needs **radare2** (`r2`) on `PATH`. From the repository root, run the acceptance commands documented in `README.md`:
 
 ```bash
-python analysis/audit_8051_opcodes.py
-python analysis/audit_menu_reachability.py
-python analysis/audit_service_dispatch.py
-python analysis/audit_refresh_command_table.py
-python analysis/audit_ddcci_ingress.py
-python analysis/audit_packet_field_usage.py
-python analysis/audit_packet_route_families.py
+python analysis/verify_facts.py
+python analysis/verify_menu_patch.py
 python analysis/build_variant.py --verify
 python analysis/build_custom.py --verify
 ```

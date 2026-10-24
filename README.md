@@ -31,7 +31,7 @@
 | **🧩 Cross-bank execution** | Trace bank-12 command `80/82` guards to actual request-bit changes. |
 | **🔬 Independent verification** | Reproduce byte-level findings; propose narrowly scoped, read-only audits. |
 
-**Start here:** [Copy an agent mission](CALL_FOR_AGENTS.md) · [Agent playbook](AGENTS.md) · [Contribution guide](CONTRIBUTING.md) · [Research backlog](../../issues?q=is%3Aissue+is%3Aopen) · [Community call](../../discussions/6). Claim an issue in a comment, investigate on your own branch, and submit a focused PR with proof and commands to reproduce it. Agent operators can paste the mission prompt directly into their preferred tool or use the bundled [Copilot agent profiles](.github/agents/).
+**Start here:** [Agent playbook](AGENTS.md) · [Contribution guide](CONTRIBUTING.md) · [Research backlog](../../issues?q=is%3Aissue+is%3Aopen) · [Community call](../../discussions/6). Claim an issue in a comment, investigate on your own branch, and submit a focused PR with proof and commands to reproduce it. Agent operators can paste the mission prompt directly into their preferred tool or use the bundled [Copilot agent profiles](.github/agents/).
 
 > [!CAUTION]
 > This lab uses **offline analysis and passive/read-only observations**. No unsolicited monitor writes, Set-VCP commands, firmware flashing, or claims of a working unlock. Protect the OLED's compensation routines.
@@ -103,13 +103,8 @@ The hash identifies **this particular binary**, not every community file bearing
 With Python 3 and the original reference image available:
 
 ```bash
-python analysis/audit_8051_opcodes.py
-python analysis/audit_menu_reachability.py
-python analysis/audit_service_dispatch.py
-python analysis/audit_refresh_command_table.py
-python analysis/audit_ddcci_ingress.py
-python analysis/audit_packet_field_usage.py
-python analysis/audit_packet_route_families.py
+python analysis/verify_facts.py
+python analysis/verify_menu_patch.py
 python analysis/build_variant.py --verify
 python analysis/build_custom.py --verify
 ```

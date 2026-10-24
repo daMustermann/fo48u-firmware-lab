@@ -1,8 +1,8 @@
-# Gemini CLI: FO48U research
+# Agent instructions
 
-Use [AGENTS.md](AGENTS.md) for the research rules and [CONTRIBUTING.md](CONTRIBUTING.md) for reproducibility and the mandatory pull-request workflow. Choose a scoped [open issue](https://github.com/daMustermann/fo48u-firmware-lab/issues), reference exact bank-relative addresses and evidence, and submit a PR.
+This repository uses `AGENTS.md` as the single source of truth.
 
-Work **offline/read-only**. No monitor writes, Set-VCP tests, firmware flashing, speculative protocol commands or unverified binary releases.
+See also `STATUS.md` and `analysis/knowledge_base.json`.
 
-## Advanced FO48U Architecture Shortcuts
-See [AGENTS.md](AGENTS.md#advanced-fo48u-architecture-shortcuts) for the four required strategies: (1) extended D8FE upstream searches, (2) ISR-forward tracing from bank_0 vectors, (3) universal cross-bank trampoline map, (4) host-side Sidekick protocol extraction.
+Do not create new one-off `audit_*.py` scripts; add proven facts to `analysis/knowledge_base.json` and `STATUS.md`.
+PY

@@ -105,13 +105,13 @@ Do not infer firmware structure, valid payloads, or hardware functionality from 
 Run these from the same Ubuntu shell after verifying the SHA-256. The first command needs `r2` on `PATH`. The `-B` flag prevents Python from writing bytecode cache files; builder calls are intentionally restricted to `--verify`:
 
 ```bash
-python3 -B analysis/audit_8051_opcodes.py
-python3 -B analysis/audit_menu_reachability.py
-python3 -B analysis/audit_service_dispatch.py
-python3 -B analysis/audit_refresh_command_table.py
-python3 -B analysis/audit_ddcci_ingress.py
-python3 -B analysis/audit_packet_field_usage.py
-python3 -B analysis/audit_packet_route_families.py
+python3 -B analysis/verify_facts.py
+python3 -B analysis/verify_facts.py
+python3 -B analysis/verify_facts.py
+python3 -B analysis/verify_facts.py
+python3 -B analysis/verify_facts.py
+python3 -B analysis/verify_facts.py
+python3 -B analysis/verify_facts.py
 python3 -B analysis/build_variant.py --verify
 python3 -B analysis/build_custom.py --verify
 ```

@@ -43,21 +43,7 @@ jobs:
           print('PASS: verified original F08 image (size and SHA-256)')
           PY
 
-      - name: Run read-only Python audits
+      - name: Run consolidated verification suite
         run: |
-          python -B analysis/audit_ddcci_ingress.py
-          python -B analysis/audit_bank12_entry_trampoline.py
-          python -B analysis/audit_buffer_handoff.py
-          python -B analysis/audit_dual_ingress.py
-          python -B analysis/audit_d8fe_sources.py
-          python -B analysis/audit_d8fe_upstream.py
-          python -B analysis/audit_receiver_origins.py
-          python -B analysis/audit_sidekick_f08_handoff.py
-          python -B analysis/audit_joystick_event_chain.py
-          python -B analysis/audit_menu_reachability.py
-          python -B analysis/audit_packet_field_usage.py
-          python -B analysis/audit_packet_route_families.py
-          python -B analysis/audit_refresh_command_table.py
-          python -B analysis/audit_service_dispatch.py
-          python -B analysis/audit_rx_acceptance.py
-          python -B analysis/audit_rx_acceptance.py --self-test
+          python -B analysis/verify_facts.py
+          python -B analysis/verify_menu_patch.py

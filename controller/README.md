@@ -68,7 +68,7 @@ minutes; Ctrl+C preserves the completed results.
 
 Set `--firmware-label` to the installed version reported by the owner or monitor
 OSD; this is an annotation, not device verification. Omit it when unknown. The
-current unit runs F06 (owner-reported), while the static atlas/patch references
+current unit runs F06 (also confirmed by a validated E0/38 HID reply), while the static atlas/patch references
 describe F08. Live F06 results do not validate F08 behavior.
 
 Run the offline regressions from the repository root:

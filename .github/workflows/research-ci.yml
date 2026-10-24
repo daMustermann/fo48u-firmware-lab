@@ -47,3 +47,6 @@ jobs:
         run: |
           python -B analysis/verify_facts.py
           python -B analysis/verify_menu_patch.py
+          python -B analysis/build_variant.py --verify
+          python -B analysis/build_custom.py --verify
+          python -B -m unittest discover -s controller -p 'test_*.py' -v

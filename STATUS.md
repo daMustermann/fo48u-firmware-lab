@@ -75,7 +75,7 @@ flash safety remain unresolved.
 
 ## Host-side evidence
 
-A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; neither a response value nor compensation execution has been demonstrated. Its Realtek-HID model branch uses VID:PID `0BDA:1100`, and Windows enumerates that HID interface, though the process-to-device handle remains unobserved. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
+A connected official Sidekick 1.21.0707.1 process was passively observed issuing an HID-backed `E0 50` query using `RtHIDLib.dll`. Its separately byte-verified IL exposes APCS/AOCS **execution** commands `80/82` and OLED **readback** selectors `7F..83`; validated F06 status response values are now recorded in the HID observation above; compensation execution remains unverified. Its Realtek-HID model branch uses VID:PID `0BDA:1100`, and Windows enumerates that HID interface, though the process-to-device handle remains unobserved. Details: [Sidekick protocol](analysis/sidekick-protocol.md).
 
 A read-only DDC/CI probe returned a response to GET-VCP `E0` that resembled the result for `DF`. This **does not prove** an accessible vendor service command: the device does not advertise `E0`, and generic fallback behavior remains plausible. No Set-VCP or USB write tests were performed.
 

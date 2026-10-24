@@ -265,5 +265,76 @@
     "0xD6": "power mode",
     "0xDF": "manufacturer specific",
     "0xE0": "manufacturer specific"
+  },
+  "post_build_safety_audit": {
+    "date": "2026-10-24",
+    "base_commit": "5fa02eb5ffb605afd10c72c835cec869a1100d2f",
+    "report": "analysis/POST_BUILD_AUDIT.md",
+    "byte_tables": "analysis/PATCH_BYTE_TABLES.md",
+    "verifier": "analysis/verify_patch_safety.py",
+    "full_control": {
+      "patch": "unlock_cmd_gate only; no additional firmware control implementation",
+      "changed_bytes": [
+        "12:68AD 64->E4",
+        "12:68AE 02->00",
+        "12:68BD B4->E4",
+        "12:68BE 02->00",
+        "12:68BF 14->00"
+      ],
+      "local_instruction_layout": "verified against stock bytes and OPLEN; independent radare2 disassembly",
+      "global_stack_balance": "not proven",
+      "carry_semantics": "Removing AOCS CJNE preserves incoming carry instead of clearing it for operand 2; downstream sensitivity not proven",
+      "flash_safety": "not established"
+    },
+    "native_hid_status_evidence": {
+      "dll_sha256": "b20b55ff4c637a2f78ce03695c5ad52636e9d313b504dfe894d065b5215ca3d8",
+      "method": "static installed x86 DLL disassembly; no HID transaction",
+      "Open_HID": "match count; >0 means opened",
+      "Open_mutiHID": "0 success; 1 failure",
+      "HID_i2cread": "0 success; nonzero failure (1,2,-1,-2 observed error paths)",
+      "HID_i2cwrite": "0 success; 1 or -1 on observed error paths"
+    },
+    "live_get_observation": {
+      "started_utc": "2026-10-24T02:36:19Z",
+      "monitor_attribution": "one active WMI AORUS FO48U/GBT4800 and one physical monitor, index 0, generic physical description",
+      "transport": "Windows Dxva2 GetVCPFeatureAndVCPFeatureReply; no HID, Set-VCP or flash",
+      "attempted": 256,
+      "responded": 37,
+      "get_failed": 219,
+      "unadvertised_responses": [
+        "1E",
+        "20",
+        "30",
+        "62",
+        "6C",
+        "6E",
+        "70",
+        "86",
+        "C9",
+        "E0",
+        "EC"
+      ],
+      "E0_DF_same_reply": {
+        "current": 514,
+        "maximum_raw": 65535,
+        "E0_advertised": false,
+        "DF_advertised": true
+      },
+      "EC_reply": {
+        "current": 0,
+        "maximum_raw": 0,
+        "meaning": "unestablished"
+      },
+      "report_local_untracked": "controller/live-probe-2026-10-24.json",
+      "limits": "GET response is not SET acceptance, correct semantic labeling, bank-12 reachability, or modified-firmware validation; identical replies may be fallback",
+      "device_firmware": {
+        "version": "F06",
+        "source": "owner_reported_after_capture",
+        "verified_by_probe": false
+      },
+      "static_reference_firmware": "F08",
+      "comparison_scope": "Cross-version observation: live F06 replies do not validate F08 behavior. F08 patch byte findings are offline only; no F06 binary has been supplied.",
+      "published_sanitized_report": "analysis/observations/f06-vcp-get-2026-10-24.json"
+    }
   }
 }

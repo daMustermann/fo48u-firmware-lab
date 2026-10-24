@@ -41,6 +41,10 @@ class OledCare:
         self.sleeper(0.15)
         response = self.transport.i2c_read(0x51, 1, 36, 0x6E, 0, 100)
         self.sleeper(0.15)
+        if len(response) != 36 or any(type(b) is not int or not 0 <= b <= 255 for b in response):
+            raise OSError("invalid OLED reply length or bytes")
+        if len(set(response)) == 1 and response[0] in (0, 255):
+            raise OSError("empty OLED reply; refusing to decode a fabricated zero/FFFF value")
         return (response[8] << 8) | response[9]
 
     def read_panel_hours(self) -> Optional[int]:
@@ -89,6 +93,9 @@ class OledCare:
 
     def execute_apcs(self, confirmed: bool = False) -> List[int]:
         return self.execute(0x80, 0x02, confirmed)
+
+    def execute_aocs(self, confirmed: bool = False) -> List[int]:
+        return self.execute(0x82, 0x02, confirmed)
 
     def set_crosshair(self, index: int, confirmed: bool = False) -> List[int]:
         if self.dry_run:

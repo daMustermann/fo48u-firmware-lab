@@ -36,8 +36,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     dry_run = not args.send
+    if dry_run and args.command in ("scan-vcp", "dump-state"):
+        print("Dry run: hardware reads skipped. Use --send or controller/live_probe.py for live GET diagnostics.")
+        return 0
 
-    if dry_run:
+    if dry_run or args.command == "scan-vcp":
         transport = None
     else:
         transport = RtHidTransport(args.dll)
@@ -97,10 +100,10 @@ def main(argv=None) -> int:
 
 class _NullTransport:
     def i2c_write(self, *a, **k):
-        return 0
+        raise RuntimeError("dry-run transport must never perform I2C operations")
 
     def i2c_read(self, *a, **k):
-        return [0] * 36
+        raise RuntimeError("dry-run transport has no hardware readings")
 
 
 if __name__ == "__main__":

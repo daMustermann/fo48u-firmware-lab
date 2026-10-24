@@ -10,7 +10,7 @@ from typing import List
 
 def _find_helper() -> str:
     candidates = [
-        Path(__file__).resolve().parents[2] / "helper" / "bin" / "Release" / "net8.0" / "win-x86" / "publish" / "helper.exe",
+        Path(__file__).resolve().parents[1] / "helper" / "bin" / "Release" / "net8.0" / "win-x86" / "publish" / "helper.exe",
         Path("controller") / "helper" / "bin" / "Release" / "net8.0" / "win-x86" / "publish" / "helper.exe",
         Path("helper") / "bin" / "Release" / "net8.0" / "win-x86" / "publish" / "helper.exe",
     ]
@@ -30,9 +30,14 @@ class HelperTransport:
             text=True,
             bufsize=1,
         )
-        ready = self._recv()
-        if not ready.get("ready"):
-            raise RuntimeError("helper did not become ready")
+        try:
+            ready = self._recv()
+            if not ready.get("ready") or ready.get("protocol") != 2:
+                raise RuntimeError("helper protocol 2 required; rebuild controller/helper to include failed-read safety fixes")
+        except Exception:
+            self.proc.terminate()
+            self.proc.wait(timeout=5)
+            raise
 
     def _send(self, payload: dict) -> dict:
         assert self.proc.stdin is not None and self.proc.stdout is not None
@@ -59,12 +64,15 @@ class HelperTransport:
             except Exception:
                 pass
         self.proc.terminate()
+        self.proc.wait(timeout=5)
 
     def i2c_write(self, buffer, slave=0x6E, speed=0) -> int:
         response = self._send({"cmd": "i2c_write", "bytes": list(buffer), "slave": slave, "speed": speed})
         if not response.get("ok"):
             raise RuntimeError(response.get("error", "write failed"))
-        return int(response.get("result", 0))
+        if type(response.get("result")) is not int or response["result"] != 0:
+            raise OSError(f"helper I2C write failed: status={response.get('result')}")
+        return 0
 
     def i2c_read(self, reg_addr=0x51, reg_len=1, buf_len=36, slave=0x6E, speed=0, timeout=100) -> List[int]:
         response = self._send({
@@ -78,4 +86,9 @@ class HelperTransport:
         })
         if not response.get("ok"):
             raise RuntimeError(response.get("error", "read failed"))
-        return list(response.get("bytes", []))
+        if type(response.get("result")) is not int or response["result"] != 0:
+            raise OSError(f"helper I2C read failed: status={response.get('result')}")
+        data = response.get("bytes")
+        if not isinstance(data, list) or len(data) != buf_len or any(type(b) is not int or not 0 <= b <= 255 for b in data):
+            raise OSError("helper returned invalid or incomplete I2C data")
+        return data

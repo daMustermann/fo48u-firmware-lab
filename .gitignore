@@ -22,6 +22,10 @@ decompiled/
 # Python
 __pycache__/
 *.pyc
+
+# Local hardware diagnostics can contain per-device state.
+live-probe*.json
+controller/live-probe*.json
 .venv/
 venv/
 

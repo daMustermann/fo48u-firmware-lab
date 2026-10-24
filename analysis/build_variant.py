@@ -91,6 +91,10 @@ VARIANTS: dict[str, tuple[list[str], str]] = {
         ["unlock_cmd_gate", "apcs_36h"],
         "unlock + APCS 36 h (TSS reminder unchanged at 36 h)",
     ),
+    "F08-full-control": (
+        ["unlock_cmd_gate"],
+        "unlock + documented full software-control profile (host-side XDATA/event injection; no new firmware bytes)",
+    ),
 }
 
 

@@ -349,12 +349,14 @@ def main(argv: list[str]) -> int:
         "menu-quiet": dict(unlock=True, menu_actions=True, apcs=36),
         "menu-no-nag": dict(unlock=True, menu_actions=True, apcs=36, tss=0),
         "menu-care": dict(unlock=True, menu_actions=True, apcs=8, aocs=750, tss=12),
+        "full-control": dict(unlock=True),
     }
     preset_descriptions = {
         "menu": "unreachable menu prototype with stock schedule",
         "menu-quiet": "unreachable menu prototype + APCS 36 h; TSS unchanged",
         "menu-no-nag": "unreachable menu prototype + APCS 36 h + TSS 255 h",
         "menu-care": "unreachable menu prototype + APCS 8 h / AOCS 750 h / TSS 12 h",
+        "full-control": "unlock command gate + documented host-side full software-control profile",
     }
     # Explicitly label the UI-scoped, unreachable research implementation.
     preset_output_names = {

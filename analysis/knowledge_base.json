@@ -200,5 +200,70 @@
     "Joystick/event origin for menu actions 23/24 (unreachable via E057)",
     "End-to-end validation/checksum of receive frames (none inbound)",
     "Whether bank-19 0x80A4 path (C501==0x20) connects to external USB"
-  ]
+  ],
+  "switch_helpers": {
+    "0x3C49": "Keil ?C?CCASE 8-bit switch helper (69 call sites)",
+    "0x3C6F": "Keil ?C?ICASE 16-bit switch helper (11 call sites)",
+    "0x3C9C": "Keil long switch helper with 6-byte entries (12 call sites)",
+    "0x3F1C": "Keil indexed jump helper with 2-byte entries (1 call site)",
+    "0x3F35": "Keil indexed jump helper with 4-byte entries (1 call site)"
+  },
+  "switch_site_count": 94,
+  "isr_vectors": {
+    "0x0003": "IE0 -> 0x510F (primary scaler/DDC-CI IRQ)",
+    "0x000B": "TF0 -> 0x5246",
+    "0x0013": "IE1 -> 0x520B (secondary I2C/AUX/USB bridge IRQ)",
+    "0x0023": "RI/TI UART0 serial ingress",
+    "0x002B": "TF2/UART1 -> 0x508A"
+  },
+  "d8fe_event_values": {
+    "0x00": "selects 128-byte receive buffer at CFD8; bank-18 may skip 80-byte copy",
+    "0x10": "nonzero D8FE variant derived from D180==1; selects 80-byte buffer path",
+    "0x20": "nonzero D8FE variant derived from D180==2; selects 80-byte buffer path",
+    "upstream": "D180 in {0,1,2} maps to R7 {0x00,0x10,0x20} at 2:FE80; C68A and D83C are intermediate mirrors"
+  },
+  "sidekick_virtual_events": {
+    "apcs": "51 85 03 E0 80 00 02 B5 -> bank-12 command 0x80, sets D12D bit0 when CFDE==2",
+    "aocs": "51 85 03 E0 82 00 02 B7 -> bank-12 command 0x82, sets D12D bit1 when CFDE==2",
+    "crosshair": "51 85 03 E0 55 00 <index> <xor> -> virtual OSD key/event injection (0xE0 family)",
+    "oled_readback": "51 83 01 E0 <selector> <xor> with selectors 7F/80/81/82/83"
+  },
+  "vcp_codes_observed": {
+    "0x02": "new control",
+    "0x04": "restore defaults",
+    "0x05": "luminance",
+    "0x06": "video gain",
+    "0x08": "color temperature increment",
+    "0x0B": "color temperature request",
+    "0x0C": "color temperature",
+    "0x10": "brightness",
+    "0x12": "contrast",
+    "0x14": "color preset",
+    "0x16": "red gain",
+    "0x18": "green gain",
+    "0x1A": "blue gain",
+    "0x1E": "auto setup",
+    "0x20": "horizontal position",
+    "0x30": "vertical position",
+    "0x52": "active control",
+    "0x60": "input select",
+    "0x62": "volume",
+    "0x6C": "black level",
+    "0x6E": "black stabilizer",
+    "0x70": "gamma",
+    "0x86": "display scaling",
+    "0x87": "sharpness",
+    "0xAC": "screen orientation",
+    "0xAE": "power control",
+    "0xB2": "OLED care / pixel clean control",
+    "0xB6": "ambiguous",
+    "0xC6": "application enable key",
+    "0xC8": "display controller ID",
+    "0xC9": "display firmware level",
+    "0xCA": "OSD",
+    "0xCC": "OSD language",
+    "0xD6": "power mode",
+    "0xDF": "manufacturer specific",
+    "0xE0": "manufacturer specific"
+  }
 }

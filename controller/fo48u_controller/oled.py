@@ -7,6 +7,14 @@ from typing import Callable, List, Optional
 
 from .transport import RtHidTransport, xor_checksum
 
+OLED_SELECTORS = {
+    0x7F: "panel hours",
+    0x80: "APCS enable/status",
+    0x81: "APCS elapsed time",
+    0x82: "AOCS enable/status",
+    0x83: "AOCS elapsed time",
+}
+
 
 class OledCare:
     def __init__(
@@ -49,6 +57,16 @@ class OledCare:
 
     def read_aocs_enable(self) -> Optional[int]:
         return self._read(0x82)
+
+    def read_all(self) -> dict[int, Optional[int]]:
+        return {selector: self._read(selector) for selector in OLED_SELECTORS}
+
+    def inject_osd_event(self, selector: int, operand: int = 0x02, confirmed: bool = False) -> List[int]:
+        """Send a virtual OSD key/event frame (Sidekick E0 family)."""
+        return self.execute(selector, operand, confirmed=confirmed)
+
+    def virtual_key(self, code: int, confirmed: bool = False) -> List[int]:
+        return self.execute(0x55, code & 0xFF, confirmed=confirmed)
 
     def execute(self, selector: int, operand: int = 0x02, confirmed: bool = False) -> List[int]:
         if self.dry_run:

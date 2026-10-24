@@ -5,8 +5,9 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .oled import OledCare
+from .oled import OledCare, OLED_SELECTORS
 from .transport import DEFAULT_DLL, RtHidTransport
+from .ddcci import VCP_NAMES
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -24,6 +25,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     aocs = sub.add_parser("execute-aocs", help="send the AOCS execution frame")
     aocs.add_argument("--yes", action="store_true", help="confirm the unverified action")
+
+    scan = sub.add_parser("scan-vcp", help="scan all DDC/CI VCP codes")
+    scan.add_argument("--code", type=lambda x: int(x, 0), help="scan a single VCP code")
+
+    dump = sub.add_parser("dump-state", help="dump OLED selectors and VCP state")
     return parser
 
 
@@ -56,6 +62,33 @@ def main(argv=None) -> int:
         elif args.command == "execute-aocs":
             frame = care.execute_aocs(confirmed=args.yes)
             print("frame:", " ".join(f"{b:02x}" for b in frame))
+        elif args.command == "scan-vcp":
+            from .ddcci import DdcCi
+            ddc = DdcCi()
+            try:
+                if getattr(args, "code", None) is not None:
+                    for phys in ddc.physical_monitors():
+                        current, maximum = ddc.get_vcp(phys.hPhysicalMonitor, args.code)
+                        print(f"VCP 0x{args.code:02X} {VCP_NAMES.get(args.code, '')}: current={current} max={maximum}")
+                else:
+                    for code, (current, maximum) in ddc.scan_vcp().items():
+                        if current is not None:
+                            print(f"VCP 0x{code:02X} {VCP_NAMES.get(code, '')}: current={current} max={maximum}")
+            finally:
+                ddc.close()
+        elif args.command == "dump-state":
+            print("OLED selectors:")
+            for selector, name in OLED_SELECTORS.items():
+                print(f"  0x{selector:02X} {name}: {care._read(selector) if hasattr(care, '_read') else 'n/a'}")
+            from .ddcci import DdcCi
+            ddc = DdcCi()
+            try:
+                print("VCP state:")
+                for code, (current, maximum) in ddc.scan_vcp().items():
+                    if current is not None:
+                        print(f"  0x{code:02X} {VCP_NAMES.get(code, '')}: current={current} max={maximum}")
+            finally:
+                ddc.close()
     finally:
         if transport is not None:
             transport.close()

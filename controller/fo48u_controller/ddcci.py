@@ -55,7 +55,105 @@ class DdcCi:
     def set_vcp(self, handle, code: int, value: int) -> bool:
         return bool(self.dxva2.SetVCPFeature(handle, code, value))
 
+
+    def scan_vcp(self) -> dict[int, tuple[int | None, int | None]]:
+        result = {}
+        for code in range(0x100):
+            found = False
+            for phys in self.physical_monitors():
+                current, maximum = self.get_vcp(phys.hPhysicalMonitor, code)
+                if current is not None:
+                    result[code] = (current, maximum)
+                    found = True
+                    break
+            if not found:
+                result[code] = (None, None)
+        return result
+
+
+    def scan_vcp(self) -> dict[int, tuple[int | None, int | None]]:
+        result = {}
+        for code in range(0x100):
+            found = False
+            for phys in self.physical_monitors():
+                current, maximum = self.get_vcp(phys.hPhysicalMonitor, code)
+                if current is not None:
+                    result[code] = (current, maximum)
+                    found = True
+                    break
+            if not found:
+                result[code] = (None, None)
+        return result
+
     def close(self) -> None:
         for _, phys_list in self.monitors:
             arr = (PHYSICAL_MONITOR * len(phys_list))(*phys_list)
             self.dxva2.DestroyPhysicalMonitors(len(phys_list), arr)
+
+
+VCP_NAMES = {
+    0x02: "New control value",
+    0x04: "Restore factory defaults",
+    0x0B: "Color temperature request",
+    0x0C: "Image mode",
+    0x10: "Brightness",
+    0x12: "Contrast",
+    0x14: "Select color preset",
+    0x16: "Red gain",
+    0x18: "Green gain",
+    0x1A: "Blue gain",
+    0x60: "Input select",
+    0x62: "Volume",
+    0x6C: "Black level",
+    0x6E: "Black stabilizer",
+    0x70: "Gamma",
+    0x87: "Sharpness",
+    0xAC: "Horizontal frequency",
+    0xAE: "Vertical frequency",
+    0xB2: "Source timing mode / OLED care",
+    0xCA: "OSD / button control",
+    0xCC: "OSD language",
+    0xD6: "Power mode",
+    0xDF: "Manufacturer specific",
+    0xE0: "Manufacturer specific",
+}
+
+SIDEKICK_COMMANDS = {
+    0x80: "APCS compensation request (D12D bit 0 when CFDE == 2)",
+    0x82: "AOCS compensation request (D12D bit 1 when CFDE == 2)",
+    0x55: "Virtual OSD key/event selector (crosshair / event injection)",
+}
+
+
+VCP_NAMES = {
+    0x02: "New control value",
+    0x04: "Restore factory defaults",
+    0x0B: "Color temperature request",
+    0x0C: "Image mode",
+    0x10: "Brightness",
+    0x12: "Contrast",
+    0x14: "Select color preset",
+    0x16: "Red gain",
+    0x18: "Green gain",
+    0x1A: "Blue gain",
+    0x60: "Input select",
+    0x62: "Volume",
+    0x6C: "Black level",
+    0x6E: "Black stabilizer",
+    0x70: "Gamma",
+    0x87: "Sharpness",
+    0xAC: "Horizontal frequency",
+    0xAE: "Vertical frequency",
+    0xB2: "Source timing mode / OLED care",
+    0xCA: "OSD / button control",
+    0xCC: "OSD language",
+    0xD6: "Power mode",
+    0xDF: "Manufacturer specific",
+    0xE0: "Manufacturer specific",
+}
+
+SIDEKICK_COMMANDS = {
+    0x80: "APCS compensation request (D12D bit 0 when CFDE == 2)",
+    0x82: "AOCS compensation request (D12D bit 1 when CFDE == 2)",
+    0x55: "Virtual OSD key/event selector (crosshair / event injection)",
+}

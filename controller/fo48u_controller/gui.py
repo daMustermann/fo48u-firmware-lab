@@ -471,6 +471,10 @@ class Fo48uGui:
         row.pack(fill="x", padx=14, pady=6)
         ctk.CTkButton(row, text="Dump DDC/CI VCP", command=self._dump_vcp).pack(side="left", padx=6)
         ctk.CTkButton(row, text="Dump OLED selectors", command=self._dump_oled).pack(side="left", padx=6)
+        ctk.CTkButton(row, text="Scan all VCP", command=self._dump_vcp).pack(side="left", padx=6)
+        ctk.CTkButton(row, text="Full state dump", command=self._dump_state).pack(side="left", padx=6)
+        ctk.CTkButton(row, text="Scan all VCP", command=self._dump_vcp).pack(side="left", padx=6)
+        ctk.CTkButton(row, text="Full state dump", command=self._dump_state).pack(side="left", padx=6)
         self.diag_text = ctk.CTkTextbox(card, corner_radius=14)
         self.diag_text.pack(fill="both", expand=True, padx=14, pady=8)
         return page
@@ -978,6 +982,46 @@ class Fo48uGui:
                 "aocs_time (0x83)": self.care.read_aocs_time(),
             }
             lines = [f"{name}: {value}" for name, value in mapping.items()]
+            text = "\n".join(lines)
+            self.root.after(0, lambda t=text: self._set_diag(t))
+
+        self._start_worker(work)
+
+    def _dump_state(self) -> None:
+        if self.ddc is None or self.care is None:
+            from tkinter import messagebox
+            messagebox.showinfo("Not connected", "Connect to the monitor first.")
+            return
+
+        def work():
+            lines = ["OLED selectors:"]
+            import fo48u_controller.oled as oled_mod
+            for selector, name in oled_mod.OLED_SELECTORS.items():
+                lines.append(f"  0x{selector:02X} {name}: {self.care._read(selector)}")
+            lines.append("VCP state:")
+            for code, (current, maximum) in self.ddc.scan_vcp().items():
+                if current is not None:
+                    lines.append(f"  0x{code:02X} {VCP_NAMES.get(code, '')}: current={current} max={maximum}")
+            text = "\n".join(lines)
+            self.root.after(0, lambda t=text: self._set_diag(t))
+
+        self._start_worker(work)
+
+    def _dump_state(self) -> None:
+        if self.ddc is None or self.care is None:
+            from tkinter import messagebox
+            messagebox.showinfo("Not connected", "Connect to the monitor first.")
+            return
+
+        def work():
+            lines = ["OLED selectors:"]
+            import fo48u_controller.oled as oled_mod
+            for selector, name in oled_mod.OLED_SELECTORS.items():
+                lines.append(f"  0x{selector:02X} {name}: {self.care._read(selector)}")
+            lines.append("VCP state:")
+            for code, (current, maximum) in self.ddc.scan_vcp().items():
+                if current is not None:
+                    lines.append(f"  0x{code:02X} {VCP_NAMES.get(code, '')}: current={current} max={maximum}")
             text = "\n".join(lines)
             self.root.after(0, lambda t=text: self._set_diag(t))
 

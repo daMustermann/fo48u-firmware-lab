@@ -82,3 +82,22 @@ Read-only dump from the controller (2026-10-22):
 
 - VCP 0x02=1/2, 0x04=0/1, 0x05=0/1, 0x06=0/1, 0x08=0/1, 0x0B=100/0, 0x0C=45/63, 0x10=50/100, 0x12=50/100, 0x14=6/11, 0x16=128/100, 0x18=122/100, 0x1A=107/100, 0x1E=0/1, 0x20=0/1, 0x30=0/1, 0x52=0/1, 0x60=15/3, 0x62=30/100, 0x6C=50/100, 0x6E=50/100, 0x70=50/100, 0x86=2/0, 0x87=5/10, 0xAC=4/59900, 0xAE=6040/65535, 0xB2=1/1, 0xB6=3/5, 0xC6=90/255, 0xC8=9/0, 0xC9=1/65535, 0xCA=1/2, 0xCC=4/13, 0xD6=1/5, 0xDF=514/65535, 0xE0=514/65535, 0xEC=0/0.
 
+
+## D8FE / OSD Event Injection Chain (F08)
+
+`XDATA 0xD8FE` is the mutable selector for the receive-buffer handoff:
+
+- `0x00`: bank 13 selects the 128-byte buffer at `CFD8`; bank 18 may skip the 80-byte copy.
+- `0x10`: nonzero variant derived from `D180 == 1` via `2:FE80`.
+- `0x20`: nonzero variant derived from `D180 == 2` via `2:FE80`.
+
+Upstream mirrors: `D180` -> `R7` (`0x00`/`0x10`/`0x20`) -> `C68A` -> `D8FE`; `D83C` is a separate selector that can also feed `D8FE` through `4:F348`. `4:E6D4..E70B` saves old `D8FE` to `C693`, clears it, then restores it.
+
+Virtual OSD/event injection uses the Sidekick `E0` family frames:
+
+- APCS: `51 85 03 E0 80 00 02 B5`
+- AOCS: `51 85 03 E0 82 00 02 B7`
+- Crosshair/virtual key: `51 85 03 E0 55 00 <index> <xor>`
+- OLED readback: `51 83 01 E0 <selector> <xor>` (`7F`, `80`, `81`, `82`, `83`)
+
+Bank 12 command table entries `0x80` and `0x82` set `D12D` bits 0/1 only when `CFDE == 2`, so host-side injection remains conditional and unverified on hardware.

@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import pathlib
 import sys
+from control_hook import HOOK_PATCHES
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 SRC = REPO / "firmware" / "F08-20221115" / "FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin"
@@ -34,9 +35,9 @@ PATCHES: dict[str, list[tuple[int, int, bytes, bytes, str]]] = {
             12,
             0x68BD,
             bytes.fromhex("B4 02 14"),
-            bytes.fromhex("E4 00 00"),
+            bytes.fromhex("C3 74 02"),
             "AOCS command entry: replace `cjne a,#2,0x68D4` with "
-            "`clr a; nop; nop`, so it always falls through",
+            "`clr c; mov a,#2`, matching A=2/CY=0 on the accepted stock path",
         ),
     ],
     "apcs_2h": [
@@ -92,10 +93,11 @@ VARIANTS: dict[str, tuple[list[str], str]] = {
         "unlock + APCS 36 h (TSS reminder unchanged at 36 h)",
     ),
     "F08-full-control": (
-        ["unlock_cmd_gate"],
-        "unlock + documented full software-control profile (host-side XDATA/event injection; no new firmware bytes)",
+        ["unlock_cmd_gate", "control_hook"],
+        "OFFLINE E0/FE allowlisted XDATA/D8FE hook prototype + carry-safe command unlock; DO NOT FLASH",
     ),
 }
+PATCHES["control_hook"] = HOOK_PATCHES
 
 
 def file_offset(bank: int, addr: int) -> int:

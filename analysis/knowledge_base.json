@@ -248,9 +248,9 @@
     "0x52": "active control",
     "0x60": "input select",
     "0x62": "volume",
-    "0x6C": "black level",
-    "0x6E": "black stabilizer",
-    "0x70": "gamma",
+    "0x6C": "video black level: red",
+    "0x6E": "video black level: green",
+    "0x70": "video black level: blue",
     "0x86": "display scaling",
     "0x87": "sharpness",
     "0xAC": "screen orientation",
@@ -263,7 +263,7 @@
     "0xCA": "OSD",
     "0xCC": "OSD language",
     "0xD6": "power mode",
-    "0xDF": "manufacturer specific",
+    "0xDF": "MCCS/VCP version",
     "0xE0": "manufacturer specific"
   },
   "post_build_safety_audit": {
@@ -273,18 +273,21 @@
     "byte_tables": "analysis/PATCH_BYTE_TABLES.md",
     "verifier": "analysis/verify_patch_safety.py",
     "full_control": {
-      "patch": "unlock_cmd_gate only; no additional firmware control implementation",
+      "patch": "carry-safe unlock plus E0/FE allowlisted offline hook prototype",
       "changed_bytes": [
         "12:68AD 64->E4",
         "12:68AE 02->00",
-        "12:68BD B4->E4",
-        "12:68BE 02->00",
-        "12:68BF 14->00"
+        "12:68BD B4->C3",
+        "12:68BE 02->74",
+        "12:68BF 14->02",
+        "Keil default pointer words at 12:5520 and 12:5EB3",
+        "Injected code at 12:FF00 and 12:FF60"
       ],
       "local_instruction_layout": "verified against stock bytes and OPLEN; independent radare2 disassembly",
       "global_stack_balance": "not proven",
-      "carry_semantics": "Removing AOCS CJNE preserves incoming carry instead of clearing it for operand 2; downstream sensitivity not proven",
-      "flash_safety": "not established"
+      "carry_semantics": "resolved by C3 74 02; see follow_up.carry_fix",
+      "flash_safety": "not established",
+      "status": "superseded by follow_up.control_hook; previous alias description is historical"
     },
     "native_hid_status_evidence": {
       "dll_sha256": "b20b55ff4c637a2f78ce03695c5ad52636e9d313b504dfe894d065b5215ca3d8",
@@ -335,6 +338,98 @@
       "static_reference_firmware": "F08",
       "comparison_scope": "Cross-version observation: live F06 replies do not validate F08 behavior. F08 patch byte findings are offline only; no F06 binary has been supplied.",
       "published_sanitized_report": "analysis/observations/f06-vcp-get-2026-10-24.json"
+    },
+    "follow_up": {
+      "carry_fix": {
+        "site": "12:68BD",
+        "stock": "B4 02 14",
+        "new": "C3 74 02",
+        "state": "A=2 CY=0 matching accepted stock comparison",
+        "cases": 131072,
+        "callees": [
+          "0:2C50 -> 18:F5B9",
+          "0:2B9C -> 18:FC60"
+        ]
+      },
+      "patch_scaffold": "strict identity/bank/length/bounds/overlap/output validation; stock banks 20..30 preserved during reassembly",
+      "menu_selectors": {
+        "page": 3,
+        "records": [
+          "9:9775",
+          "9:9777"
+        ],
+        "page_pointer": "9:E481",
+        "item_id": "9:E4B8",
+        "item_flag": "9:E4C7",
+        "physical_selection": "unproved"
+      },
+      "host_crc": {
+        "algorithm": "CRC-8 poly07 init00 refin=false refout=false xorout00 per 65536-byte bank",
+        "dll_sha256": "09586d4b2cfd5d80b20ad3bf2ee2b01fd080260f0753e83c8ec32eaf3b0ec652",
+        "function": "RFlash.dll:10002540",
+        "function_file_offset": "0x1940",
+        "function_size": 496,
+        "function_sha256": "d97be5736c67e3a0e87cb749fe0d115941fb7dea5d8be2a10c68d3313920d686",
+        "validation": "isolated native x86 emulation matches Python for zero/incrementing/stock-bank12 vectors",
+        "stock_bank12_crc": 79,
+        "limits": "Host flash/readback path only; boot authentication and recovery remain unproved"
+      },
+      "control_hook": {
+        "status": "offline prototype; never flashed or sent to F06",
+        "family": "E0/FE",
+        "GET_default_word": "12:5520 -> 12:FF60",
+        "SET_default_word": "12:5EB3 -> 12:FF00",
+        "GET_code_size": 111,
+        "SET_code_size": 70,
+        "read_allowlist": [
+          "D12D",
+          "D13D",
+          "D13E",
+          "D8FE"
+        ],
+        "write_allowlist": {
+          "D8FE": [
+            "00",
+            "10",
+            "20"
+          ]
+        },
+        "frame_checks": [
+          "51 header",
+          "85 GET / 86 SET length",
+          "XOR zero"
+        ],
+        "cases": 133376,
+        "changed_bytes_in_full_control": 189,
+        "limits": "erased bytes verified; indirect cave ownership, physical ingress and whole-system stack depth unproved"
+      },
+      "F06_hid_status": {
+        "report": "analysis/observations/f06-hid-status-2026-10-24.json",
+        "device_firmware": "F06",
+        "revision_query_raw": "6E 88 02 00 E0 38 FF FF 46 06 2C",
+        "integrity": "11-byte framed reply XOR=50, selector/header/length/result validated",
+        "values": {
+          "38": 17926,
+          "02": 10,
+          "07": 3,
+          "7F": 55,
+          "80": 1,
+          "81": 56,
+          "82": 0,
+          "83": 0
+        },
+        "limits": "counter units and transaction freshness unproved; no settings/protection/flash writes",
+        "standard_get_result": "6 strict replies pass; E0 rejected as vendor-shaped E0/32 reply (type=32, not standard 00/01)",
+        "standard_E0_analysis": {
+          "request_frame": "51 82 01 E0 32",
+          "reply_frame": "6E 88 02 00 E0 32 00 07 00 01 60",
+          "reply_xor": 80,
+          "standard_type_byte": 50,
+          "interpretation": "Checksum-valid vendor-shaped E0/32 reply, not a valid standard VCP reply. The unqualified E0 request checksum byte is also 32, consistent with it being consumed as a missing vendor selector; causation remains an inference without F06 code."
+        }
+      },
+      "verdict": "FAIL for flashing: physical selection, end-to-end patched transport, cave ownership, global stack, boot checks and recovery remain open",
+      "standard_code_labels_source": "https://www.ddcutil.com/vcpinfo_output/"
     }
   }
 }

@@ -18,6 +18,7 @@ import subprocess
 import build_custom as custom
 import build_variant as variant
 from oplen import OPLEN
+from control_hook import HOOK_PATCHES, SET_ENTRY, GET_ENTRY, SET_CODE, GET_CODE, verify_control_hook, apply_control_hook
 
 REPO = Path(__file__).resolve().parents[1]
 SHA256 = "3dd2e95afce675d3b299dc29bffa1bf43aaee5efdad12d88a562442804bfdf5f"
@@ -46,6 +47,25 @@ def relative_target(data, pc):
         return None
     rel = data[pc + size - 1]
     return (pc + size + (rel if rel < 128 else rel - 256)) & 0xFFFF
+
+
+def bank_crc8(data):
+    """RFlash.dll 09586d4b... @10002540: CRC-8 poly 07, init/xorout 0.
+
+    Bank includes all 65536 bytes, including erased tail. This is host flash
+    readback verification, not a stored image footer or boot authentication.
+    """
+    if len(data) != 0x10000:
+        raise ValueError("CRC input must be exactly one 64 KiB bank")
+    table = []
+    for value in range(256):
+        for _ in range(8):
+            value = ((value << 1) ^ 7) & 255 if value & 128 else (value << 1) & 255
+        table.append(value)
+    crc = 0
+    for byte in data:
+        crc = table[crc ^ byte]
+    return crc
 
 
 @lru_cache(maxsize=None)
@@ -93,8 +113,49 @@ def operations(source):
     yield "menu-actions (unreachable prototype)", sites, modified
 
 
+def verify_aocs_carry(source):
+    """Exhaust both incoming carries, all operands and all D12D flag values.
+
+    MOVX at 68C3 reloads A; no instruction up to the first call changes CY.
+    Compare patched execution with stock's accepted operand=2 path.
+    """
+    modified = bytearray(source)
+    custom.patch_unlock(modified, [])
+    code = bytes(modified[0xC68BD:0xC68C7])
+    assert code == bytes.fromhex("C3 74 02 90 D1 2D E0 44 02 F0")
+    cases = 0
+    for incoming_carry in (0, 1):
+        for operand in range(256):
+            for flags in range(256):
+                a, carry = operand, incoming_carry
+                pc, dptr, stored = 0, None, None
+                while pc < len(code):
+                    op = code[pc]
+                    if op == 0xC3:
+                        carry = 0; pc += 1
+                    elif op == 0x74:
+                        a = code[pc + 1]; pc += 2
+                        assert (a, carry) == (2, 0)
+                    elif op == 0x90:
+                        dptr = int.from_bytes(code[pc+1:pc+3], 'big'); pc += 3
+                    elif op == 0xE0:
+                        assert dptr == 0xD12D
+                        a = flags; pc += 1
+                    elif op == 0x44:
+                        a |= code[pc+1]; pc += 2
+                    elif op == 0xF0:
+                        stored = a; pc += 1
+                    else:
+                        raise AssertionError(f"unmodeled opcode {op:02X}")
+                assert (a, carry, stored, dptr) == (flags | 2, 0, flags | 2, 0xD12D)
+                cases += 1
+    return cases
+
+
 def verify():
     source = bytes(custom.load_source())
+    carry_cases = verify_aocs_carry(source)
+    hook_cases = verify_control_hook()
     assert hashlib.sha256(source).hexdigest() == SHA256
     for bank in range(20):
         path = REPO / f"analysis/banks/bank_{bank}.bin"
@@ -105,8 +166,8 @@ def verify():
              "All 20 extracted code banks match the stock image. Remaining 11 banks are covered by the image hash. Mutations below occur only in RAM.",
              "PASS applies to local encoding/layout only. Global stack, interrupts, bank switching,",
              "firmware integrity checks, hardware behavior and recoverability are not certified.", "",
-             "`full-control` changes exactly five bytes and is identical to `unlock_cmd_gate`.",
-             "There is no additional XDATA/event-control firmware implementation in that profile.", ""]
+             "`full-control` adds an offline E0/FE allowlisted XDATA/D8FE hook to the carry-safe unlock.",
+             f"Injected-code interpreter passes {hook_cases} cases; external runtime reachability and cave ownership remain unproved.", ""]
     count = 0
     unique = set()
     branches = set()
@@ -119,15 +180,25 @@ def verify():
             assert source[offset:offset + len(old)] == old
             assert modified[offset:offset + len(new)] == new
             allowed.update(range(offset, offset + len(old)))
+            if bank == 12 and addr in (0x5520, 0x5EB3):
+                unique.add((bank, addr, old, new))
+                # These are CCASE table DATA words, never 8051 instructions.
+                assert int.from_bytes(old, 'big') in (0x5D3D, 0x68CF)
+                assert int.from_bytes(new, 'big') in (GET_ENTRY, SET_ENTRY)
+                lines += [f"## {name}: {bank}:{addr:04X} (Keil default pointer data)", "",
+                          "| Bank:address | Stock | After | Kind |", "|---|---|---|---|",
+                          *[f"| {bank}:{addr+i:04X} | {a:02X} | {b:02X} | table data |" for i, (a,b) in enumerate(zip(old,new))], ""]
+                continue
             before_bank = source[bank * 0x10000:(bank + 1) * 0x10000]
             after_bank = modified[bank * 0x10000:(bank + 1) * 0x10000]
-            start, end = (0xFEFA, 0xFF1E) if addr == 0xFEFA else WINDOWS[bank]
+            hook = bank == 12 and addr in (SET_ENTRY, GET_ENTRY)
+            start, end = (addr, addr + len(new)) if hook else (0xFEFA, 0xFF1E) if addr == 0xFEFA else WINDOWS[bank]
             before_points = boundaries(before_bank, start, end)
             after_points = boundaries(after_bank, start, end)
             assert addr in before_points and addr in after_points
             assert addr + len(old) in before_points | {end}
             assert addr + len(new) in after_points | {end}
-            if addr != 0xFEFA:
+            if addr != 0xFEFA and not hook:
                 # No original entry boundary is lost, including potential incoming edges.
                 assert before_points <= after_points
             for version, data, points in (("stock", before_bank, before_points), ("patched", after_bank, after_points)):
@@ -139,11 +210,11 @@ def verify():
             # No new stack operations or direct SP writes occur in replacement blocks.
             for instruction in disassemble(new, addr):
                 op = int(instruction["bytes"][:2], 16)
-                assert op not in (0xC0, 0xD0, 0x22, 0x32), "unexpected stack opcode"
+                assert op not in (0xC0, 0xD0, 0x32) and (op != 0x22 or hook), "unexpected stack opcode"
                 if op == 0x12:
                     assert old == bytes.fromhex("12 97 DB") and new == bytes.fromhex("12 FE FA")
-                assert op in {0x00, 0x02, 0x12, 0x44, 0x60, 0x70, 0x7C, 0x7D,
-                              0x90, 0x94, 0xB4, 0xE0, 0xE4, 0xEB, 0xED, 0xEF, 0xF0}, "replacement opcode needs SP review"
+                assert hook or op in {0x00, 0x02, 0x12, 0x44, 0x60, 0x70, 0x7C, 0x7D,
+                              0x74, 0xC3, 0x90, 0x94, 0xB4, 0xE0, 0xE4, 0xEB, 0xED, 0xEF, 0xF0}, "replacement opcode needs SP review"
             key = (bank, addr, old, new)
             if key in unique:
                 continue
@@ -169,10 +240,16 @@ def verify():
         modified = bytearray(source)
         for patch in patches:
             variant.apply_patch(modified, patch)
-        if name in ("F08-unlock", "F08-full-control"):
+        if name == "F08-unlock":
             assert sum(a != b for a, b in zip(source, modified)) == 5
+        if name == 'F08-full-control':
+            unlocked = bytearray(source)
+            custom.patch_unlock(unlocked, [])
+            assert modified != unlocked
+            assert all(modified[b*65536+a:b*65536+a+len(new)] == new for b,a,old,new,_ in HOOK_PATCHES)
     full_control = bytearray(source)
     custom.patch_unlock(full_control, [])
+    apply_control_hook(full_control, [])
     begin, end = 0xC68A9, 0xC68D6
     old_context = {i['addr']: i for i in disassemble(source[begin:end], 0x68A9)}
     new_context = {i['addr']: i for i in disassemble(bytes(full_control[begin:end]), 0x68A9)}
@@ -196,18 +273,28 @@ def verify():
               "tail-jumps to 9:97DB with no additional stack use. Stock dispatcher return consumes",
               "that same address (SP -2), conditional on the unchanged dispatcher/callees returning.",
               "The APCS/AOCS handlers retain calls 0:2C50 and 0:2B9C and RET at 12:68D5.",
-              "Removing CJNE also removes its carry update: an accepted stock AOCS operand",
-              "clears C, whereas CLR A; NOP; NOP preserves incoming C. Callee sensitivity",
-              "to that difference remains unproven; encoding safety is not semantic equivalence.",
+              f"AOCS CLR C; MOV A,#2 matches the accepted stock A=2/CY=0 state; {carry_cases} cases pass.",
+              "MOVX at 12:68C3 reloads A before the request update; CY remains zero at 12:68C7.",
               "Cross-bank synthetic returns and ISR stack depth are outside this local proof.",
               "An unchanged call graph does not prove absence of overflow or balanced runtime SP.", "",
+              "New SET hook paths consume the existing return address once (RET); GET paths tail-jump",
+              "to stock checksum/send code at 12:5D5A. No injected PUSH/POP/LCALL or SP write occurs.",
+              "Unknown commands tail-jump to their original defaults. FE requests require exact length,",
+              "51 header and XOR=00. SET writes only D8FE values 00/10/20; GET reads only D12D/D13D/D13E/D8FE.",
               "All selected ranges end at instruction boundaries; no trailing instruction fragments.",
               "Unchanged bytes are included in the tables. Erased FF bytes decode as MOV R7,A;",
               "that does not prove the erased region is unreachable or available for a trampoline.",
               "Parameter samples cover all named presets and endpoints; arbitrary valid values only",
               "replace immediate operands (94 xx / 7C hi 7D lo), preserving the same boundaries.",
-              "Caller-provided JSON for patch.py is unbounded and has no universal byte inventory.",
-              "It lacks equal-length, bank, range, image-identity and instruction-layout guards.", "",
+              "patch.py validates stock identity, length, bounds, overlaps, bank selection and outputs.",
+              "Arbitrary JSON still requires its own instruction/semantic audit.", "",
+              "## Host per-bank verification CRC", "",
+              "RFlash.dll SHA-256 09586d4b2cfd5d80b20ad3bf2ee2b01fd080260f0753e83c8ec32eaf3b0ec652",
+              "implements CRC-8 (poly 07, init 00, refin/refout false, xorout 00) over each 65536-byte bank.",
+              "The native comparison at 10002CFD compares this with the scaler CRC result (register 75).",
+              "No stored trailer is repaired. All stock banks end in FFFF at FFFE; boot checks remain open.", "",
+              "| Bank | Stock CRC-8 | Full-control prototype CRC-8 |", "|---|---|---|",
+              *[f"| {b} | {bank_crc8(source[b*65536:(b+1)*65536]):02X} | {bank_crc8(full_control[b*65536:(b+1)*65536]):02X} |" for b in range(31)], "",
               f"Verified {count} transformations and {len(unique)} distinct site/replacement combinations.",
               "DO NOT FLASH. Local verification is not a finding of zero brick risk.", ""]
     return "\n".join(lines)

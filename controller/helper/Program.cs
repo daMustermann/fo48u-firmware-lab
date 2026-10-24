@@ -26,11 +26,12 @@ class Program
 
     static bool _opened = false;
 
-    static void Main()
+    static void Main(string[] args)
     {
+        bool readOnly = Array.IndexOf(args, "--read-only") >= 0;
         ushort vid = 0x0BDA;
         ushort pid = 0x1100;
-        Console.WriteLine(JsonSerializer.Serialize(new { ready = true, protocol = 2 }));
+        Console.WriteLine(JsonSerializer.Serialize(new { ready = true, protocol = 2, read_only = readOnly, status_query = true }));
         string? line;
         while ((line = Console.ReadLine()) != null)
         {
@@ -39,6 +40,8 @@ class Program
                 using var doc = JsonDocument.Parse(line);
                 var root = doc.RootElement;
                 string cmd = root.GetProperty("cmd").GetString() ?? "";
+                if (readOnly && cmd != "open" && cmd != "close" && cmd != "quit" && cmd != "status_query" && cmd != "ddc_query")
+                    throw new InvalidOperationException("command prohibited in read-only helper");
                 if (cmd == "open")
                 {
                     bool ok = Open_HID(vid, pid) > 0;
@@ -54,6 +57,38 @@ class Program
                 {
                     if (_opened) { Close_HID(); _opened = false; }
                     Console.WriteLine(JsonSerializer.Serialize(new { ok = true }));
+                }
+                else if (cmd == "status_query" || cmd == "ddc_query")
+                {
+                    if (!_opened) throw new InvalidOperationException("HID device is not open");
+                    byte selector = root.GetProperty("selector").GetByte();
+                    bool standard = cmd == "ddc_query";
+                    bool allowed = standard
+                        ? selector == 0x10 || selector == 0x12 || selector == 0x6C || selector == 0x6E || selector == 0x70 || selector == 0xDF || selector == 0xE0
+                        : selector == 0x02 || selector == 0x07 || selector == 0x38 || selector == 0x7F || selector == 0x80 || selector == 0x81 || selector == 0x82 || selector == 0x83;
+                    if (!allowed)
+                        throw new ArgumentException("selector is not an allowlisted status query");
+                    byte[] frame = new byte[36];
+                    frame[0] = 0x51; frame[1] = standard ? (byte)0x82 : (byte)0x83; frame[2] = 1;
+                    frame[3] = standard ? selector : (byte)0xE0;
+                    if (!standard) frame[4] = selector;
+                    int checksumIndex = standard ? 4 : 5;
+                    for (int k = 0; k < checksumIndex; k++) frame[checksumIndex] ^= frame[k];
+                    byte[] reply = new byte[36];
+                    IntPtr buf = Marshal.AllocHGlobal(36);
+                    try
+                    {
+                        Marshal.Copy(frame, 0, buf, 36);
+                        int writeStatus = HID_i2cwrite(buf, 36, 0x6E, 0);
+                        if (writeStatus != 0) throw new InvalidOperationException($"status query send failed: {writeStatus}");
+                        System.Threading.Thread.Sleep(150);
+                        Marshal.Copy(reply, 0, buf, 36);
+                        int readStatus = HID_i2cread(0x51, 1, buf, 36, 0x6E, 0, 100);
+                        if (readStatus != 0) throw new InvalidOperationException($"status query receive failed: {readStatus}");
+                        Marshal.Copy(buf, reply, 0, 36);
+                        Console.WriteLine(JsonSerializer.Serialize(new { ok = true, result = 0, bytes = Array.ConvertAll(reply, b => (int)b), query = Array.ConvertAll(frame, b => (int)b) }));
+                    }
+                    finally { Marshal.FreeHGlobal(buf); }
                 }
                 else if (cmd == "i2c_write")
                 {

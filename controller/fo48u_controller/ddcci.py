@@ -121,9 +121,9 @@ VCP_NAMES = {
     0x1A: "Blue gain",
     0x60: "Input select",
     0x62: "Volume",
-    0x6C: "Black level",
-    0x6E: "Black stabilizer",
-    0x70: "Gamma",
+    0x6C: "Video black level: Red",
+    0x6E: "Video black level: Green",
+    0x70: "Video black level: Blue",
     0x87: "Sharpness",
     0xAC: "Horizontal frequency",
     0xAE: "Vertical frequency",
@@ -131,7 +131,7 @@ VCP_NAMES = {
     0xCA: "OSD / button control",
     0xCC: "OSD language",
     0xD6: "Power mode",
-    0xDF: "Manufacturer specific",
+    0xDF: "MCCS/VCP version",
     0xE0: "Manufacturer specific",
 }
 

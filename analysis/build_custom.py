@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import pathlib
 import sys
+from control_hook import apply_control_hook, HOOK_PATCHES
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 SRC = REPO / "firmware" / "F08-20221115" / "FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin"
@@ -79,7 +80,9 @@ def patch_unlock(data: bytearray, notes: list[str]) -> None:
     expect(data, *UNLOCK_SITES[0], "unlock APCS command gate")
     expect(data, *UNLOCK_SITES[1], "unlock AOCS command gate")
     put(data, 12, 0x68AD, bytes.fromhex("E4 00"))
-    put(data, 12, 0x68BD, bytes.fromhex("E4 00 00"))
+    # Match the stock CJNE's accepted state exactly: A=2, CY=0.
+    # MOVX at 68C3 subsequently reloads A, but carry survives into the calls.
+    put(data, 12, 0x68BD, bytes.fromhex("C3 74 02"))
     notes.append(
         "bank 12 0x68AD/0x68BD: removed the `0xCFDE == 2` gate in front of the "
         "APCS/AOCS command entries"
@@ -168,6 +171,7 @@ def verify_all() -> None:
         ("AOCS divisor", *AOCS_SITE),
         ("TSS interval", *TSS_SITE),
         ("UI dispatcher call", *MENU_UI_CALL_SITE),
+        *[("control hook", bank, address, old) for bank, address, old, _, _ in HOOK_PATCHES],
     ]
     print(f"source: {SRC}")
     print(f"size:   {SRC_SIZE} bytes")
@@ -206,6 +210,9 @@ def build(args: argparse.Namespace) -> dict[str, object]:
     if args.unlock:
         patch_unlock(data, notes)
         patches.append("unlock")
+    if getattr(args, "full_control", False):
+        apply_control_hook(data, notes)
+        patches.append("control-hook-prototype")
     if args.menu_actions:
         patch_menu_actions(data, notes)
         patches.append("menu-actions")
@@ -318,6 +325,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--name", default="F08-custom", help="output base name")
     parser.add_argument("--description", default="", help="manifest description")
     parser.add_argument("--unlock", action="store_true", help="OFFLINE RESEARCH ONLY / DO NOT FLASH: remove unvalidated APCS/AOCS command operand check")
+    parser.add_argument("--full-control", action="store_true", help="OFFLINE ONLY: allowlisted E0/FE XDATA prototype; no flash-safety claim")
     parser.add_argument("--menu-actions", action="store_true", help="unreachable APCS/AOCS menu-hook prototype (disabled by default)")
     parser.add_argument("--allow-unreachable-menu-prototype", action="store_true",
                         help="explicitly emit known nonfunctional prototype for OFFLINE RESEARCH ONLY; DO NOT FLASH")
@@ -349,14 +357,14 @@ def main(argv: list[str]) -> int:
         "menu-quiet": dict(unlock=True, menu_actions=True, apcs=36),
         "menu-no-nag": dict(unlock=True, menu_actions=True, apcs=36, tss=0),
         "menu-care": dict(unlock=True, menu_actions=True, apcs=8, aocs=750, tss=12),
-        "full-control": dict(unlock=True),
+        "full-control": dict(unlock=True, full_control=True),
     }
     preset_descriptions = {
         "menu": "unreachable menu prototype with stock schedule",
         "menu-quiet": "unreachable menu prototype + APCS 36 h; TSS unchanged",
         "menu-no-nag": "unreachable menu prototype + APCS 36 h + TSS 255 h",
         "menu-care": "unreachable menu prototype + APCS 8 h / AOCS 750 h / TSS 12 h",
-        "full-control": "unlock command gate + documented host-side full software-control profile",
+        "full-control": "OFFLINE E0/FE allowlisted XDATA/D8FE hook prototype + carry-safe command unlock; DO NOT FLASH",
     }
     # Explicitly label the UI-scoped, unreachable research implementation.
     preset_output_names = {

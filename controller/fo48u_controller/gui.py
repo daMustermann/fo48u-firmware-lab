@@ -541,6 +541,12 @@ class Fo48uGui:
             self._refresh_info()
         except Exception as exc:
             self.connected.set(False)
+            for resource in (self.transport, self.ddc):
+                if resource is not None:
+                    try:
+                        resource.close()
+                    except Exception as cleanup_error:
+                        self.log(f"Connection cleanup failed: {cleanup_error}")
             self.transport = None
             self.care = None
             self.ddc = None
@@ -626,7 +632,9 @@ class Fo48uGui:
             return
         from tkinter import messagebox
         if kind == "aocs":
-            self.log("Note: AOCS may only act after ~1500 panel hours (firmware threshold).")
+            self.log("AOCS execution is unavailable in the GUI; no command sent.")
+            return
+        if not messagebox.askyesno("Confirm OLED care", f"Send the experimental {kind.upper()} compensation request?"):
             return
 
         def work():

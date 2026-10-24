@@ -162,3 +162,12 @@ fi
 The REA invocation requires a Linux-compatible installation. On WSL2/Linux it works when `REA_BINWALK_COMMAND` points to a Linux `binwalk` on `PATH` (the example above sets it with `readlink -f`); no REA scan result is guaranteed in every environment, and the standalone Binwalk scan remains the tested fallback. A short `gpg_signed`-like signature candidate at file offset `0x5A3F5` lies inside apparent table data and **does not establish the presence of a signed GPG payload**. Treat signature scans as leads rather than proof of embedded formats.
 
 A monitor-connected read-only GET-VCP `E0` probe also yielded a generic-looking reply. It does not prove a callable vendor command. The active work is mapping packet ingress and joystick selection; no firmware is considered ready for hardware flashing.
+
+## Post-build verification
+
+The [2026-10-24 safety audit](POST_BUILD_AUDIT.md) and
+[byte/disassembly tables](PATCH_BYTE_TABLES.md) distinguish local encoding checks
+from the unresolved stack, transport, recovery and flash-safety questions.
+`python analysis/verify_patch_safety.py` reproduces the tables without writing
+firmware; it requires radare2. `controller/live_probe.py` provides an independent
+GET-only Windows hardware report. No modified image is approved for flashing.

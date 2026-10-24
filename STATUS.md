@@ -1,6 +1,6 @@
 # Current research status
 
-**Target:** Gigabyte AORUS FO48U · **Image:** F08 / 2022-11-15 · **Method:** static firmware analysis and read-only host observations.
+**Target:** Gigabyte AORUS FO48U · **Static image:** F08 / 2022-11-15 · **Live monitor:** F06 (owner-reported; not updated to F08) · **Method:** static firmware analysis and read-only host observations.
 
 | Track | Status | Scope |
 | :-- | :-- | :-- |
@@ -23,6 +23,30 @@
 | ASC auto-dimming | **Documented** | Manual documents 10-min 50% dim and 15-min screensaver; not a verified firmware patch target |
 
 The observations are specific to the hash-identified binary. Static analysis alone cannot establish a reliable manual refresh procedure.
+
+## Post-build safety audit (2026-10-24)
+
+Base commit `5fa02eb` has **no flash-safety approval**. The `full-control`
+profile changes only the same five command-gate bytes as `unlock`. Fixed patch
+sites pass local instruction-boundary and relative-branch checks, but global
+stack safety, AOCS carry propagation, recovery and hardware execution remain
+unproved. The menu hook remains unreachable for actions 23/24. The generic
+`patch.py` scaffold can resize banks and is outside the fixed-site guarantee.
+
+The independent GET-only probe completed on the attached FO48U running **F06**
+(owner-reported): **37 responses
+and 219 failures across 256 codes**, with no Set-VCP, HID or compensation request.
+Unadvertised `E0` again matched advertised `DF` (`0202/FFFF`), so this does not
+prove a vendor unlock. Controller failure-status/buffer handling and dry-run
+isolation were corrected; full OLED reply validation and selected-monitor GUI
+writes remain incomplete. The updated helper requires protocol 2 and rejects
+stale builds. See the [full audit](analysis/POST_BUILD_AUDIT.md),
+[complete byte tables](analysis/PATCH_BYTE_TABLES.md), and local ignored JSON
+report at `controller/live-probe-2026-10-24.json`.
+The [sanitized F06 observation](analysis/observations/f06-vcp-get-2026-10-24.json)
+provides the 256 per-code results without host/device identifiers.
+These live results do not validate F08 behavior. The byte audit covers only the
+F08 reference image; no F06 binary has been supplied for static comparison.
 
 ## Key addresses
 

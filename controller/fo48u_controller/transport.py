@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import ctypes
 import os
-from ctypes import c_byte, c_int, c_ushort, c_uint, c_void_p
+from ctypes import c_ubyte as c_byte, c_int, c_ushort, c_uint, c_void_p
 from typing import List, Optional
 
 
@@ -27,6 +27,7 @@ class RtHidTransport:
         self.dll = ctypes.CDLL(dll_path)
         self.vid = vid
         self.pid = pid
+        self._opened = False
         self._setup_signatures()
 
     def _setup_signatures(self) -> None:
@@ -49,19 +50,38 @@ class RtHidTransport:
         self.dll.Open_mutiHID.restype = c_int
 
     def open(self) -> None:
-        if not self.dll.Open_HID(self.vid, self.pid):
+        self._opened = self.dll.Open_HID(self.vid, self.pid) > 0
+        if not self._opened:
             # Sidekick also probes the multi-HID list before retrying.
             index = self.dll.Get_mutiHID(self.vid, self.pid)
-            if index:
-                self.dll.Open_mutiHID(0)
+            if index > 0:
+                # Installed RtHIDLib: Open_HID returns a count, whereas
+                # Open_mutiHID and I2C operations return zero on success.
+                self._opened = self.dll.Open_mutiHID(0) == 0
+        if not self._opened:
+            raise OSError("Realtek HID device could not be opened")
 
     def close(self) -> None:
-        self.dll.Close_HID()
+        if self._opened:
+            self.dll.Close_HID()
+            self._opened = False
+
+    def _require_open(self) -> None:
+        if not self._opened:
+            raise OSError("Realtek HID device is not open")
 
     def i2c_write(self, buffer: List[int], slave: int = 0x6E, speed: int = 0) -> int:
-        arr = (c_byte * len(buffer))(*[b & 0xFF for b in buffer])
+        self._require_open()
+        if not 1 <= len(buffer) <= 128 or any(type(b) is not int or not 0 <= b <= 255 for b in buffer):
+            raise ValueError("I2C write requires 1..128 bytes")
+        if not 0 <= slave <= 255 or not 0 <= speed <= 255:
+            raise ValueError("slave and speed must be bytes")
+        arr = (c_byte * len(buffer))(*buffer)
         ptr = ctypes.cast(arr, c_void_p)
-        return int(self.dll.HID_i2cwrite(ptr, len(buffer), slave, speed))
+        result = int(self.dll.HID_i2cwrite(ptr, len(buffer), slave, speed))
+        if result != 0:
+            raise OSError(f"HID_i2cwrite failed: status={result}")
+        return result
 
     def i2c_read(
         self,
@@ -72,7 +92,14 @@ class RtHidTransport:
         speed: int = 0,
         timeout: int = 100,
     ) -> List[int]:
+        self._require_open()
+        if not 1 <= buf_len <= 128 or not 0 <= reg_addr <= 0xFFFFFFFF or not 0 <= reg_len <= 4:
+            raise ValueError("invalid I2C read range")
+        if not 0 <= slave <= 255 or not 0 <= speed <= 255 or not 0 <= timeout <= 0xFFFFFFFF:
+            raise ValueError("invalid I2C slave, speed or timeout")
         arr = (c_byte * buf_len)()
         ptr = ctypes.cast(arr, c_void_p)
-        self.dll.HID_i2cread(reg_addr, reg_len, ptr, buf_len, slave, speed, timeout)
+        result = int(self.dll.HID_i2cread(reg_addr, reg_len, ptr, buf_len, slave, speed, timeout))
+        if result != 0:
+            raise OSError(f"HID_i2cread failed: status={result}")
         return [b & 0xFF for b in arr]

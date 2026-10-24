@@ -1,0 +1,1463 @@
+{
+  "schema_version": 1,
+  "observed_utc": "2026-10-24T02:36:19.731949+00:00",
+  "monitor_model": "AORUS FO48U",
+  "device_firmware": {
+    "version": "F06",
+    "source": "owner_reported_after_capture",
+    "verified_by_probe": false
+  },
+  "method": "Windows Dxva2 GetVCPFeatureAndVCPFeatureReply; one GET per code 00..FF",
+  "writes_sent": 0,
+  "complete": true,
+  "comparison_scope": "Static references describe F08; captured live responses are from F06 per the owner. This is not live validation of F08. No F06 firmware binary has been byte-audited.",
+  "static_reference_image": {
+    "path": "firmware/F08-20221115/FO48U_MP_F08_20221115_r9120_SIDEKICK_USE.bin",
+    "size": 2031616,
+    "sha256": "3dd2e95afce675d3b299dc29bffa1bf43aaee5efdad12d88a562442804bfdf5f",
+    "md5": "d4324c6c88abea48b1ee896f7e14ee9f",
+    "scaler": "Realtek RTD2718",
+    "architecture": "banked 8051 (Keil C51)"
+  },
+  "reference_files_at_capture": [
+    {
+      "path": "analysis/knowledge_base.json",
+      "sha256": "75e1ef79f97f9f005e41bf99dab086ac332c858b3cd419a10038a11ee3b2e9e9"
+    },
+    {
+      "path": "analysis/atlas/SWITCH_TABLES.md",
+      "sha256": "c2021a9dfc64813514bf2b464c3bbe2c1700f6c5794c8ecf13aaa5f08118b910"
+    }
+  ],
+  "capabilities": {
+    "error": null,
+    "raw": "(prot(monitor)type(LCD)model(AORUS)cmds(01 02 03 07 0C E3 F3)vcp(02 04 05 06 08 0B 0C 10 12 14(01 02 04 05 06 08 0B) 16 18 1A 52 60(01 03 0F 11) 87 AC AE B2 B6 C6 C8 CA CC(01 02 03 04 06 0A 0D) D6(01 04 05) DF FD FF)mswhql(1)asset_eep(40)mccs_ver(2.2))"
+  },
+  "vcp": {
+    "0x00": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x01": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x02": {
+      "status": "responded",
+      "current": 1,
+      "maximum_raw": 2,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x03": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x04": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x05": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x06": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x07": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x08": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x09": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x0A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x0B": {
+      "status": "responded",
+      "current": 100,
+      "maximum_raw": 0,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x0C": {
+      "status": "responded",
+      "current": 45,
+      "maximum_raw": 63,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x0D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x0E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x0F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x10": {
+      "status": "responded",
+      "current": 50,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x11": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x12": {
+      "status": "responded",
+      "current": 50,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x13": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x14": {
+      "status": "responded",
+      "current": 6,
+      "maximum_raw": 11,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x15": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x16": {
+      "status": "responded",
+      "current": 128,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x17": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x18": {
+      "status": "responded",
+      "current": 122,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x19": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x1A": {
+      "status": "responded",
+      "current": 107,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x1B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x1C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x1D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x1E": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x1F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x20": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x21": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x22": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x23": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x24": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x25": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x26": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x27": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x28": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x29": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x2A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x2B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x2C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x2D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x2E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x2F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x30": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x31": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x32": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x33": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x34": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x35": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x36": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x37": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x38": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x39": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x3A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x3B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x3C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x3D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x3E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x3F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x40": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x41": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x42": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x43": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x44": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x45": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x46": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x47": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x48": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x49": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x4A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x4B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x4C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x4D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x4E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x4F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x50": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x51": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x52": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 1,
+      "vcp_type_raw": 0,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x53": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x54": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x55": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x56": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x57": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x58": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x59": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x5A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x5B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x5C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x5D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x5E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x5F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x60": {
+      "status": "responded",
+      "current": 15,
+      "maximum_raw": 3,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x61": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x62": {
+      "status": "responded",
+      "current": 30,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x63": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x64": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x65": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x66": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x67": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x68": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x69": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x6A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x6B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x6C": {
+      "status": "responded",
+      "current": 50,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x6D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x6E": {
+      "status": "responded",
+      "current": 50,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x6F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x70": {
+      "status": "responded",
+      "current": 50,
+      "maximum_raw": 100,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x71": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x72": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x73": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x74": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x75": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x76": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x77": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x78": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x79": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x7A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x7B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x7C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x7D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x7E": {
+      "status": "get_failed",
+      "win32_error": -1071241846,
+      "advertised": false
+    },
+    "0x7F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x80": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x81": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x82": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x83": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x84": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x85": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x86": {
+      "status": "responded",
+      "current": 2,
+      "maximum_raw": 0,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0x87": {
+      "status": "responded",
+      "current": 5,
+      "maximum_raw": 10,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0x88": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x89": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x8A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x8B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x8C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x8D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x8E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x8F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x90": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x91": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x92": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x93": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x94": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x95": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x96": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x97": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x98": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x99": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x9A": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x9B": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x9C": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x9D": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x9E": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0x9F": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA0": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA1": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA2": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA3": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA4": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA5": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA6": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA7": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA8": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xA9": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xAA": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xAB": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xAC": {
+      "status": "responded",
+      "current": 4,
+      "maximum_raw": 59900,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xAD": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xAE": {
+      "status": "responded",
+      "current": 6040,
+      "maximum_raw": 65535,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xAF": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB0": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB1": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB2": {
+      "status": "responded",
+      "current": 1,
+      "maximum_raw": 1,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xB3": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB4": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB5": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB6": {
+      "status": "responded",
+      "current": 3,
+      "maximum_raw": 5,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xB7": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB8": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xB9": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xBA": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xBB": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xBC": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xBD": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xBE": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xBF": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC0": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC1": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC2": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC3": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC4": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC5": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC6": {
+      "status": "responded",
+      "current": 90,
+      "maximum_raw": 255,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xC7": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xC8": {
+      "status": "responded",
+      "current": 9,
+      "maximum_raw": 0,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xC9": {
+      "status": "responded",
+      "current": 1,
+      "maximum_raw": 65535,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0xCA": {
+      "status": "responded",
+      "current": 1,
+      "maximum_raw": 2,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xCB": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xCC": {
+      "status": "responded",
+      "current": 4,
+      "maximum_raw": 13,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xCD": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xCE": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xCF": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD0": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD1": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD2": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD3": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD4": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD5": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD6": {
+      "status": "responded",
+      "current": 1,
+      "maximum_raw": 5,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xD7": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD8": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xD9": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xDA": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xDB": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xDC": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xDD": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xDE": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xDF": {
+      "status": "responded",
+      "current": 514,
+      "maximum_raw": 65535,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": true
+    },
+    "0xE0": {
+      "status": "responded",
+      "current": 514,
+      "maximum_raw": 65535,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0xE1": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE2": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE3": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE4": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE5": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE6": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE7": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE8": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xE9": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xEA": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xEB": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xEC": {
+      "status": "responded",
+      "current": 0,
+      "maximum_raw": 0,
+      "vcp_type_raw": 1,
+      "win32_error": null,
+      "advertised": false
+    },
+    "0xED": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xEE": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xEF": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF0": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF1": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF2": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF3": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF4": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF5": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF6": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF7": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF8": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xF9": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xFA": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xFB": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xFC": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xFD": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": true
+    },
+    "0xFE": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": false
+    },
+    "0xFF": {
+      "status": "get_failed",
+      "win32_error": -1071241852,
+      "advertised": true
+    }
+  },
+  "summary": {
+    "responded": 37,
+    "get_failed": 219,
+    "not_attempted": 0,
+    "identical_reply_groups": [
+      [
+        "0x02",
+        "0xCA"
+      ],
+      [
+        "0x04",
+        "0x05",
+        "0x06",
+        "0x08",
+        "0x1E",
+        "0x20",
+        "0x30",
+        "0x52"
+      ],
+      [
+        "0x10",
+        "0x12",
+        "0x6C",
+        "0x6E",
+        "0x70"
+      ],
+      [
+        "0xDF",
+        "0xE0"
+      ]
+    ],
+    "interpretation": "A successful GET is a response observation, not SET acceptance or proof of vendor-handler reachability. Identical replies can be legitimate or generic fallback. Maximum is undefined for non-continuous controls."
+  },
+  "publication_scope": "Only model, firmware provenance, capabilities and VCP outcomes are retained. Host paths, serials, PnP instance identifiers and monitor handles are omitted."
+}

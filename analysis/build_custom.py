@@ -331,7 +331,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--no-manifest", action="store_true", help="retain the existing multi-variant manifest")
     parser.add_argument(
         "--preset",
-        choices=["menu", "menu-quiet", "menu-no-nag", "menu-care", "all"],
+        choices=["menu", "menu-quiet", "menu-no-nag", "menu-care", "full-control", "all"],
         help="build a named preset (all = every preset)",
     )
     args = parser.parse_args(argv[1:])
@@ -364,6 +364,7 @@ def main(argv: list[str]) -> int:
         "menu-quiet": "F08-menu-ui-scoped-quiet",
         "menu-no-nag": "F08-menu-ui-scoped-no-nag",
         "menu-care": "F08-menu-ui-scoped-care",
+        "full-control": "F08-full-control",
     }
 
     verify_all()

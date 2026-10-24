@@ -660,3 +660,7 @@ Disassembly from 6:A15B writes R5 or 0x01 to XDATA 0xFFAE. This is a 0xFFAE stat
 - XDATA 0XFFE7: 12 direct reads, 0 direct writes.
 - XDATA 0XFFE5: 15 direct reads, 1 direct writes.
 - XDATA 0XFFE4: 15 direct reads, 0 direct writes.
+
+## AOCS execution note
+
+AOCS (1500 h threshold) may not produce a visible action on panels below the degradation threshold. APCS was verified on user hardware; AOCS remains to be validated on a panel that meets the threshold.

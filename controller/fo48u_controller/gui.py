@@ -621,7 +621,8 @@ class Fo48uGui:
             messagebox.showinfo("Read-only", "Enable write access first.")
             return
         from tkinter import messagebox
-        if not messagebox.askyesno("Confirm", f"Send unverified {kind.upper()} execution frame?"):
+        if kind == "aocs":
+            self.log("Note: AOCS may only act after ~1500 panel hours (firmware threshold).")
             return
 
         def work():
